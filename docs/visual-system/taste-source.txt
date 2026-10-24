@@ -1,0 +1,24 @@
+TASTESKILL · LINT   18 file(s)
+
+WARN
+  [numbering] Decorative index numbering (01 / 02 / 03).  (2×)
+      admin-web/src/App.tsx:774  "09"
+      maintenance-web/src/App.tsx:774  "09"
+  [shadow] Shadow. Elements at rest carry none; only real overlays (menu, dialog, sticky bar) may.  (20×)
+      admin-web/src/styles/app.css:1108  box-shadow:
+      admin-web/src/styles/app.css:1137  box-shadow:
+      admin-web/src/styles/premium.css:21  box-shadow:
+      admin-web/src/styles/premium.css:54  box-shadow:
+      admin-web/src/styles/visual-system.css:13  box-shadow:
+      admin-web/src/styles/visual-system.css:14  box-shadow:
+      … 14 more
+  [glass] Backdrop blur. One sticky bar at most; glass cards are a tell.  (4×)
+      admin-web/src/styles/visual-system.css:30  backdrop-filter:
+      admin-web/src/styles/visual-system.css:41  backdrop-filter:
+      maintenance-web/src/styles/visual-system.css:30  backdrop-filter:
+      maintenance-web/src/styles/visual-system.css:41  backdrop-filter:
+  [em-dash] Em-dash habit. Use a full stop or a comma; keep at most one or two on a page.  (1×)
+      (all files):0  6 em dashes
+
+RESULT: 0 FAIL, 27 WARN
+Interface fragments marked data-ui keep their own borders and shadows. Any other line that must keep a flagged pattern for a real reason can carry the comment taste-skill-ignore.

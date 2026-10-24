@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "Protected citizen page requires login; no automatic demo session",
+    "Three-step signup, private address, preserved details and password visibility",
+    "Citizen can review and correct private address in profile",
+    "Logout revokes session and protects report routes after reload",
+    "Wrong password feedback and valid password login",
+    "Duplicate/weak registration, role mismatch, created-account demo bypass and forged sessions rejected",
+    "Admin-provisioned staff password login; visible staff logout; no profile account switchers",
+    "Expired sessions rejected",
+    "32 responsive authentication screen/theme/width checks plus registration address/password screenshots"
+  ],
+  "errors": []
+}

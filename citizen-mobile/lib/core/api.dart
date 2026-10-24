@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'models.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 class PatagStore extends ChangeNotifier {
   static const baseUrl = String.fromEnvironment('API_URL', defaultValue: 'http://10.0.2.2:4100/api');
   String? token;
@@ -41,6 +42,7 @@ class PatagStore extends ChangeNotifier {
     if (response.statusCode >= 400) {
       if (response.statusCode == 401) {
         token = null;
+        user=null; reports=[]; notifications=[];
         timer?.cancel();
         notifyListeners();
       }
@@ -106,6 +108,8 @@ class PatagStore extends ChangeNotifier {
     }
     catch (_) {
     }
+    final preferences=await SharedPreferences.getInstance();
+    await preferences.remove('patag-draft');
     token=null;
     user=null;
     reports=[];

@@ -1,10 +1,5 @@
-@font-face {
-  font-family: Lilita One;
-  src: url("/assets/LilitaOne-Regular.ttf") format("truetype");
-  font-display: swap;
-}
 :root {
-  font-family: Arial, sans-serif;
+  font-family: Montserrat, sans-serif;
   color: #182b49;
   background: #f7f1eb;
   font-synthesis: none;
@@ -45,7 +40,7 @@ button,
   padding: 10px 15px;
   border: 1px solid #cbd0d5;
   border-radius: 7px;
-  background: white;
+  background: var(--surface);
   color: var(--ink);
   cursor: pointer;
   font-weight: 600;
@@ -80,14 +75,14 @@ textarea {
   min-height: 42px;
   border: 1px solid #bdc4cb;
   border-radius: 6px;
-  background: white;
+  background: var(--surface);
   padding: 10px 12px;
   max-width: 100%;
   min-width: 0;
 }
 input::placeholder,
 textarea::placeholder {
-  color: #68737f;
+  color: var(--slate);
 }
 textarea {
   resize: vertical;
@@ -122,8 +117,7 @@ p {
 }
 h1 {
   font-family:
-    Lilita One,
-    Arial,
+    Montserrat,
     sans-serif;
   font-weight: 400;
   font-size: 32px;
@@ -296,7 +290,7 @@ small {
   align-items: center;
   justify-content: space-between;
   padding: 0 36px;
-  background: #fff;
+  background: var(--surface);
   border-bottom: 1px solid var(--line);
   font-size: 12px;
 }
@@ -344,7 +338,7 @@ main#main {
 }
 .page-heading p {
   margin-bottom: 0;
-  color: #5e6b79;
+  color: var(--slate);
   font-size: 13px;
 }
 .scope {
@@ -508,7 +502,7 @@ main#main {
 .report-row small {
   display: block;
   font-size: 11px;
-  color: #657180;
+  color: var(--slate);
   line-height: 1.7;
   margin-top: 4px;
 }
@@ -604,13 +598,13 @@ main#main {
   object-fit: contain;
 }
 .community-strip h2 {
-  font-family: Lilita One;
+  font-family: Montserrat, sans-serif;
   font-weight: 400;
   font-size: 24px;
 }
 .community-strip p {
   font-size: 12px;
-  color: #5a6673;
+  color: var(--slate);
   margin: 5px 0 0;
 }
 .community-strip > a {
@@ -658,7 +652,7 @@ main#main {
   gap: 9px;
   border: 1px solid #bdc4cb;
   border-radius: 6px;
-  background: white;
+  background: var(--surface);
   padding: 0 12px;
   margin: 0;
   flex: 1;
@@ -712,7 +706,7 @@ table {
 }
 th {
   text-align: left;
-  color: #626d7b;
+  color: var(--slate);
   font-weight: 400;
   font-size: 11px;
   padding: 11px 10px;
@@ -755,7 +749,7 @@ td:last-child {
 .table-identity small {
   display: block;
   font-size: 11px;
-  color: #657180;
+  color: var(--slate);
   margin-top: 4px;
 }
 .row-action {
@@ -768,7 +762,7 @@ td:last-child {
 .sub-state {
   display: block;
   font-size: 11px;
-  color: #68737f;
+  color: var(--slate);
   margin-top: 5px;
   max-width: 200px;
 }
@@ -826,7 +820,7 @@ td:last-child {
   align-items: center;
   justify-content: space-between;
   font-size: 11px;
-  color: #616b78;
+  color: var(--slate);
   padding-top: 6px;
 }
 .detail-list {
@@ -841,7 +835,7 @@ td:last-child {
   padding: 13px 0;
 }
 .detail-list dt {
-  color: #657180;
+  color: var(--slate);
   flex: none;
 }
 .detail-list dd {
@@ -863,7 +857,7 @@ td:last-child {
   margin: 6px 0;
 }
 .location-detail small {
-  color: #637080;
+  color: var(--slate);
 }
 .external-link {
   display: flex;
@@ -883,7 +877,7 @@ td:last-child {
 }
 .action-stack p {
   font-size: 12px;
-  color: #5e6b79;
+  color: var(--slate);
 }
 .timeline {
   padding: 0;
@@ -917,11 +911,11 @@ td:last-child {
 .timeline p {
   font-size: 12px;
   margin: 6px 0;
-  color: #5e6b79;
+  color: var(--slate);
 }
 .timeline small {
   font-size: 11px;
-  color: #5e6b79;
+  color: var(--slate);
 }
 .duplicate-link {
   display: grid;
@@ -933,7 +927,7 @@ td:last-child {
 }
 .duplicate-link span {
   font-size: 11px;
-  color: #627080;
+  color: var(--slate);
 }
 .duplicate-link > svg {
   position: absolute;
@@ -1018,7 +1012,7 @@ td:last-child {
 }
 .notice-row small {
   display: block;
-  color: #64717e;
+  color: var(--slate);
   font-size: 11px;
   margin-top: 5px;
 }
@@ -1034,7 +1028,7 @@ td:last-child {
 }
 .settings-row > div:first-child p {
   font-size: 13px;
-  color: #617080;
+  color: var(--slate);
   max-width: 300px;
   margin-top: 10px;
 }
@@ -1044,7 +1038,7 @@ td:last-child {
 .empty {
   text-align: center;
   padding: 32px 16px;
-  color: #5d6d7e;
+  color: var(--slate);
 }
 .empty img {
   width: 80px;
@@ -1089,7 +1083,7 @@ td:last-child {
 .upload span {
   font-size: 11px;
   font-weight: 400;
-  color: #637080;
+  color: var(--slate);
 }
 .upload input {
   margin-top: 14px;
@@ -1207,17 +1201,17 @@ dialog header {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  background: #fff;
+  background: var(--surface);
 }
 .login-form h2 {
-  font-family: Lilita One;
+  font-family: Montserrat, sans-serif;
   font-weight: 400;
   font-size: 36px;
   line-height: 1.1;
   margin: 20px 0 12px;
 }
 .login-form > p {
-  color: #64707d;
+  color: var(--slate);
   font-size: 14px;
   margin-bottom: 28px;
 }
@@ -1240,7 +1234,7 @@ dialog header {
 }
 .demo-access p {
   font-size: 12px;
-  color: #637080;
+  color: var(--slate);
   margin: 10px 0 16px;
 }
 .demo-access button {
@@ -1266,7 +1260,7 @@ dialog header {
   font-size: 40px;
 }
 .success p {
-  color: #5e6b79;
+  color: var(--slate);
 }
 .loading {
   text-align: center;
@@ -1280,14 +1274,14 @@ dialog header {
   font-size: 26px;
 }
 .loading p {
-  color: #617080;
+  color: var(--slate);
 }
 .skip-link {
   position: fixed;
   top: -80px;
   left: 20px;
   z-index: 9999;
-  background: white;
+  background: var(--surface);
   padding: 12px;
 }
 .skip-link:focus {
@@ -1703,7 +1697,7 @@ dialog header {
   border-radius: 7px;
 }
 .workflow-counts span {
-  color: #606c79;
+  color: var(--slate);
 }
 .workflow-counts strong {
   margin-left: auto;

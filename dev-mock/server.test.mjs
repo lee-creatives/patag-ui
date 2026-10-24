@@ -30,6 +30,8 @@ test('HTTP cross-role flow, evidence validation, privacy, ownership, feedback an
   assert.equal((await event('assign',{teamId:'team-1'})).status,409);
   assert.equal((await event('verify')).data.status,'Verified');await event('assign',{teamId:'team-1',note:'Inspect the outer lane'});
   assert.ok((await call('/bootstrap',undefined,crew)).data.reports.some(r=>r.id===id));
+  const beforeCount=created.data.photos.length;
+  const before=await event('before-photos',{photos:[photo]},crew);assert.equal(before.status,200);assert.equal(before.data.photos.length,beforeCount+1);assert.equal(before.data.status,'Assigned');
   await event('start',{},crew);await event('progress',{note:'Site prepared'},crew);
   assert.equal((await event('resolve',{},crew)).status,409);
   assert.equal((await event('complete',{note:'Repaired'},crew)).status,400);

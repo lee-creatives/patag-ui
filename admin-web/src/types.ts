@@ -53,6 +53,7 @@ export interface Report {
   jurisdiction: string;
   history: History[];
   flagged: boolean;
+  publicPhotosApproved?: boolean;
   duplicateOf?: string;
   assignment: {
     teamId: string;
@@ -92,6 +93,8 @@ export interface Notice {
   at: string;
 }
 export interface Bootstrap {
+  settings?: {agency:string;city:string;province:string};
+  demo?: boolean;
   reports: Report[];
   teams: Team[];
   users: User[];

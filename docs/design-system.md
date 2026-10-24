@@ -1,30 +1,40 @@
 # PATAG design system
 
-## Brand and typography
+Updated 23 October 2026. Applies to the existing LGU, maintenance and Flutter citizen applications, plus their portable browser companion.
 
-Ink Navy #182B49; Tangerine #F26A32; Warm Paper #F7F1EB; white #FFFFFF; charcoal #26313B; original slate #6C7783. Supporting text uses darker #586471 where needed. Approved peach fills #FDD3BC and #FEE8DD give emphasis without making the whole interface orange. Status chips always include words.
+## Identity and typography
 
-Lilita One is bundled for display moments; Arial is the supporting face. Android requests Arial and falls back to platform sans where unavailable; a licensed Arial font is not redistributed. Official wordmark and mascot assets are preserved. The mascot is used in citizen hero/onboarding/help; operational pages prioritize evidence and work.
+Preserve the official PATAG wordmark and cone mascot. Ink Navy #182B49 and Tangerine #F26A32 remain brand anchors. All interface typography uses locally bundled Montserrat, with its SIL Open Font License beside the font. The wordmark artwork is unchanged. Headings use 600 weight and close tracking; body uses 400–500; data uses tabular numerals. Web page titles scale 28–38px, section titles 17–20px, body 14–16px, and supporting labels 11–13px. Native headline sizes are 28–34px and scale with accessibility preferences.
 
-## Layout tokens
+## Color roles
 
-Web: 84px compact rail, expandable labelled navigation, fluid content with 32px desktop gutters, 20px panel gaps. Major surfaces use 24px radii, fields 14px and primary controls pill radii. Spacing steps 4/8/12/16/20/24/32px. Layouts collapse for tablet and phone; data tables retain horizontal scrolling within their own container.
+| Role | Light | Dark |
+| --- | --- | --- |
+| Ground | #F7F1EB | #101114 |
+| Surface | #FFFFFF | #1B1C20 |
+| Raised/control | #F0EBE5 | #26272C |
+| Primary text | #171717 | #F8F8F8 |
+| Supporting text | #626263 | #B5B5BE |
+| Border | #E5DFD8 | #35363B |
 
-Flutter: PatagTokens defines 20px gap, 24px surface radius, 16px field radius and 160ms motion. SafeArea protects custom bottom navigation. Reporting preserves a separate step action area and draft state.
+Primary actions use a 135-degree #FFAA76 → #FF7A2F → #F26A32 gradient with dark text. Feature surfaces use #333438 → #111215 with light text. Use neutral actions for secondary tasks. Status chips retain paired pale fills and dark labels, plus readable status words.
 
-## Component patterns
+## Composition and components
 
-- Display headings: 30–36px native, 32px web, responsive citizen hero. Body 14–16px; supporting labels generally 12px and above, compact badges 11px.
-- Summary: one peach feature number plus supporting white metrics; citizen uses a single navy summary with subordinate counts.
-- Actions: navy-on-orange web primary action; white-on-navy citizen hero action; quieter outlined secondary controls.
-- Inputs: labelled fields, readable neutral fill, visible border and focused outline; error/success states keep explicit text.
-- Navigation: pill top navigation and utility rail on web; navy five-item citizen bottom bar with prominent report action.
-- Cards: varied sizes by information priority, minimal resting shadows, flat white or peach surfaces. Shadows reserved for overlays/floating navigation.
-- Status: textual chips, progress milestone overview and full event history. Awaiting Verification is distinct from Resolved.
-- Evidence: before/after panels and large upload controls retain the original validation and administrative approval boundary.
-- Charts: single Tangerine series, light gridlines, restrained ticks and actual record counts.
-- Motion: short named-property transitions, no decorative looping animation; web reduced-motion override retained.
+- Desktop web: 260px grouped sidebar or 76px collapsed rail; fluid content, 28px gutters and a 12-column grid with 20px gaps. The sidebar pushes content instead of covering it. Below 1024px it becomes a dismissible keyboard-accessible drawer.
+- Cards: 22–24px main surfaces, 16px nested maps and 14–16px controls. One feature metric leads; operational work, road locations, trends and priorities retain their actual computed data. Subtle two-layer shadows separate light surfaces.
+- Controls: 44px web targets, visible focus, restrained hover/pressed feedback. Native main actions are at least 52px tall. Orange gradients are reserved for primary actions and selected feature areas.
+- Glass: top navigation and selected overlays only, with solid fallbacks; no transparent data panels.
+- Maps: isolated layer 1, sticky chrome 20, scrim 30, drawer 40, toasts 60. Web modal dialogs use the browser top layer. ResizeObserver refreshes Leaflet layout. Dark styling affects tiles without inverting pins or overlays.
+- Tables: contained horizontal scrolling; forms and evidence panels use min-width:0 and responsive grid tracks. Charts resize inside their container.
+- Native: a greeting/avatar row, orange report feature, dark impact summary, rounded dark navigation with SafeArea; the keyboard does not cover the wizard action area.
 
-Implementation: admin-web/src/styles/premium.css, maintenance-web/src/styles/premium.css, citizen-mobile/lib/app/theme.dart and shared/widgets/ui.dart. Browser citizen equivalent: browser-preview/citizen-premium.css.
+## Theme state
 
-The interactive preview uses 12 fictional Malolos cases, two fictional crews and clearly labelled demonstration evidence. It is independent of real backend authentication and saves edits in the browser. Map tiles require internet.
+React theme.ts applies `data-theme`, follows system preference until chosen, and persists `patag-theme` in localStorage. CSS variables cover the shared screens and charts. Flutter ThemeController stores ThemeMode through shared_preferences; MaterialApp supplies centralized light/dark ThemeData and animates the transition. Settings can restore system mode. Both native and web navigation expose the toggle.
+
+## Implementation and verification
+
+Web source: each portal's `src/theme.ts` and `src/styles/visual-system.css`, layered after existing layout styles. Native source: `citizen-mobile/lib/app/theme.dart` and `lib/shared/widgets/ui.dart`. Browser companion: `browser-preview/citizen-premium.css` and `citizen.mjs`.
+
+See [validation and evidence](visual-system/validation.md). The applications retain the existing fictional demo data and backend contracts. No new real-world claims, partnerships or metrics were introduced.

@@ -101,9 +101,9 @@ try {
     .getByRole("button", { name: "Continue as LGU administrator" })
     .click();
   await page
-    .getByRole("heading", { name: "Every report. A road forward." })
+    .getByRole("heading", { name: "Roads overview" })
     .waitFor();
-  await mkdir(path.join(root, "docs/screenshots"), { recursive: true });
+  await mkdir(path.join(root, "docs/visual-system/production"), { recursive: true });
   const adminRoutes = [
     "dashboard",
     "reports",
@@ -189,7 +189,7 @@ try {
     if (kind === "CSV" && !buffer.toString("utf8").includes("Reference"))
       throw Error("Invalid CSV export");
     await writeFile(
-      path.join(root, "docs/screenshots/qa-export." + kind.toLowerCase()),
+      path.join(root, "docs/visual-system/production/qa-export." + kind.toLowerCase()),
       buffer,
     );
   }
@@ -201,7 +201,7 @@ try {
     await page.goto("http://127.0.0.1:5173/admin/dashboard");
     await page.locator("main#main h1").waitFor();
     await page.screenshot({
-      path: path.join(root, `docs/screenshots/admin-${width}.png`),
+      path: path.join(root, `docs/visual-system/production/admin-${width}.png`),
       fullPage: true,
     });
     const overflow = await page.evaluate(
@@ -211,13 +211,14 @@ try {
     if (overflow) throw Error("Admin overflow at " + width);
   }
   await page.setViewportSize({width:390,height:900});
-  await page.getByRole('button',{name:'Open navigation'}).click();
+  if(await page.locator('.sidebar.open').count())await page.getByRole('button',{name:'Close navigation drawer',exact:true}).click();
+  await page.getByRole('button',{name:'Open navigation',exact:true}).click();
   await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'All reports',exact:true}).click();
   await page.getByRole('heading',{name:'All reports',exact:true}).waitFor();
-  await page.waitForFunction(()=>getComputedStyle(document.querySelector('.sidebar')).transform==='matrix(1, 0, 0, 1, -244, 0)');
+  await page.waitForFunction(()=>!document.querySelector('.sidebar.open'));
   const tableLayout=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,oversized:[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().right>innerWidth+2).slice(0,12).map(e=>({tag:e.tagName,cls:e.className,right:e.getBoundingClientRect().right}))}));
   if(tableLayout.scroll>tableLayout.width)throw Error('Mobile table layout overflow: '+JSON.stringify(tableLayout));
-  await page.screenshot({path:path.join(root,'docs/screenshots/admin-table-390.png'),fullPage:true,animations:'disabled'});
+  await page.screenshot({path:path.join(root,'docs/visual-system/production/admin-table-390.png'),fullPage:true,animations:'disabled'});
   await page.goto('http://127.0.0.1:5173/admin/map');
   await page.getByRole('button',{name:'Zoom in',exact:true}).click();
   await page.getByRole('button',{name:'Recenter report map'}).click();
@@ -232,7 +233,7 @@ try {
     .getByRole("button", { name: "Continue as Road Crew Alpha" })
     .click();
   await crew
-    .getByRole("heading", { name: "Make way for better roads." })
+    .getByRole("heading", { name: "Your day on the road" })
     .waitFor();
   const maintenanceRoutes = [
     "dashboard",
@@ -343,7 +344,7 @@ try {
     await crew.goto("http://127.0.0.1:5174/maintenance/dashboard");
     await crew.locator("main#main h1").waitFor();
     await crew.screenshot({
-      path: path.join(root, `docs/screenshots/maintenance-${width}.png`),
+      path: path.join(root, `docs/visual-system/production/maintenance-${width}.png`),
       fullPage: true,
     });
     const overflow = await crew.evaluate(
@@ -361,7 +362,7 @@ try {
   process.exitCode = 1;
 } finally {
   await writeFile(
-    path.join(root, "docs/browser-results.json"),
+    path.join(root, "docs/visual-system/production-results.json"),
     JSON.stringify(results, null, 2),
   );
   await browser?.close();

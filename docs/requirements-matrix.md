@@ -23,4 +23,4 @@ Authoritative source: `references/IT 305 - PROJECT 2 (1).pdf`, all three pages i
 | FR-17 | Feedback | Report owner, Resolved-only, once-only 1–5 rating and text. | API feedback and repeat protection tested; Flutter form unverified |
 | FR-18 | Report export | Admin selection of date/status/severity/area/fields; escaped CSV and paginated jsPDF. | Browser export blobs validated; sandbox cancels native download file writes |
 
-Completion remains partial until the native app compiles, Android tests pass, and real backend/security integrations are supplied. Source coverage is not acceptance-test coverage.
+Updated 24 October: Flutter analysis, 26 tests and the debug APK now pass. Actual Android permission/camera/GPS acceptance and deployed backend/security remain outstanding. The current detailed assessment supersedes stale native-unverified labels above: see [PDF requirements and UX audit](project2-audit/audit.md). Source coverage is not acceptance-test coverage.
