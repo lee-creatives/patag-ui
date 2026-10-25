@@ -1,0 +1,4 @@
+// Illustrated placeholders referenced by seeded demo reports (/demo-evidence.svg, /demo-after.svg).
+export function demoSvg(after: boolean) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450"><rect width="800" height="450" fill="#dde2e4"/><path d="M0 100L800 25V450H0" fill="#636b72"/><path d="M0 270L800 190" stroke="#f7f1eb" stroke-width="9" stroke-dasharray="90 60"/>${after ? '<path d="M280 260l190-45 90 90-220 40z" fill="#414951"/>' : '<path d="M250 255l100-54 144 25 80 65-92 70-175-20z" fill="#26313b"/><path d="M270 262l90-37 120 22 48 40-62 39-143-10z" fill="#182b49"/>'}<rect x="25" y="24" width="240" height="34" rx="6" fill="#f7f1eb"/><text x="40" y="47" font-family="Arial" font-size="17" fill="#182b49">Illustrated demo ${after ? 'repair' : 'evidence'}</text></svg>`;
+}

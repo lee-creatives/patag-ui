@@ -3,6 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "api": "npm --prefix backend run dev",
+    "test:backend": "npm --prefix backend test",
     "demo:api": "node dev-mock/server.mjs",
     "test:api": "node --test dev-mock/server.test.mjs dev-mock/project2.test.mjs",
     "build:web": "npm --prefix admin-web run build && npm --prefix maintenance-web run build",

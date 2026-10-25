@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "citizen-mobile (emulator)",
+      "type": "dart",
+      "request": "launch",
+      "cwd": "citizen-mobile",
+      "program": "lib/main.dart",
+      "args": ["--dart-define=API_URL=http://10.0.2.2:4100/api"]
+    }
+  ]
+}

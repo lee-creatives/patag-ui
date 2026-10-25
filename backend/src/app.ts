@@ -1,0 +1,410 @@
+// HTTP API implementing docs/api-contract.md. Every response, including errors, is JSON
+// except image bytes; errors are always { "error": "..." }.
+import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
+import { randomUUID } from 'node:crypto';
+import { z } from 'zod';
+import type { BlobStore } from './blobs.ts';
+import { demoSvg } from './demo-svg.ts';
+import {
+  EMAIL, HttpError, UPLOAD_NAME, UPLOAD_URL, addressFields, candidates, fail, publicReport, publicUser,
+  registrationFields, roles, statuses, transition, validCoordinates,
+  type Photo, type Report, type User,
+} from './domain.ts';
+import { hashPassword, newToken, sha256, verifyPassword } from './passwords.ts';
+import type { Store } from './store.ts';
+
+export interface AppOptions {
+  store: Store;
+  blobs: BlobStore;
+  allowDemo?: boolean;
+  corsOrigins?: string[];
+  logger?: boolean;
+  bodyLimit?: number;
+}
+
+const SESSION_MS = 8 * 60 * 60 * 1000;
+const MAX_PHOTO = 8 * 1024 * 1024;
+const BODY_LIMIT = 12 * 1024 * 1024; // base64 of an 8 MB photo plus JSON overhead
+
+const photoRef = z.object({
+  id: z.string().min(1).max(100),
+  url: z.string().regex(UPLOAD_URL),
+  name: z.string().max(200).optional(),
+  kind: z.string().max(20).optional(),
+});
+const text = (max: number) => z.string().trim().min(1).max(max);
+const reportInput = z.object({
+  title: z.string().trim().max(120).optional(),
+  description: text(2000),
+  hazards: z.string().trim().max(500).optional(),
+  severity: z.enum(['Low', 'Medium', 'High']),
+  photos: z.array(photoRef).min(1).max(10),
+  location: z.object({
+    road: text(120), barangay: text(120), city: text(120), province: text(120),
+    landmark: z.string().trim().max(200).optional(),
+    coordinates: z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) }),
+  }),
+});
+const eventInput = z.object({
+  action: z.string().min(1).max(40),
+  note: z.string().max(2000).optional(),
+  approved: z.unknown().optional(),
+  duplicateOf: z.string().max(40).optional(),
+  jurisdiction: z.string().max(200).optional(),
+  teamId: z.string().max(100).optional(),
+  priority: z.enum(['Low', 'Medium', 'High']).optional(),
+  targetDate: z.string().regex(/^\d{4}-\d{2}-\d{2}/).nullable().optional(),
+  phase: z.string().max(60).optional(),
+  photos: z.array(photoRef).max(10).optional(),
+});
+
+const sanitizePhoto = (p: z.infer<typeof photoRef>, kind: string): Photo =>
+  ({ id: p.id, url: p.url, name: (p.name || 'Road evidence').slice(0, 200), kind });
+
+const uploadName = (url: string) => url.slice('/uploads/'.length);
+
+export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], logger = false, bodyLimit = BODY_LIMIT }: AppOptions) {
+  const app = Fastify({ logger, bodyLimit });
+
+  // Accept an empty JSON body as {} (Flutter sends Content-Type on every request).
+  app.removeContentTypeParser('application/json');
+  app.addContentTypeParser('application/json', { parseAs: 'string' }, (_req, body, done) => {
+    try { done(null, body ? JSON.parse(body as string) : {}); } catch { done(new HttpError(400, 'Invalid JSON.'), undefined); }
+  });
+
+  app.addHook('onRequest', async (req, reply) => {
+    const origin = req.headers.origin;
+    if (origin && corsOrigins.includes(origin)) {
+      reply.header('Access-Control-Allow-Origin', origin);
+      reply.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
+      reply.header('Access-Control-Allow-Methods', 'GET,POST,PATCH,OPTIONS');
+      reply.header('Access-Control-Max-Age', '600');
+    }
+    reply.header('Vary', 'Origin');
+    reply.header('X-Content-Type-Options', 'nosniff');
+    if (req.method === 'OPTIONS') return reply.code(204).send();
+  });
+
+  app.setErrorHandler((err: any, req, reply) => {
+    if (err instanceof HttpError) return reply.code(err.status).send({ error: err.message });
+    if (err.code === 'FST_ERR_CTP_BODY_TOO_LARGE') return reply.code(413).send({ error: 'Photo must be under 8 MB.' });
+    if (err.code === 'FST_ERR_CTP_INVALID_MEDIA_TYPE') return reply.code(415).send({ error: 'Send JSON with Content-Type: application/json.' });
+    if (err.statusCode && err.statusCode < 500) return reply.code(err.statusCode).send({ error: 'Invalid request.' });
+    req.log.error(err);
+    return reply.code(500).send({ error: 'PATAG could not complete this request. Please try again.' });
+  });
+  app.setNotFoundHandler((_req, reply) => reply.code(404).send({ error: 'Endpoint not found.' }));
+
+  // ---- helpers
+  const body = (req: FastifyRequest) => (req.body && typeof req.body === 'object' && !Array.isArray(req.body) ? req.body : {}) as Record<string, any>;
+  const bearer = (req: FastifyRequest) => (req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
+  async function currentUser(req: FastifyRequest) {
+    const token = bearer(req);
+    const user = token ? await store.sessionUser(sha256(token)) : null;
+    if (!user) fail(401, 'Session expired. Sign in again.');
+    return user!;
+  }
+  async function issue(user: User) {
+    const token = newToken();
+    await store.createSession(sha256(token), user.id, new Date(Date.now() + SESSION_MS));
+    return { token, user: publicUser(user) };
+  }
+  const attempts = new Map<string, { count: number; until: number }>();
+  function throttle(req: FastifyRequest) {
+    const key = `${req.ip}:${req.url}`, now = Date.now();
+    let a = attempts.get(key);
+    if (!a || a.until < now) { a = { count: 0, until: now + 60_000 }; attempts.set(key, a); }
+    if (++a.count > 20) fail(429, 'Too many attempts. Wait a minute and try again.');
+    if (attempts.size > 10_000) for (const [k, v] of attempts) if (v.until < now) attempts.delete(k);
+  }
+  async function notify(s: Store, r: Report, title: string) {
+    await s.addNotifications([
+      { role: 'citizen', userId: r.reporterId, teamId: null, reportId: r.id, title },
+      { role: 'admin', userId: null, teamId: null, reportId: r.id, title },
+      ...(r.teamId ? [{ role: 'maintenance' as const, userId: null, teamId: r.teamId, reportId: r.id, title }] : []),
+    ]);
+  }
+  async function requireUploads(photos: { url: string }[]) {
+    if (!(await store.uploadsExist(photos.map(p => uploadName(p.url))))) fail(400, 'Upload the photo first, then attach it.');
+  }
+  function canSee(user: User, r: Report) {
+    return user.role === 'admin' || (user.role === 'citizen' ? r.reporterId === user.id : r.teamId === user.teamId);
+  }
+
+  // ---- public
+  app.register(async api => {
+    api.get('/health', async () => ({ ok: true, mode: 'supabase' }));
+
+    api.get('/demo-evidence.svg', async (_q, reply) => reply.type('image/svg+xml').send(demoSvg(false)));
+    api.get('/demo-after.svg', async (_q, reply) => reply.type('image/svg+xml').send(demoSvg(true)));
+
+    // Evidence URLs are unguessable UUIDs and served without auth so Image.network / <img> work.
+    api.get('/uploads/:file', async (req: FastifyRequest<{ Params: { file: string } }>, reply: FastifyReply) => {
+      const name = req.params.file;
+      if (!UPLOAD_NAME.test(name)) fail(404, 'Photo not found.');
+      const blob = await blobs.get(name);
+      if (!blob) fail(404, 'Photo not found.');
+      const ext = name.split('.').pop();
+      return reply
+        .type(ext === 'jpg' ? 'image/jpeg' : `image/${ext}`)
+        .header('Cache-Control', 'private, max-age=86400, immutable')
+        .header('Content-Security-Policy', "default-src 'none'")
+        .send(blob!.bytes);
+    });
+
+    api.get('/public/reports', async () => (await store.listPublicReports()).map(publicReport));
+
+    // ---- auth
+    if (allowDemo) {
+      api.get('/auth/demo/accounts', async () => (await store.listDemoUsers()).map(publicUser));
+      api.post('/auth/demo', async req => {
+        const b = body(req);
+        const user = await store.demoUser(String(b.role || ''), typeof b.userId === 'string' ? b.userId : undefined);
+        if (!user) fail(403, 'Demo role unavailable.');
+        return issue(user!);
+      });
+    }
+
+    api.post('/auth/register', async (req, reply) => {
+      throttle(req);
+      const f = registrationFields(body(req), { addressRequired: true });
+      // role/team/active in the body are ignored: registration always creates an active citizen.
+      const user = await store.insertUser({
+        name: f.name, email: f.email, role: 'citizen', active: true, teamId: null, address: f.address,
+        emailVerified: false, passwordHash: await hashPassword(f.password),
+      });
+      if (!user) fail(409, 'Unable to create an account with these details. Try signing in or recovering access.');
+      return reply.code(201).send(await issue(user!));
+    });
+
+    api.post('/auth/login', async req => {
+      throttle(req);
+      const b = body(req);
+      const email = typeof b.email === 'string' ? b.email.trim().toLowerCase() : '';
+      const password = typeof b.password === 'string' && b.password.length <= 256 ? b.password : '';
+      const user = email ? await store.userByEmail(email) : null;
+      const valid = await verifyPassword(password, user?.passwordHash ?? null);
+      if (!valid || !user!.active || (b.role && user!.role !== b.role)) fail(401, 'Email or password is incorrect for this portal.');
+      return issue(user!);
+    });
+
+    api.post('/auth/recovery', async req => {
+      const email = body(req).email;
+      if (typeof email !== 'string' || !EMAIL.test(email.trim())) fail(400, 'Enter a valid email.');
+      // Same answer whether or not the account exists. No email transport is configured yet.
+      return { message: 'If an account exists for that email, recovery instructions will be sent. Email delivery is not configured in this build.' };
+    });
+
+    // ---- authenticated
+    api.post('/auth/logout', async req => {
+      await currentUser(req);
+      await store.deleteSession(sha256(bearer(req)));
+      return { ok: true };
+    });
+
+    api.get('/bootstrap', async req => {
+      const user = await currentUser(req);
+      const reports = user.role === 'admin' ? await store.listReports({})
+        : user.role === 'citizen' ? await store.listReports({ reporterId: user.id })
+        : await store.listReports({ teamId: user.teamId });
+      const [teams, settings, notifications, users] = await Promise.all([
+        store.listTeams(), store.getSettings(), store.notificationsFor(user),
+        user.role === 'admin' ? store.listUsers() : Promise.resolve([]),
+      ]);
+      return { reports, teams, settings, demo: allowDemo, users: users.map(publicUser), notifications, user: publicUser(user), statuses };
+    });
+
+    api.patch('/me', async req => {
+      const user = await currentUser(req);
+      const b = body(req);
+      const name = typeof b.name === 'string' ? b.name.trim() : '';
+      if (!name || name.length > 100 || typeof b.email !== 'string' || !EMAIL.test(b.email.trim())) fail(400, 'Name and valid email are required.');
+      if (b.email.trim().toLowerCase() !== user.email.toLowerCase()) fail(400, 'Email changes require verified account recovery.');
+      const address = b.address ? addressFields(b.address) : null;
+      user.name = name;
+      if (address && user.role === 'citizen') user.address = address;
+      await store.updateUser(user);
+      return publicUser(user);
+    });
+
+    api.post('/notifications/read', async req => {
+      const user = await currentUser(req);
+      const id = body(req).id;
+      if (typeof id !== 'string' || !id) fail(400, 'Choose a notification.');
+      await store.markNotificationsRead(user, id);
+      return { ok: true };
+    });
+
+    api.post('/uploads', async (req, reply) => {
+      const user = await currentUser(req);
+      const b = body(req);
+      const m = /^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/.exec(typeof b.data === 'string' ? b.data : '');
+      if (!m) fail(400, 'Choose a PNG, JPEG or WebP image.');
+      const type = m![1];
+      const bytes = Buffer.from(m![2], 'base64');
+      if (bytes.length > MAX_PHOTO || bytes.length < 8) fail(400, 'Invalid image or file exceeds 8 MB.');
+      const magic = type === 'png' ? bytes.subarray(0, 8).equals(Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]))
+        : type === 'jpeg' ? bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff
+        : bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP';
+      if (!magic) fail(400, 'Image content does not match its type.');
+      const contentType = `image/${type}`;
+      const name = `${randomUUID()}.${type === 'jpeg' ? 'jpg' : type}`;
+      await blobs.put(name, bytes, contentType);
+      await store.recordUpload(name, user.id, contentType, bytes.length);
+      const display = typeof b.name === 'string' && b.name.trim() ? b.name.trim().slice(0, 200) : name;
+      return reply.code(201).send({ id: randomUUID(), url: `/uploads/${name}`, name: display, kind: b.kind === 'after' ? 'after' : 'before' });
+    });
+
+    api.post('/duplicates', async req => {
+      await currentUser(req);
+      const b = body(req);
+      if (!validCoordinates(b.location?.coordinates)) fail(400, 'Valid coordinates are required.');
+      const road = typeof b.location.road === 'string' ? b.location.road : '';
+      if (!road.trim()) return [];
+      const draft = { id: typeof b.id === 'string' ? b.id : undefined, location: { road, coordinates: b.location.coordinates } };
+      return candidates(await store.reportsOnRoad(road), draft).map(x => ({ ...x, report: publicReport(x.report) }));
+    });
+
+    api.post('/reports', async (req, reply) => {
+      const user = await currentUser(req);
+      if (user.role !== 'citizen') fail(403, 'Only citizen accounts can submit reports.');
+      const parsed = reportInput.safeParse(body(req));
+      if (!parsed.success) fail(400, 'Evidence photo, description, road, barangay, city, province, valid coordinates and severity are required.');
+      const input = parsed.data!;
+      await requireUploads(input.photos);
+      const [id, settings] = [await store.nextReportId(), await store.getSettings()];
+      const at = new Date().toISOString();
+      const report: Report = {
+        id, title: input.title || 'Pothole report', description: input.description, hazards: input.hazards ?? '',
+        severity: input.severity, status: 'Submitted',
+        location: { ...input.location, landmark: input.location.landmark ?? '' },
+        photos: input.photos.map(p => sanitizePhoto(p, 'before')), reporterId: user.id, jurisdiction: settings.agency,
+        createdAt: at, updatedAt: at, teamId: null, assignment: null,
+        history: [{ id: randomUUID(), at, actor: 'citizen', action: 'Submitted', from: null, to: 'Submitted', note: 'Citizen report received; administrative review required.' }],
+        updates: [], completion: null, feedback: null, flagged: false,
+      };
+      await store.tx(async tx => {
+        await tx.insertReport(report);
+        await notify(tx, report, 'Report submitted for review');
+      });
+      return reply.code(201).send(report);
+    });
+
+    api.get('/reports/:id', async (req: FastifyRequest<{ Params: { id: string } }>) => {
+      const user = await currentUser(req);
+      const r = await store.getReport(req.params.id);
+      if (!r) fail(404, 'Report not found.');
+      if (!canSee(user, r!)) fail(403, 'This report belongs to another account or team.');
+      return r;
+    });
+
+    api.post('/reports/:id/events', async (req: FastifyRequest<{ Params: { id: string } }>) => {
+      const user = await currentUser(req);
+      const parsed = eventInput.safeParse(body(req));
+      if (!parsed.success) fail(400, 'Check the action details and try again.');
+      const e = parsed.data!;
+      if (['complete', 'before-photos'].includes(e.action) && !e.photos) fail(400, 'Upload real repair photos first.');
+      if (e.photos?.length) await requireUploads(e.photos);
+      return store.tx(async tx => {
+        const r = await tx.getReport(req.params.id, { forUpdate: true });
+        if (!r) fail(404, 'Report not found.');
+        if (!canSee(user, r!)) fail(403, 'This report belongs to another account or team.');
+        if (e.action === 'duplicate' && (!e.duplicateOf || e.duplicateOf === r!.id || !(await tx.reportExists(e.duplicateOf)))) fail(400, 'Original report not found.');
+        const kind = e.action === 'complete' ? 'after' : 'before';
+        const photos = e.photos?.map(p => sanitizePhoto(p, kind));
+        transition(r!, user.role, e.action, { ...e, photos }, e.action === 'assign' ? await tx.listTeams() : []);
+        await tx.saveReport(r!);
+        await notify(tx, r!, e.action === 'complete' ? 'Repair ready for LGU verification' : `${r!.id}: ${r!.status}`);
+        return r;
+      });
+    });
+
+    api.post('/reports/:id/feedback', async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
+      const user = await currentUser(req);
+      return store.tx(async tx => {
+        const r = await tx.getReport(req.params.id, { forUpdate: true });
+        if (!r) fail(404, 'Report not found.');
+        if (user.role !== 'citizen' || r!.reporterId !== user.id) fail(403, 'This report belongs to another account or team.');
+        if (r!.status !== 'Resolved' || r!.feedback) fail(409, 'Feedback is available once for resolved reports.');
+        const b = body(req);
+        const feedbackText = typeof b.text === 'string' ? b.text.trim() : '';
+        if (!Number.isInteger(b.rating) || b.rating < 1 || b.rating > 5 || !feedbackText || feedbackText.length > 1000) fail(400, 'Choose a rating and add feedback.');
+        r!.feedback = { rating: b.rating, text: feedbackText, at: new Date().toISOString() };
+        await tx.saveReport(r!);
+        return reply.code(201).send(r!.feedback);
+      });
+    });
+
+    // ---- admin workspace
+    async function admin(req: FastifyRequest) {
+      const user = await currentUser(req);
+      if (user.role !== 'admin') fail(403, 'Administrator access required.');
+      return user;
+    }
+
+    api.patch('/settings', async req => {
+      await admin(req);
+      const b = body(req);
+      const s = { agency: String(b.agency ?? '').trim(), city: String(b.city ?? '').trim(), province: String(b.province ?? '').trim() };
+      if (!s.agency || !s.city || !s.province) fail(400, 'Agency, city and province are required.');
+      if (Object.values(s).some(v => v.length > 120)) fail(400, 'Keep each field within 120 characters.');
+      return store.setSettings(s);
+    });
+
+    async function saveTeam(req: FastifyRequest, create: boolean) {
+      await admin(req);
+      const b = body(req);
+      const name = typeof b.name === 'string' ? b.name.trim() : '';
+      if (!name || name.length > 100) fail(400, 'Team name is required.');
+      const existing = create ? null : await store.teamById(String(b.id ?? ''));
+      if (!create && !existing) fail(404, 'Team not found.');
+      if (await store.teamNameTaken(name, existing?.id ?? null)) fail(409, 'A team with that name already exists.');
+      const active = b.active !== false;
+      if (!create && !active && (await store.teamHasOpenWorkOrMembers(existing!.id))) fail(409, 'Move active members and finish assigned tasks before deactivating this team.');
+      const team = create ? await store.insertTeam({ name, active }) : await store.updateTeam({ id: existing!.id, name, active });
+      if (!team) fail(409, 'A team with that name already exists.');
+      return team;
+    }
+    api.post('/teams', async (req, reply) => reply.code(201).send(await saveTeam(req, true)));
+    api.patch('/teams', async req => saveTeam(req, false));
+
+    async function teamCheck(role: string, teamId: string | null | undefined) {
+      if (role !== 'maintenance') return null;
+      const team = teamId ? await store.teamById(teamId) : null;
+      if (!team?.active) fail(400, 'Choose an active maintenance team.');
+      return team!.id;
+    }
+
+    api.post('/users', async (req, reply) => {
+      await admin(req);
+      const b = body(req);
+      const f = registrationFields(b);
+      const role = b.role ?? 'citizen';
+      if (!roles.includes(role)) fail(400, 'Choose a valid role.');
+      const teamId = await teamCheck(role, b.teamId);
+      const user = await store.insertUser({
+        name: f.name, email: f.email, role, active: b.active !== false, teamId,
+        address: role === 'citizen' && b.address ? f.address : null, emailVerified: false, passwordHash: await hashPassword(f.password),
+      });
+      if (!user) fail(409, 'Email is already registered.');
+      return reply.code(201).send(publicUser(user!));
+    });
+
+    api.patch('/users', async req => {
+      const me = await admin(req);
+      const b = body(req);
+      const user = await store.userById(String(b.id ?? ''));
+      if (!user) fail(404, 'Account not found.');
+      if (user!.id === me.id) fail(400, 'Manage your own profile in Settings.');
+      const role = b.role ?? user!.role;
+      if (!roles.includes(role)) fail(400, 'Choose a valid role.');
+      user!.role = role;
+      user!.teamId = await teamCheck(role, b.teamId ?? user!.teamId);
+      if (typeof b.active === 'boolean') user!.active = b.active;
+      await store.updateUser(user!);
+      return publicUser(user!);
+    });
+  }, { prefix: '/api' });
+
+  return app;
+}
