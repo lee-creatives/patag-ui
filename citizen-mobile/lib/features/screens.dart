@@ -565,6 +565,25 @@ class CitizenHome extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                const Text(
+                  'Around you',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                ),
+                TextButton(
+                  onPressed: () => go(context, '/map'),
+                  child: const Text('Explore'),
+                ),
+              ],
+            ),
+            gap(12),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: RoadMap(reports: store.publicReports, height: 200),
+            ),
+            gap(24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
                 const Expanded(
                     child: Text(
                   'Your impact',
@@ -664,25 +683,6 @@ class CitizenHome extends StatelessWidget {
                 'Send a clear photo and a location.',
               ),
             ...rs.take(1).map((r) => ReportCard(r)),
-            gap(10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Around you',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                ),
-                TextButton(
-                  onPressed: () => go(context, '/map'),
-                  child: const Text('Explore'),
-                ),
-              ],
-            ),
-            gap(12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(22),
-              child: RoadMap(reports: store.publicReports, height: 200),
-            ),
             gap(22),
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
