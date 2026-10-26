@@ -462,6 +462,7 @@ class DashboardTab extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Row(
           children: [
             logo(width: 96),
