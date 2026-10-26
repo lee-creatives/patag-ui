@@ -126,6 +126,8 @@ class PotholeReport {
   final Map<String, dynamic> json;
   PotholeReport(this.json);
 
+  Map<String, dynamic> toJson() => json;
+
   String get id => json['id'] as String? ?? '';
   String get title => json['title'] as String? ?? '';
   String get description => json['description'] as String? ?? '';
