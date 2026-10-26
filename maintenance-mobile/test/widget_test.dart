@@ -12,11 +12,11 @@ void main() {
         home: const MaintenanceLogin(),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('Crew Workspace Sign In'), findsOneWidget);
+    expect(find.text('Welcome back, crew.'), findsOneWidget);
     expect(find.text('Continue as Road Crew Alpha'), findsOneWidget);
-    expect(find.text('Sign in to Workspace'), findsOneWidget);
+    expect(find.text('Sign in to workspace'), findsOneWidget);
   });
 
   testWidgets('Maintenance splash screen displays title and logo',
@@ -46,8 +46,8 @@ void main() {
           home: const MaintenanceLogin(),
         ),
       );
-      await tester.pumpAndSettle();
-      expect(find.text('Crew Workspace Sign In'), findsOneWidget);
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('Welcome back, crew.'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }

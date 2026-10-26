@@ -43,7 +43,8 @@ class PatagMaintenanceApp extends StatelessWidget {
           }
 
           // Portrait mobile device frame for desktop/wide browser preview
-          final frameHeight = math.min(890.0, math.max(680.0, size.height - 36.0));
+          final frameHeight =
+              math.min(890.0, math.max(680.0, size.height - 36.0));
           return Container(
             color: dark ? const Color(0xFF090B0E) : const Color(0xFFE4DFD7),
             alignment: Alignment.center,
@@ -70,7 +71,8 @@ class PatagMaintenanceApp extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
-                          color: dark ? Colors.white70 : const Color(0xFF4A4E57),
+                          color:
+                              dark ? Colors.white70 : const Color(0xFF4A4E57),
                           letterSpacing: 0.3,
                         ),
                       ),
@@ -85,7 +87,9 @@ class PatagMaintenanceApp extends StatelessWidget {
                     color: Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.circular(44),
                     border: Border.all(
-                      color: dark ? const Color(0xFF2B303C) : const Color(0xFFD4CDC4),
+                      color: dark
+                          ? const Color(0xFF2B303C)
+                          : const Color(0xFFD4CDC4),
                       width: 8,
                     ),
                     boxShadow: [
@@ -174,7 +178,8 @@ class PatagMaintenanceApp extends StatelessWidget {
             screen = const MainShell(initialTab: 2);
           } else if (route == '/map') {
             screen = const MainShell(initialTab: 3);
-          } else if (route.startsWith('/repairs/') && parts.last == 'document') {
+          } else if (route.startsWith('/repairs/') &&
+              parts.last == 'document') {
             screen = RepairDocumentationScreen(parts[2]);
           } else if (route.startsWith('/repairs/') && parts.last == 'success') {
             screen = SubmissionSuccessScreen(parts[2]);

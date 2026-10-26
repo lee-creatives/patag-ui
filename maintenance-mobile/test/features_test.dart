@@ -70,18 +70,27 @@ void main() {
 
   testWidgets('Dashboard renders team name, metrics, and active work orders',
       (tester) async {
+    tester.view.physicalSize = const Size(800, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+
     await tester.pumpWidget(
       MaterialApp(
         theme: patagMaintenanceTheme(),
         home: const DashboardTab(),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.text('Road Crew Alpha'), findsWidgets);
     expect(find.text('Active Work Orders'), findsOneWidget);
-    expect(find.text('Paseo del Congreso'), findsOneWidget);
     expect(find.text('MacArthur Highway'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text('Paseo del Congreso'),
+      260,
+      scrollable: find.byType(Scrollable).first,
+    );
+    expect(find.text('Paseo del Congreso'), findsOneWidget);
   });
 
   testWidgets('AssignmentsTab renders search and list of tasks',
@@ -92,7 +101,7 @@ void main() {
         home: const AssignmentsTab(),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.text('My Assignments'), findsOneWidget);
     expect(find.text('Paseo del Congreso'), findsOneWidget);
@@ -122,9 +131,10 @@ void main() {
         home: const SubmissionSuccessScreen('PTG-2026-0106'),
       ),
     );
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('Work submitted.\nOne step closer to patag.'), findsOneWidget);
+    expect(find.text('Work submitted.\nOne step closer to patag.'),
+        findsOneWidget);
     expect(find.text('Return to Overview'), findsOneWidget);
   });
 }

@@ -122,8 +122,11 @@ class _TaskMapScreenState extends State<TaskMapScreen> {
                       },
                       selectedColor: orange,
                       labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : (dark ? Colors.white70 : ink),
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                        color: isSelected
+                            ? Colors.white
+                            : (dark ? Colors.white70 : ink),
+                        fontWeight:
+                            isSelected ? FontWeight.w700 : FontWeight.w500,
                         fontSize: 12,
                       ),
                     ),

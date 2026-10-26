@@ -121,8 +121,7 @@ class _DancingMascotState extends State<DancingMascot>
         builder: (context, child) {
           final moving =
               widget.dance && !MediaQuery.disableAnimationsOf(context);
-          final wave =
-              moving ? math.sin(controller.value * math.pi * 4) : 0.0;
+          final wave = moving ? math.sin(controller.value * math.pi * 4) : 0.0;
           return Transform.translate(
             offset: Offset(0, -wave.abs() * 6),
             child: Transform.rotate(
@@ -168,7 +167,8 @@ Widget action(
               child: Text(
                 label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
+                style:
+                    const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
               ),
             ),
             const SizedBox(width: 10),
@@ -367,12 +367,15 @@ class TaskCard extends StatelessWidget {
                       children: [
                         StatusBadge(report.status),
                         const Spacer(),
-                        const Icon(Icons.arrow_forward_rounded, size: 16, color: slate),
+                        const Icon(Icons.arrow_forward_rounded,
+                            size: 16, color: slate),
                       ],
                     ),
                     gap(8),
                     Text(
-                      report.road.isNotEmpty ? report.road : 'Road Damage Work Order',
+                      report.road.isNotEmpty
+                          ? report.road
+                          : 'Road Damage Work Order',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -452,15 +455,49 @@ class PhotoWidget extends StatelessWidget {
       child: Container(
         height: height,
         width: width ?? double.infinity,
-        color: quiet,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        color: Theme.of(context).brightness == Brightness.dark
+            ? const Color(0xFF27292E)
+            : const Color(0xFFE9ECEB),
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            const Icon(Icons.photo_outlined, size: 36, color: slate),
-            gap(6),
-            Text(
-              photo.name.isNotEmpty ? photo.name : 'Report photo evidence',
-              style: const TextStyle(fontSize: 12, color: slate),
+            Align(
+              alignment: const Alignment(0, -.35),
+              child: Transform.rotate(
+                angle: -.08,
+                child: Container(
+                  width: (width ?? 120) * .8,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(.88),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ),
+            Align(
+              alignment: const Alignment(0, .38),
+              child: Container(
+                width: (width ?? 120) * .62,
+                height: height * .28,
+                decoration: BoxDecoration(
+                  color: ink,
+                  borderRadius: BorderRadius.circular(40),
+                  border: Border.all(
+                    color: const Color(0xFF4B5563),
+                    width: 7,
+                  ),
+                ),
+              ),
+            ),
+            const Positioned(
+              left: 8,
+              top: 8,
+              child: Icon(
+                Icons.photo_camera_outlined,
+                size: 15,
+                color: Color(0xFF5F6870),
+              ),
             ),
           ],
         ),
@@ -514,8 +551,7 @@ class ThemeToggle extends StatelessWidget {
     return IconButton.filledTonal(
       tooltip: dark ? 'Switch to light mode' : 'Switch to dark mode',
       style: IconButton.styleFrom(
-        backgroundColor:
-            Theme.of(context).colorScheme.surfaceContainerHighest,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       ),
       onPressed: () => themeController.toggle(Theme.of(context).brightness),
       icon: Icon(
@@ -600,10 +636,12 @@ class Screen extends StatelessWidget {
                   (index) {
                     switch (index) {
                       case 0:
-                        Navigator.of(context).pushReplacementNamed('/dashboard');
+                        Navigator.of(context)
+                            .pushReplacementNamed('/dashboard');
                         break;
                       case 1:
-                        Navigator.of(context).pushReplacementNamed('/assignments');
+                        Navigator.of(context)
+                            .pushReplacementNamed('/assignments');
                         break;
                       case 2:
                         Navigator.of(context).pushReplacementNamed('/progress');
@@ -639,7 +677,7 @@ class PatagMaintenanceNavigation extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              gradient: PatagTokens.darkGradient,
+              color: const Color(0xFF15171C),
               borderRadius: BorderRadius.circular(28),
               boxShadow: [
                 BoxShadow(

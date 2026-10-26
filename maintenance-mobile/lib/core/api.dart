@@ -120,7 +120,8 @@ class PatagMaintenanceStore extends ChangeNotifier {
       startPolling();
     } catch (e) {
       // Seamless demo fallback so staff is never locked out of demo environment
-      if (email.trim().toLowerCase() == 'crew@malolos.gov.ph' || reports.isEmpty) {
+      if (email.trim().toLowerCase() == 'crew@malolos.gov.ph' ||
+          reports.isEmpty) {
         _setDemoSession();
         return;
       }
@@ -368,7 +369,8 @@ class PatagMaintenanceStore extends ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>> upload(XFile file, {String kind = 'after'}) async {
+  Future<Map<String, dynamic>> upload(XFile file,
+      {String kind = 'after'}) async {
     final bytes = await file.readAsBytes();
     if (bytes.length > 8 * 1024 * 1024) {
       throw Exception('Choose a photo under 8 MB.');

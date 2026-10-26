@@ -78,6 +78,15 @@ ThemeData patagMaintenanceTheme({Brightness brightness = Brightness.light}) {
   );
   return base.copyWith(
     scaffoldBackgroundColor: dark ? const Color(0xFF101114) : paper,
+    appBarTheme: AppBarTheme(
+      backgroundColor: dark ? const Color(0xFF101114) : paper,
+      foregroundColor: colors.onSurface,
+      surfaceTintColor: Colors.transparent,
+      elevation: 0,
+      scrolledUnderElevation: 0,
+      centerTitle: false,
+      toolbarHeight: 68,
+    ),
     textTheme: base.textTheme.copyWith(
       headlineLarge: TextStyle(
         fontFamily: 'Montserrat',
@@ -163,6 +172,34 @@ ThemeData patagMaintenanceTheme({Brightness brightness = Brightness.light}) {
           fontWeight: FontWeight.w600,
           fontSize: 15,
         ),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: colors.onSurface,
+        minimumSize: const Size.fromHeight(50),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        side: BorderSide(color: colors.outlineVariant),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(PatagTokens.fieldRadius),
+        ),
+        textStyle: const TextStyle(
+          fontFamily: 'Montserrat',
+          fontWeight: FontWeight.w600,
+          fontSize: 14,
+        ),
+      ),
+    ),
+    chipTheme: base.chipTheme.copyWith(
+      backgroundColor: colors.surface,
+      selectedColor: orange,
+      side: BorderSide(color: colors.outlineVariant),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      labelStyle: TextStyle(
+        color: colors.onSurface,
+        fontWeight: FontWeight.w600,
+        fontSize: 12,
       ),
     ),
   );

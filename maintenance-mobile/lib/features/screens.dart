@@ -217,107 +217,193 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final dark = theme.brightness == Brightness.dark;
 
-    return Screen(
-      title: 'Sign in',
-      body: Form(
-        child: ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-          children: [
-            logo(),
-            gap(28),
-            heading(context, 'Crew Workspace Sign In'),
-            gap(6),
-            Text(
-              'City of Malolos Road Maintenance Operations · Local Demo API',
-              style: TextStyle(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontSize: 12,
-              ),
-            ),
-            gap(24),
-            TextFormField(
-              controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
-              autofillHints: const [AutofillHints.email],
-              decoration: const InputDecoration(
-                labelText: 'Staff Email',
-                prefixIcon: Icon(Icons.email_outlined),
-              ),
-            ),
-            gap(16),
-            TextFormField(
-              controller: _passwordController,
-              obscureText: _obscure,
-              autofillHints: const [AutofillHints.password],
-              decoration: InputDecoration(
-                labelText: 'Password',
-                prefixIcon: const Icon(Icons.lock_outline),
-                suffixIcon: IconButton(
-                  tooltip: _obscure ? 'Show password' : 'Hide password',
-                  icon: Icon(
-                    _obscure
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
+    return Scaffold(
+      body: SafeArea(
+        child: Form(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              Container(
+                padding: const EdgeInsets.fromLTRB(22, 14, 22, 26),
+                decoration: BoxDecoration(
+                  gradient: dark
+                      ? PatagTokens.crewGradient
+                      : const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFFFFE7DA), Color(0xFFFFC6A4)],
+                        ),
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(34),
+                    bottomRight: Radius.circular(34),
                   ),
-                  onPressed: () => setState(() => _obscure = !_obscure),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        logo(width: 112),
+                        const Spacer(),
+                        const ThemeToggle(),
+                      ],
+                    ),
+                    gap(24),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Ayusin natin\nang maayos.',
+                                style: theme.textTheme.headlineLarge?.copyWith(
+                                  color: dark
+                                      ? Colors.white
+                                      : const Color(0xFF20180F),
+                                  fontSize: 30,
+                                ),
+                              ),
+                              gap(10),
+                              Text(
+                                'Your crew workspace for safer, smoother roads.',
+                                style: TextStyle(
+                                  color: dark
+                                      ? const Color(0xFFDCE4EE)
+                                      : const Color(0xFF493326),
+                                  fontSize: 13,
+                                  height: 1.45,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        mascot(width: 104, dance: true),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-            ),
-            if (_error != null) ...[
-              gap(14),
-              Text(
-                _error!,
-                style: TextStyle(
-                  color: theme.colorScheme.error,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 28, 22, 30),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome back, crew.',
+                      style: theme.textTheme.headlineMedium,
+                    ),
+                    gap(7),
+                    Text(
+                      'Sign in with your LGU maintenance account.',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        fontSize: 13,
+                      ),
+                    ),
+                    gap(22),
+                    const Text(
+                      'Staff email',
+                      style:
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                    ),
+                    gap(8),
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      autofillHints: const [AutofillHints.email],
+                      decoration: const InputDecoration(
+                        hintText: 'crew@malolos.gov.ph',
+                        prefixIcon: Icon(Icons.email_outlined),
+                      ),
+                    ),
+                    gap(16),
+                    const Text(
+                      'Password',
+                      style:
+                          TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
+                    ),
+                    gap(8),
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: _obscure,
+                      autofillHints: const [AutofillHints.password],
+                      decoration: InputDecoration(
+                        hintText: 'Enter your password',
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          tooltip: _obscure ? 'Show password' : 'Hide password',
+                          icon: Icon(
+                            _obscure
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                          ),
+                          onPressed: () => setState(() => _obscure = !_obscure),
+                        ),
+                      ),
+                    ),
+                    if (_error != null) ...[
+                      gap(14),
+                      Text(
+                        _error!,
+                        style: TextStyle(
+                          color: theme.colorScheme.error,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                    gap(22),
+                    action(
+                      _loading ? 'Connecting…' : 'Sign in to workspace',
+                      _loading ? null : _submit,
+                    ),
+                    gap(20),
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Divider(
+                                color: theme.colorScheme.outlineVariant)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          child: Text(
+                            'or preview the app',
+                            style: TextStyle(
+                              color: theme.colorScheme.onSurfaceVariant,
+                              fontSize: 11,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                            child: Divider(
+                                color: theme.colorScheme.outlineVariant)),
+                      ],
+                    ),
+                    gap(16),
+                    OutlinedButton.icon(
+                      onPressed: _loading ? null : _demoLogin,
+                      icon: const Icon(Icons.play_arrow_rounded, color: orange),
+                      label: const Text('Continue as Road Crew Alpha'),
+                    ),
+                    gap(22),
+                    Center(
+                      child: Text(
+                        'Authorized maintenance staff only · Academic demo',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 10,
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
-            gap(22),
-            action(
-              _loading ? 'Connecting…' : 'Sign in to Workspace',
-              _loading ? null : _submit,
-            ),
-            gap(22),
-            Text(
-              'Explore the demo without typing a password.',
-              style: TextStyle(
-                color: theme.colorScheme.onSurfaceVariant,
-                fontSize: 13,
-              ),
-            ),
-            gap(10),
-            OutlinedButton(
-              onPressed: _loading ? null : _demoLogin,
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.play_arrow_rounded, color: orange, size: 20),
-                  SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      'Continue as Road Crew Alpha',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            gap(28),
-            Text(
-              'Academic demonstration · IT 305\nCity of Malolos Road Maintenance Operations.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 11,
-                color: theme.colorScheme.onSurfaceVariant,
-                height: 1.5,
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -401,8 +487,7 @@ class DashboardTab extends StatelessWidget {
           IconButton(
             tooltip: 'Notifications',
             icon: Icon(
-              store.showUnread &&
-                      store.notifications.any((n) => n.read != true)
+              store.showUnread && store.notifications.any((n) => n.read != true)
                   ? Icons.notifications_active_outlined
                   : Icons.notifications_outlined,
             ),
@@ -501,38 +586,42 @@ class DashboardTab extends StatelessWidget {
                           ],
                         ),
                       ),
-                      mascot(width: 70),
+                      mascot(width: 78, dance: true),
                     ],
                   ),
-                  gap(12),
-                  Row(
-                    children: [
-                      _metricBox(
-                        context,
-                        'Assigned',
-                        '${store.newAssignments.length}',
-                        crewAmber,
-                      ),
-                      const SizedBox(width: 8),
-                      _metricBox(
-                        context,
-                        'In Progress',
-                        '${inProgress.length}',
-                        orange,
-                      ),
-                      const SizedBox(width: 8),
-                      _metricBox(
-                        context,
-                        'Resolved',
-                        '${completed.length}',
-                        crewGreen,
-                      ),
-                    ],
+                  gap(16),
+                  action(
+                    'Review next work order',
+                    store.myAssignments.isEmpty
+                        ? null
+                        : () => Navigator.of(context).pushNamed(
+                              '/assignments/${store.myAssignments.first.id}',
+                            ),
+                    icon: Icons.arrow_forward_rounded,
+                    dark: true,
                   ),
                 ],
               ),
             ),
-            gap(18),
+            gap(14),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+              decoration: BoxDecoration(
+                color: const Color(0xFF15171C),
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: Row(
+                children: [
+                  _metricBox(context, 'Assigned',
+                      '${store.newAssignments.length}', crewAmber),
+                  _metricBox(
+                      context, 'In Progress', '${inProgress.length}', orange),
+                  _metricBox(
+                      context, 'Resolved', '${completed.length}', crewGreen),
+                ],
+              ),
+            ),
+            gap(22),
             // Active Work Orders Section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -566,12 +655,12 @@ class DashboardTab extends StatelessWidget {
                 ),
               ),
               ...store.newAssignments.take(3).map(
-                (r) => TaskCard(
-                  r,
-                  onTap: () =>
-                      Navigator.of(context).pushNamed('/assignments/${r.id}'),
-                ),
-              ),
+                    (r) => TaskCard(
+                      r,
+                      onTap: () => Navigator.of(context)
+                          .pushNamed('/assignments/${r.id}'),
+                    ),
+                  ),
             ],
             gap(18),
             // Safety Tip Card
@@ -635,16 +724,15 @@ class DashboardTab extends StatelessWidget {
     String value,
     Color accent,
   ) {
-    final theme = Theme.of(context);
-    final dark = theme.brightness == Brightness.dark;
-
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 6),
         decoration: BoxDecoration(
-          color: dark ? const Color(0xFF1E2026) : Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: theme.colorScheme.outlineVariant),
+          border: Border(
+            right: label == 'Resolved'
+                ? BorderSide.none
+                : const BorderSide(color: Color(0xFF343740)),
+          ),
         ),
         child: Column(
           children: [
@@ -663,7 +751,7 @@ class DashboardTab extends StatelessWidget {
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: theme.colorScheme.onSurfaceVariant,
+                color: const Color(0xFFD5DEE9),
               ),
             ),
           ],
@@ -1025,8 +1113,7 @@ class RepairDocumentationScreen extends StatefulWidget {
       _RepairDocumentationScreenState();
 }
 
-class _RepairDocumentationScreenState
-    extends State<RepairDocumentationScreen> {
+class _RepairDocumentationScreenState extends State<RepairDocumentationScreen> {
   final _notesController = TextEditingController(
     text:
         'Base compacted, crack seal applied, and hot asphalt patched to grade.',
@@ -1167,7 +1254,7 @@ class SubmissionSuccessScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                mascot(width: 130),
+                mascot(width: 130, dance: true),
                 gap(20),
                 const StatusBadge('Awaiting Verification'),
                 gap(16),
