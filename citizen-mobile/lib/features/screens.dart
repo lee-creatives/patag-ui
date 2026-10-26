@@ -565,9 +565,11 @@ class CitizenHome extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Around you',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                const Expanded(
+                  child: Text(
+                    'Around you',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
                 ),
                 TextButton(
                   onPressed: () => go(context, '/map'),
