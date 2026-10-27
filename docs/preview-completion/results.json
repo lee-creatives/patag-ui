@@ -1,0 +1,28 @@
+{
+  "checks": [
+    "Create maintenance team",
+    "Create staff account with team membership",
+    "Shared settings survive reload",
+    "Citizen registration and session survive reload",
+    "Citizen password login and error feedback",
+    "New report uses shared agency; photos private by default",
+    "LGU approve/hide public photos updates citizen visibility",
+    "New crew receives assigned report after password login",
+    "48 responsive screen/theme/width checks"
+  ],
+  "errors": [],
+  "crewEvidence": {
+    "user": {
+      "id": "cedc676d-d64a-43ed-b928-f2efbc607c3f",
+      "active": true,
+      "name": "Preview Crew Charlie",
+      "email": "charlie@example.test",
+      "role": "maintenance",
+      "teamId": "43411d12-4269-4ee3-be2a-3f5df20c33c9",
+      "iterations": 600000
+    },
+    "reportIds": [
+      "PTG-2026-E49A47D8"
+    ]
+  }
+}

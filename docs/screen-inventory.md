@@ -1,6 +1,6 @@
 # Screen inventory
 
-All 55 specified route entries have source implementations. The PDF requires functional areas, not 55 distinct pages. Related views intentionally reuse the report workspace component. Web routes were opened in local Chrome; this is route smoke coverage, not proof of every control. Flutter source now passes analysis and 13 widget/model tests; actual Android device validation remains incomplete. See redesign-validation.md for the latest evidence.
+All 55 specified route entries have source implementations. The PDF requires functional areas, not 55 distinct pages. Related views intentionally reuse the report workspace component. Web routes were opened in local Chrome; this is route smoke coverage, not proof of every control. Flutter source now passes analysis and 26 widget/model tests; actual Android device validation remains incomplete. See redesign-validation.md for the latest evidence.
 
 | ID | Screen | Route | Scope | Evidence |
 |---|---|---|---|---|

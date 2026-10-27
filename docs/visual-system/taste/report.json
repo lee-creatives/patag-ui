@@ -1,0 +1,2366 @@
+{
+ "url": "http://127.0.0.1:8080/#/admin/dashboard",
+ "at": "2026-10-23T13:33:28.042Z",
+ "allow": [
+  "gradient",
+  "button-fx",
+  "glass",
+  "shadow",
+  "palette-cream",
+  "palette-terracotta",
+  "micro-label",
+  "kpi-size",
+  "app-title-size"
+ ],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.77,
+    0.87
+   ],
+   "motion": {
+    "elements": 11,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 11,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 1367,
+     "screens": 1.5,
+     "words": 232,
+     "img": 12,
+     "video": 0,
+     "canvas": 0,
+     "svg": 37,
+     "sections": 6,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 6,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "3753.png",
+      "3754.png",
+      "3753.png",
+      "3753.png",
+      "3754.png",
+      "3754.png"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Roads overview",
+     "words": 2,
+     "chars": 14,
+     "lines": 1,
+     "size": 37,
+     "vw": 2.6,
+     "font": "Montserrat",
+     "weight": 600,
+     "tracking": -0.05,
+     "leading": 1.18,
+     "top": 173,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Roads overview",
+     "words": 2,
+     "lines": 1,
+     "size": 37.4,
+     "font": "Montserrat"
+    },
+    "headings": [
+     {
+      "text": "Roads overview",
+      "words": 2,
+      "chars": 14,
+      "lines": 1,
+      "size": 37.4,
+      "vw": 2.6,
+      "font": "Montserrat",
+      "weight": 600,
+      "tracking": -0.045,
+      "leading": 1.18,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.26,
+      "top": 173,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "12",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 48,
+      "vw": 3.3,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": -0.07,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.2,
+      "top": 316,
+      "tag": "div",
+      "kind": "heading"
+     },
+     {
+      "text": "3",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 34,
+      "vw": 2.4,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": -0.06,
+      "leading": 1.4,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.01,
+      "top": 326,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "3",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 34,
+      "vw": 2.4,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": -0.06,
+      "leading": 1.4,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.01,
+      "top": 326,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "1",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 34,
+      "vw": 2.4,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": -0.06,
+      "leading": 1.4,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.01,
+      "top": 326,
+      "tag": "strong",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 5,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Montserrat",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      11,
+      12,
+      13,
+      14,
+      16,
+      17,
+      22,
+      24,
+      26,
+      34,
+      37,
+      48
+     ],
+     "sizeCount": 12,
+     "notLoaded": [],
+     "body": null,
+     "measureChars": null,
+     "max": {
+      "size": 48,
+      "vw": 3.3,
+      "font": "Montserrat",
+      "text": "12"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.04,
+     "centerShare": 0,
+     "smallText": 37
+    },
+    "eyebrows": [
+     {
+      "text": "LGU operations Malolos, Bulacan",
+      "above": "Roads overview",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 11,
+      "top": 146
+     },
+     {
+      "text": "Community reports",
+      "above": "12",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 13,
+      "top": 300
+     },
+     {
+      "text": "Pending review",
+      "above": "3",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 13,
+      "top": 300
+     },
+     {
+      "text": "In progress",
+      "above": "3",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 13,
+      "top": 300
+     },
+     {
+      "text": "Resolved",
+      "above": "1",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 13,
+      "top": 300
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#101114",
+     "bodyBgHsl": {
+      "h": 225,
+      "s": 0.11,
+      "l": 0.07
+     },
+     "dark": true,
+     "sectionBgs": [],
+     "textColors": [
+      {
+       "color": "#b5b5be",
+       "share": 0.53
+      },
+      {
+       "color": "#f8f8f8",
+       "share": 0.33
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.05
+      },
+      {
+       "color": "#d2dce8",
+       "share": 0.03
+      },
+      {
+       "color": "#d0d0d5",
+       "share": 0.03
+      }
+     ],
+     "button": {
+      "bg": "#26272c",
+      "hsl": {
+       "h": 230,
+       "s": 0.07,
+       "l": 0.16
+      },
+      "fg": "#f8f8f8"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 13,
+     "inHero": 7,
+     "radius": 0,
+     "height": 65,
+     "withShadow": 1,
+     "withGradient": 1,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Skip to content",
+      "Overview",
+      "Overview",
+      "Review reports",
+      "Verify reports 3"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 9,
+     "shadowOverlay": 0,
+     "shadowSamples": [
+      "a.primary → rgba(242, 106, 50, 0.11) 0px 4px 10px 0px",
+      "a.summary-lead → rgba(0, 0, 0, 0.067) 0px 3px 5px 0px, rgba(0, 0, 0, 0.133) 0px 12px 28px 0px",
+      "a.summary-metric → rgba(0, 0, 0, 0.067) 0px 3px 5px 0px, rgba(0, 0, 0, 0.133) 0px 12px 28px 0px",
+      "a.summary-metric → rgba(0, 0, 0, 0.067) 0px 3px 5px 0px, rgba(0, 0, 0, 0.133) 0px 12px 28px 0px"
+     ],
+     "gradients": 1,
+     "scrims": 0,
+     "gradientSamples": [
+      "a.summary-lead → linear-gradient(135deg, rgb(51, 52, 56), rgb(17, 18, 21))"
+     ],
+     "gradientText": 0,
+     "hairlines": 6,
+     "hairlineSamples": [
+      "aside#workspace-navigation.sidebar.open 260px",
+      "div.topbar 1180px",
+      "a.report-row 502px",
+      "a.report-row 502px",
+      "a.report-row 407px"
+     ],
+     "outlinedBoxes": 9,
+     "dashed": 0,
+     "blurred": 1,
+     "roundedBoxes": 14,
+     "boxRadius": 22,
+     "squareMedia": 6,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [
+     {
+      "type": "svg",
+      "ratio": 0.13
+     }
+    ],
+    "nav": {
+     "links": 0,
+     "fixed": true,
+     "height": 868,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "montserrat"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 1367,
+    "margins": {
+     "left": 288,
+     "right": 58
+    },
+    "sections": [
+     {
+      "sel": "section.overview-summary",
+      "tag": "section",
+      "top": 277,
+      "height": 158,
+      "words": 23,
+      "media": 0,
+      "middle": 163,
+      "heading": {
+       "text": "12",
+       "size": 48,
+       "tag": "strong"
+      },
+      "left": 313,
+      "right": 162,
+      "textLeft": 313,
+      "textRight": 162,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.operations-grid",
+      "tag": "div",
+      "top": 456,
+      "height": 692,
+      "words": 56,
+      "media": 5,
+      "middle": 0,
+      "heading": {
+       "text": "The action desk",
+       "size": 17,
+       "tag": "h2"
+      },
+      "left": 313,
+      "right": 0,
+      "textLeft": 313,
+      "textRight": 58,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Roads overview",
+      "size": 37,
+      "top": 173,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 313,
+      "n": 3
+     },
+     {
+      "x": 288,
+      "n": 1
+     },
+     {
+      "x": 885,
+      "n": 1
+     },
+     {
+      "x": 980,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 6,
+    "bodySize": 14,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.07,
+    "voidBox": {
+     "x": 720,
+     "y": 120,
+     "w": 480,
+     "h": 180
+    }
+   },
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": true,
+    "ground": "#101114",
+    "sidebar": {
+     "w": 260,
+     "tag": "aside",
+     "links": 16,
+     "share": 0.18
+    },
+    "topbar": null,
+    "canvas": {
+     "left": 28,
+     "right": 3
+    },
+    "hero": {
+     "text": "Roads overview",
+     "words": 2,
+     "chars": 14,
+     "lines": 1,
+     "size": 37,
+     "vw": 2.6,
+     "font": "Montserrat",
+     "weight": 600,
+     "tracking": -0.05,
+     "leading": 1.18,
+     "top": 173,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 3,
+    "layout": {
+     "panels": 10,
+     "firstScreen": 9,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 16,
+     "radii": [
+      [
+       22,
+       7
+      ],
+      [
+       16,
+       5
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       24,
+       2
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 16,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 1,
+     "tabularShare": 0,
+     "kpiMax": 48
+    },
+    "rows": null,
+    "chartHues": 3,
+    "placeholders": [],
+    "type": {
+     "under13": 0.76,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      11,
+      12,
+      13,
+      14,
+      16,
+      17,
+      37,
+      48
+     ]
+    },
+    "title": {
+     "text": "Roads overview",
+     "size": 37,
+     "top": 173
+    },
+    "colourShare": 0.039
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.78,
+    0.81,
+    0.79
+   ],
+   "motion": {
+    "elements": 19,
+    "css": 0,
+    "transitions": 6,
+    "scripted": 13,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 2311,
+     "screens": 2.3,
+     "words": 185,
+     "img": 14,
+     "video": 0,
+     "canvas": 0,
+     "svg": 37,
+     "sections": 6,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 8,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "3753.png",
+      "3753.png",
+      "3754.png",
+      "3754.png",
+      "3753.png",
+      "3753.png",
+      "3754.png",
+      "3754.png"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Roads overview",
+     "words": 2,
+     "chars": 14,
+     "lines": 1,
+     "size": 30,
+     "vw": 3.9,
+     "font": "Montserrat",
+     "weight": 600,
+     "tracking": -0.05,
+     "leading": 1.18,
+     "top": 159,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Roads overview",
+     "words": 2,
+     "lines": 1,
+     "size": 30,
+     "font": "Montserrat"
+    },
+    "headings": [
+     {
+      "text": "Roads overview",
+      "words": 2,
+      "chars": 14,
+      "lines": 1,
+      "size": 30,
+      "vw": 3.9,
+      "font": "Montserrat",
+      "weight": 600,
+      "tracking": -0.045,
+      "leading": 1.18,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.49,
+      "top": 159,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "12",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 48,
+      "vw": 6.3,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": -0.07,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.4,
+      "top": 291,
+      "tag": "div",
+      "kind": "heading"
+     },
+     {
+      "text": "3",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 34,
+      "vw": 4.4,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": -0.06,
+      "leading": 1.4,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.02,
+      "top": 301,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "3",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 34,
+      "vw": 4.4,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": -0.06,
+      "leading": 1.4,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.02,
+      "top": 472,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "1",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 34,
+      "vw": 4.4,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": -0.06,
+      "leading": 1.4,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.01,
+      "top": 472,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "3",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 26,
+      "vw": 3.4,
+      "font": "Montserrat",
+      "weight": 500,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.21,
+      "top": 695,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "2",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 26,
+      "vw": 3.4,
+      "font": "Montserrat",
+      "weight": 500,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.21,
+      "top": 695,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "1",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 26,
+      "vw": 3.4,
+      "font": "Montserrat",
+      "weight": 500,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.21,
+      "top": 695,
+      "tag": "strong",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 8,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Montserrat",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      11,
+      12,
+      13,
+      14,
+      16,
+      17,
+      22,
+      24,
+      26,
+      30,
+      34,
+      48
+     ],
+     "sizeCount": 12,
+     "notLoaded": [],
+     "body": null,
+     "measureChars": null,
+     "max": {
+      "size": 48,
+      "vw": 6.3,
+      "font": "Montserrat",
+      "text": "12"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0,
+     "smallText": 23
+    },
+    "eyebrows": [
+     {
+      "text": "LGU operations Malolos, Bulacan",
+      "above": "Roads overview",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 11,
+      "top": 132
+     },
+     {
+      "text": "Community reports",
+      "above": "12",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 13,
+      "top": 275
+     },
+     {
+      "text": "Pending review",
+      "above": "3",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 13,
+      "top": 275
+     },
+     {
+      "text": "In progress",
+      "above": "3",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 13,
+      "top": 446
+     },
+     {
+      "text": "Resolved",
+      "above": "1",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 13,
+      "top": 446
+     },
+     {
+      "text": "Verify reports",
+      "above": "3",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 12,
+      "top": 672
+     },
+     {
+      "text": "Ready for a crew",
+      "above": "2",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 12,
+      "top": 672
+     },
+     {
+      "text": "Approve repairs",
+      "above": "1",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 12,
+      "top": 672
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#101114",
+     "bodyBgHsl": {
+      "h": 225,
+      "s": 0.11,
+      "l": 0.07
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#1b1c20",
+       "top": 588,
+       "hsl": {
+        "h": 228,
+        "s": 0.08,
+        "l": 0.12
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#b5b5be",
+       "share": 0.43
+      },
+      {
+       "color": "#f8f8f8",
+       "share": 0.39
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.07
+      },
+      {
+       "color": "#d2dce8",
+       "share": 0.04
+      },
+      {
+       "color": "#d0d0d5",
+       "share": 0.04
+      }
+     ],
+     "button": {
+      "bg": "#1b1c20",
+      "hsl": {
+       "h": 228,
+       "s": 0.08,
+       "l": 0.12
+      },
+      "fg": "#f8f8f8"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 9,
+     "inHero": 3,
+     "radius": 0,
+     "height": 67,
+     "withShadow": 1,
+     "withGradient": 1,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Skip to content",
+      "Overview",
+      "Review reports"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 9,
+     "shadowOverlay": 0,
+     "shadowSamples": [
+      "a.primary → rgba(242, 106, 50, 0.11) 0px 4px 10px 0px",
+      "a.summary-lead → rgba(0, 0, 0, 0.067) 0px 3px 5px 0px, rgba(0, 0, 0, 0.133) 0px 12px 28px 0px",
+      "a.summary-metric → rgba(0, 0, 0, 0.067) 0px 3px 5px 0px, rgba(0, 0, 0, 0.133) 0px 12px 28px 0px",
+      "a.summary-metric → rgba(0, 0, 0, 0.067) 0px 3px 5px 0px, rgba(0, 0, 0, 0.133) 0px 12px 28px 0px"
+     ],
+     "gradients": 1,
+     "scrims": 0,
+     "gradientSamples": [
+      "a.summary-lead → linear-gradient(135deg, rgb(51, 52, 56), rgb(17, 18, 21))"
+     ],
+     "gradientText": 0,
+     "hairlines": 5,
+     "hairlineSamples": [
+      "div.topbar 768px",
+      "a.report-row 674px",
+      "a.report-row 674px",
+      "a.report-row 674px",
+      "a.report-row 674px"
+     ],
+     "outlinedBoxes": 9,
+     "dashed": 0,
+     "blurred": 1,
+     "roundedBoxes": 14,
+     "boxRadius": 22,
+     "squareMedia": 8,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 4,
+       "iconTopped": true,
+       "rounded": true,
+       "top": 254
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 0,
+     "fixed": true,
+     "height": 0,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "montserrat"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 2311,
+    "margins": {
+     "left": 24,
+     "right": 47
+    },
+    "sections": [
+     {
+      "sel": "section.overview-summary",
+      "tag": "section",
+      "top": 254,
+      "height": 314,
+      "words": 23,
+      "media": 0,
+      "middle": 163,
+      "heading": {
+       "text": "12",
+       "size": 48,
+       "tag": "strong"
+      },
+      "left": 45,
+      "right": 229,
+      "textLeft": 45,
+      "textRight": 229,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "div.operations-grid",
+      "tag": "div",
+      "top": 588,
+      "height": 1349,
+      "words": 56,
+      "media": 10,
+      "middle": 0,
+      "heading": {
+       "text": "The action desk",
+       "size": 17,
+       "tag": "h2"
+      },
+      "left": 0,
+      "right": 0,
+      "textLeft": 47,
+      "textRight": 47,
+      "fullBleed": true,
+      "footer": false,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.road-progress",
+      "tag": "section",
+      "top": 1958,
+      "height": 265,
+      "words": 19,
+      "media": 0,
+      "middle": 147,
+      "heading": {
+       "text": "From a tag to a better road",
+       "size": 16,
+       "tag": "h2"
+      },
+      "left": 47,
+      "right": 205,
+      "textLeft": 47,
+      "textRight": 205,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Roads overview",
+      "size": 30,
+      "top": 159,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 47,
+      "n": 5
+     },
+     {
+      "x": 24,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 6,
+    "bodySize": 14,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": true,
+    "ground": "#101114",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 20,
+     "right": 16
+    },
+    "hero": {
+     "text": "Roads overview",
+     "words": 2,
+     "chars": 14,
+     "lines": 1,
+     "size": 30,
+     "vw": 3.9,
+     "font": "Montserrat",
+     "weight": 600,
+     "tracking": -0.05,
+     "leading": 1.18,
+     "top": 159,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 3,
+    "layout": {
+     "panels": 9,
+     "firstScreen": 6,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 14,
+     "radii": [
+      [
+       22,
+       7
+      ],
+      [
+       16,
+       5
+      ],
+      [
+       20,
+       1
+      ],
+      [
+       24,
+       1
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 16,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 1,
+     "tabularShare": 0,
+     "kpiMax": 48
+    },
+    "rows": null,
+    "chartHues": 3,
+    "placeholders": [],
+    "type": {
+     "under13": 0.7,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      11,
+      12,
+      13,
+      14,
+      16,
+      17,
+      30,
+      48
+     ]
+    },
+    "title": {
+     "text": "Roads overview",
+     "size": 30,
+     "top": 159
+    },
+    "colourShare": 0.039
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 3,
+   "filled": [
+    0.69,
+    0.92,
+    0.83
+   ],
+   "motion": {
+    "elements": 15,
+    "css": 0,
+    "transitions": 6,
+    "scripted": 9,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 2470,
+     "screens": 2.9,
+     "words": 172,
+     "img": 10,
+     "video": 0,
+     "canvas": 0,
+     "svg": 37,
+     "sections": 6,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 4,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "3753.png",
+      "3753.png",
+      "3754.png",
+      "3754.png"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Roads overview",
+     "words": 2,
+     "chars": 14,
+     "lines": 1,
+     "size": 28,
+     "vw": 7.2,
+     "font": "Montserrat",
+     "weight": 600,
+     "tracking": -0.04,
+     "leading": 1.15,
+     "top": 162,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Roads overview",
+     "words": 2,
+     "lines": 1,
+     "size": 28,
+     "font": "Montserrat"
+    },
+    "headings": [
+     {
+      "text": "Roads overview",
+      "words": 2,
+      "chars": 14,
+      "lines": 1,
+      "size": 28,
+      "vw": 7.2,
+      "font": "Montserrat",
+      "weight": 600,
+      "tracking": -0.045,
+      "leading": 1.15,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 162,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "12",
+      "words": 1,
+      "chars": 2,
+      "lines": 1,
+      "size": 42,
+      "vw": 10.8,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": -0.07,
+      "leading": 1.3,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.36,
+      "top": 348,
+      "tag": "div",
+      "kind": "heading"
+     },
+     {
+      "text": "3",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 32,
+      "vw": 8.2,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": -0.06,
+      "leading": 1.4,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.04,
+      "top": 358,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "3",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 32,
+      "vw": 8.2,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": -0.06,
+      "leading": 1.4,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.04,
+      "top": 533,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "1",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 32,
+      "vw": 8.2,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": -0.06,
+      "leading": 1.4,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.02,
+      "top": 533,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "3",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 22,
+      "vw": 5.6,
+      "font": "Montserrat",
+      "weight": 500,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.03,
+      "top": 740,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "2",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 22,
+      "vw": 5.6,
+      "font": "Montserrat",
+      "weight": 500,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.03,
+      "top": 799,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "1",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 22,
+      "vw": 5.6,
+      "font": "Montserrat",
+      "weight": 500,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.02,
+      "top": 858,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "+",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 22,
+      "vw": 5.6,
+      "font": "Montserrat",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.36,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "left",
+      "widthRatio": 0.08,
+      "top": 1224,
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "−",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 22,
+      "vw": 5.6,
+      "font": "Montserrat",
+      "weight": 700,
+      "tracking": 0,
+      "leading": 1.36,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "center",
+      "position": "left",
+      "widthRatio": 0.08,
+      "top": 1254,
+      "tag": "a",
+      "kind": "heading"
+     },
+     {
+      "text": "2",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.25,
+      "top": 2199,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "1",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.25,
+      "top": 2199,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "2",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.25,
+      "top": 2199,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "1",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.25,
+      "top": 2283,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "3",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.25,
+      "top": 2283,
+      "tag": "strong",
+      "kind": "heading"
+     },
+     {
+      "text": "1",
+      "words": 1,
+      "chars": 1,
+      "lines": 1,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Montserrat",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.25,
+      "top": 2283,
+      "tag": "strong",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 16,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 2,
+     "medianWords": 1,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Montserrat",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      22,
+      24,
+      28,
+      32,
+      42
+     ],
+     "sizeCount": 11,
+     "notLoaded": [],
+     "body": null,
+     "measureChars": null,
+     "max": {
+      "size": 42,
+      "vw": 10.8,
+      "font": "Montserrat",
+      "text": "12"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0.01,
+     "centerShare": 0,
+     "smallText": 23
+    },
+    "eyebrows": [
+     {
+      "text": "LGU operations Malolos, Bulacan",
+      "above": "Roads overview",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 11,
+      "top": 130
+     },
+     {
+      "text": "Community reports",
+      "above": "12",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 13,
+      "top": 330
+     },
+     {
+      "text": "Pending review",
+      "above": "3",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 13,
+      "top": 330
+     },
+     {
+      "text": "In progress",
+      "above": "3",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 13,
+      "top": 505
+     },
+     {
+      "text": "Resolved",
+      "above": "1",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 13,
+      "top": 505
+     },
+     {
+      "text": "Every stage, accounted for.",
+      "above": "2",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 12,
+      "top": 2149
+     },
+     {
+      "text": "Every stage, accounted for.",
+      "above": "1",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 12,
+      "top": 2149
+     },
+     {
+      "text": "Every stage, accounted for.",
+      "above": "2",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 12,
+      "top": 2149
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#101114",
+     "bodyBgHsl": {
+      "h": 225,
+      "s": 0.11,
+      "l": 0.07
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#1b1c20",
+       "top": 664,
+       "hsl": {
+        "h": 228,
+        "s": 0.08,
+        "l": 0.12
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#b5b5be",
+       "share": 0.46
+      },
+      {
+       "color": "#f8f8f8",
+       "share": 0.4
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.06
+      },
+      {
+       "color": "#d0d0d5",
+       "share": 0.04
+      },
+      {
+       "color": "#20180f",
+       "share": 0.02
+      }
+     ],
+     "button": {
+      "bg": "#26272c",
+      "hsl": {
+       "h": 230,
+       "s": 0.07,
+       "l": 0.16
+      },
+      "fg": "#f8f8f8"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 11,
+     "inHero": 4,
+     "radius": 0,
+     "height": 65,
+     "withShadow": 1,
+     "withGradient": 1,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Skip to content",
+      "Review reports",
+      "Verify reports 3",
+      "Ready for a crew 2"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 9,
+     "shadowOverlay": 0,
+     "shadowSamples": [
+      "a.primary → rgba(242, 106, 50, 0.11) 0px 4px 10px 0px",
+      "a.summary-lead → rgba(0, 0, 0, 0.067) 0px 3px 5px 0px, rgba(0, 0, 0, 0.133) 0px 12px 28px 0px",
+      "a.summary-metric → rgba(0, 0, 0, 0.067) 0px 3px 5px 0px, rgba(0, 0, 0, 0.133) 0px 12px 28px 0px",
+      "a.summary-metric → rgba(0, 0, 0, 0.067) 0px 3px 5px 0px, rgba(0, 0, 0, 0.133) 0px 12px 28px 0px"
+     ],
+     "gradients": 2,
+     "scrims": 0,
+     "gradientSamples": [
+      "a.primary → linear-gradient(135deg, rgb(255, 170, 118), rgb(255, 122, 47) 55%, rgb(242, 106, 50))",
+      "a.summary-lead → linear-gradient(135deg, rgb(51, 52, 56), rgb(17, 18, 21))"
+     ],
+     "gradientText": 0,
+     "hairlines": 5,
+     "hairlineSamples": [
+      "div.topbar 390px",
+      "a.report-row 316px",
+      "a.report-row 316px",
+      "a.report-row 316px",
+      "a.report-row 316px"
+     ],
+     "outlinedBoxes": 9,
+     "dashed": 0,
+     "blurred": 1,
+     "roundedBoxes": 11,
+     "boxRadius": 20,
+     "squareMedia": 4,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 4,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 311
+      }
+     ]
+    },
+    "heroMedia": [],
+    "nav": {
+     "links": 0,
+     "fixed": true,
+     "height": 0,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "montserrat"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 2470,
+    "margins": {
+     "left": 16,
+     "right": 37
+    },
+    "sections": [
+     {
+      "sel": "header.page-heading",
+      "tag": "header",
+      "top": 130,
+      "height": 155,
+      "words": 18,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Roads overview",
+       "size": 28,
+       "tag": "h1"
+      },
+      "left": 16,
+      "right": 49,
+      "textLeft": 16,
+      "textRight": 49,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.overview-summary",
+      "tag": "section",
+      "top": 311,
+      "height": 333,
+      "words": 23,
+      "media": 0,
+      "middle": 57,
+      "heading": {
+       "text": "12",
+       "size": 42,
+       "tag": "strong"
+      },
+      "left": 33,
+      "right": 46,
+      "textLeft": 33,
+      "textRight": 46,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.panel.action-desk",
+      "tag": "section",
+      "top": 664,
+      "height": 458,
+      "words": 24,
+      "media": 0,
+      "middle": 73,
+      "heading": {
+       "text": "The action desk",
+       "size": 15,
+       "tag": "h2"
+      },
+      "left": 37,
+      "right": 44,
+      "textLeft": 37,
+      "textRight": 44,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.panel.overview-map",
+      "tag": "section",
+      "top": 1154,
+      "height": 342,
+      "words": 11,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Road conditions",
+       "size": 15,
+       "tag": "h2"
+      },
+      "left": 37,
+      "right": 42,
+      "textLeft": 37,
+      "textRight": 42,
+      "fullBleed": true,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.panel.overview-trend",
+      "tag": "section",
+      "top": 1528,
+      "height": 263,
+      "words": 7,
+      "media": 1,
+      "middle": 0,
+      "heading": {
+       "text": "Reports over time",
+       "size": 15,
+       "tag": "h2"
+      },
+      "left": 37,
+      "right": 37,
+      "textLeft": 37,
+      "textRight": 37,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.panel.overview-priority",
+      "tag": "section",
+      "top": 1823,
+      "height": 239,
+      "words": 14,
+      "media": 0,
+      "middle": 64,
+      "heading": {
+       "text": "Priority roads",
+       "size": 15,
+       "tag": "h2"
+      },
+      "left": 37,
+      "right": 44,
+      "textLeft": 37,
+      "textRight": 44,
+      "fullBleed": false,
+      "footer": false,
+      "hero": false,
+      "continues": true,
+      "pinned": false
+     },
+     {
+      "sel": "section.road-progress",
+      "tag": "section",
+      "top": 2098,
+      "height": 258,
+      "words": 19,
+      "media": 0,
+      "middle": 7,
+      "heading": {
+       "text": "From a tag to a better road",
+       "size": 16,
+       "tag": "h2"
+      },
+      "left": 37,
+      "right": 85,
+      "textLeft": 37,
+      "textRight": 85,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Roads overview",
+      "size": 28,
+      "top": 162,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 37,
+      "n": 5
+     },
+     {
+      "x": 16,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 6,
+    "bodySize": 12,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "dark": true,
+    "ground": "#101114",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 16,
+     "right": -7
+    },
+    "hero": {
+     "text": "Roads overview",
+     "words": 2,
+     "chars": 14,
+     "lines": 1,
+     "size": 28,
+     "vw": 7.2,
+     "font": "Montserrat",
+     "weight": 600,
+     "tracking": -0.04,
+     "leading": 1.15,
+     "top": 162,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 3,
+    "layout": {
+     "panels": 9,
+     "firstScreen": 5,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 11,
+     "radii": [
+      [
+       20,
+       4
+      ],
+      [
+       22,
+       4
+      ],
+      [
+       16,
+       2
+      ],
+      [
+       24,
+       1
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 16,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 1,
+     "tabularShare": 0,
+     "kpiMax": 42
+    },
+    "rows": null,
+    "chartHues": 3,
+    "placeholders": [],
+    "type": {
+     "under13": 0.74,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      28,
+      42
+     ]
+    },
+    "title": {
+     "text": "Roads overview",
+     "size": 28,
+     "top": 162
+    },
+    "colourShare": 0.08
+   },
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "radius-mix",
+   "width": 1440,
+   "message": "Panels use 4 corner radii (22, 16, 0, 24px).",
+   "fix": "One radius for panels, one for controls, full round only for pills and avatars."
+  },
+  {
+   "level": "WARN",
+   "id": "tiny-text",
+   "width": 1440,
+   "message": "76% of the text is under 13px.",
+   "fix": "Data and labels read at 13–14px; keep 11–12px for sublines and axis ticks.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "C:\\Users\\user\\Downloads\\PATAG\\docs\\visual-system\\taste\\desktop-fold.jpg",
+   "pages": [
+    "C:\\Users\\user\\Downloads\\PATAG\\docs\\visual-system\\taste\\desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "C:\\Users\\user\\Downloads\\PATAG\\docs\\visual-system\\taste\\tablet-fold.jpg",
+   "pages": [
+    "C:\\Users\\user\\Downloads\\PATAG\\docs\\visual-system\\taste\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "C:\\Users\\user\\Downloads\\PATAG\\docs\\visual-system\\taste\\mobile-fold.jpg",
+   "pages": [
+    "C:\\Users\\user\\Downloads\\PATAG\\docs\\visual-system\\taste\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

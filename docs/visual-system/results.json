@@ -1,0 +1,2441 @@
+{
+  "dashboards": [
+    {
+      "role": "admin",
+      "width": 320,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 375,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 390,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 430,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 768,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 1024,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 1280,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 1440,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 1920,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 320,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 375,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 390,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 430,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 768,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 1024,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 1280,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 1440,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 1920,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 320,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 375,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 390,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 430,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 768,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 1024,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 1280,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 1440,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 1920,
+      "theme": "light",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 320,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 375,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 390,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 430,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 768,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 1024,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 1280,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 1440,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "admin",
+      "width": 1920,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 320,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 375,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 390,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 430,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 768,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 1024,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 1280,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 1440,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "maintenance",
+      "width": 1920,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 320,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 375,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 390,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 430,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 768,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 1024,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 1280,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 1440,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 1920,
+      "theme": "dark",
+      "font": "Montserrat, sans-serif",
+      "fontLoaded": true,
+      "overflow": false
+    }
+  ],
+  "routes": [
+    {
+      "id": "C07",
+      "route": "/citizen/home",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "May lubaksa daan?"
+      ]
+    },
+    {
+      "id": "C08",
+      "route": "/citizen/report/new",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Show us the road."
+      ]
+    },
+    {
+      "id": "C09",
+      "route": "/citizen/report/success/PTG-2026-0101",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Na-tag naang lubak!"
+      ]
+    },
+    {
+      "id": "C10",
+      "route": "/citizen/reports",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Your tags.Their progress."
+      ]
+    },
+    {
+      "id": "C11",
+      "route": "/citizen/reports/PTG-2026-0101",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "MacArthur Highway"
+      ]
+    },
+    {
+      "id": "C12",
+      "route": "/citizen/map",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Know theroad ahead."
+      ]
+    },
+    {
+      "id": "C13",
+      "route": "/citizen/map/reports/PTG-2026-0101",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "MacArthur Highway"
+      ]
+    },
+    {
+      "id": "C14",
+      "route": "/citizen/notifications",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Notifications"
+      ]
+    },
+    {
+      "id": "C15",
+      "route": "/citizen/reports/PTG-2026-0108/feedback",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "How wasthe repair?"
+      ]
+    },
+    {
+      "id": "C16",
+      "route": "/citizen/profile",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Alex Dela Cruz"
+      ]
+    },
+    {
+      "id": "C17",
+      "route": "/citizen/profile/edit",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Edit profile"
+      ]
+    },
+    {
+      "id": "C18",
+      "route": "/citizen/settings",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Settings"
+      ]
+    },
+    {
+      "id": "C19",
+      "route": "/citizen/help",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "A good report goes further."
+      ]
+    },
+    {
+      "id": "C20",
+      "route": "/citizen/about",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "I-tag ang lubak. Tungo sa patag."
+      ]
+    },
+    {
+      "id": "A01",
+      "route": "/admin/login",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Better roads.Built together."
+      ]
+    },
+    {
+      "id": "A02",
+      "route": "/admin/dashboard",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Roads overview"
+      ]
+    },
+    {
+      "id": "A03",
+      "route": "/admin/reports",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "All reports"
+      ]
+    },
+    {
+      "id": "A04",
+      "route": "/admin/reports/PTG-2026-0101",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "MacArthur Highway"
+      ]
+    },
+    {
+      "id": "A05",
+      "route": "/admin/verification",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Verification queue"
+      ]
+    },
+    {
+      "id": "A06",
+      "route": "/admin/verification/PTG-2026-0101",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Review the report"
+      ]
+    },
+    {
+      "id": "A07",
+      "route": "/admin/duplicates",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Possible duplicates"
+      ]
+    },
+    {
+      "id": "A08",
+      "route": "/admin/map",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Pothole map"
+      ]
+    },
+    {
+      "id": "A09",
+      "route": "/admin/assignments",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Assignment management"
+      ]
+    },
+    {
+      "id": "A10",
+      "route": "/admin/assignments/new/PTG-2026-0103",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Assign a maintenance team"
+      ]
+    },
+    {
+      "id": "A11",
+      "route": "/admin/teams",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Maintenance teams"
+      ]
+    },
+    {
+      "id": "A12",
+      "route": "/admin/teams/team-1",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Maintenance team"
+      ]
+    },
+    {
+      "id": "A13",
+      "route": "/admin/completions",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Repair verification"
+      ]
+    },
+    {
+      "id": "A14",
+      "route": "/admin/completions/PTG-2026-0107",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Verify completed repair"
+      ]
+    },
+    {
+      "id": "A15",
+      "route": "/admin/users",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "User accounts"
+      ]
+    },
+    {
+      "id": "A16",
+      "route": "/admin/users/citizen-1",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "User details"
+      ]
+    },
+    {
+      "id": "A17",
+      "route": "/admin/analytics",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Community reports, in perspective."
+      ]
+    },
+    {
+      "id": "A18",
+      "route": "/admin/exports",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Export center"
+      ]
+    },
+    {
+      "id": "A19",
+      "route": "/admin/notifications",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Notifications"
+      ]
+    },
+    {
+      "id": "A20",
+      "route": "/admin/settings",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Workspace settings"
+      ]
+    },
+    {
+      "id": "A21",
+      "route": "/admin/activity",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Report history"
+      ]
+    },
+    {
+      "id": "M01",
+      "route": "/maintenance/login",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Better roads.Built together."
+      ]
+    },
+    {
+      "id": "M02",
+      "route": "/maintenance/dashboard",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Your day on the road"
+      ]
+    },
+    {
+      "id": "M03",
+      "route": "/maintenance/assignments",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "My assignments"
+      ]
+    },
+    {
+      "id": "M04",
+      "route": "/maintenance/assignments/PTG-2026-0104",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Mabini Street"
+      ]
+    },
+    {
+      "id": "M05",
+      "route": "/maintenance/map",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Assigned task map"
+      ]
+    },
+    {
+      "id": "M06",
+      "route": "/maintenance/progress",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Repairs in progress"
+      ]
+    },
+    {
+      "id": "M07",
+      "route": "/maintenance/progress/PTG-2026-0106",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Cabanas Road"
+      ]
+    },
+    {
+      "id": "M08",
+      "route": "/maintenance/repairs/PTG-2026-0106/document",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Document the repair"
+      ]
+    },
+    {
+      "id": "M09",
+      "route": "/maintenance/repairs/PTG-2026-0106/submit",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Review completion evidence"
+      ]
+    },
+    {
+      "id": "M10",
+      "route": "/maintenance/repairs/PTG-2026-0106/success",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Work submitted.One step closer to patag."
+      ]
+    },
+    {
+      "id": "M11",
+      "route": "/maintenance/submissions",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Completion submissions"
+      ]
+    },
+    {
+      "id": "M12",
+      "route": "/maintenance/history",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Repair history"
+      ]
+    },
+    {
+      "id": "M13",
+      "route": "/maintenance/notifications",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Notifications"
+      ]
+    },
+    {
+      "id": "M14",
+      "route": "/maintenance/profile",
+      "width": 320,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Profile & settings"
+      ]
+    },
+    {
+      "id": "C07",
+      "route": "/citizen/home",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "May lubaksa daan?"
+      ]
+    },
+    {
+      "id": "C08",
+      "route": "/citizen/report/new",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Show us the road."
+      ]
+    },
+    {
+      "id": "C09",
+      "route": "/citizen/report/success/PTG-2026-0101",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Na-tag naang lubak!"
+      ]
+    },
+    {
+      "id": "C10",
+      "route": "/citizen/reports",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Your tags.Their progress."
+      ]
+    },
+    {
+      "id": "C11",
+      "route": "/citizen/reports/PTG-2026-0101",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "MacArthur Highway"
+      ]
+    },
+    {
+      "id": "C12",
+      "route": "/citizen/map",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Know theroad ahead."
+      ]
+    },
+    {
+      "id": "C13",
+      "route": "/citizen/map/reports/PTG-2026-0101",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "MacArthur Highway"
+      ]
+    },
+    {
+      "id": "C14",
+      "route": "/citizen/notifications",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Notifications"
+      ]
+    },
+    {
+      "id": "C15",
+      "route": "/citizen/reports/PTG-2026-0108/feedback",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "How wasthe repair?"
+      ]
+    },
+    {
+      "id": "C16",
+      "route": "/citizen/profile",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Alex Dela Cruz"
+      ]
+    },
+    {
+      "id": "C17",
+      "route": "/citizen/profile/edit",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Edit profile"
+      ]
+    },
+    {
+      "id": "C18",
+      "route": "/citizen/settings",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Settings"
+      ]
+    },
+    {
+      "id": "C19",
+      "route": "/citizen/help",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "A good report goes further."
+      ]
+    },
+    {
+      "id": "C20",
+      "route": "/citizen/about",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "I-tag ang lubak. Tungo sa patag."
+      ]
+    },
+    {
+      "id": "A01",
+      "route": "/admin/login",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Better roads.Built together."
+      ]
+    },
+    {
+      "id": "A02",
+      "route": "/admin/dashboard",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Roads overview"
+      ]
+    },
+    {
+      "id": "A03",
+      "route": "/admin/reports",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "All reports"
+      ]
+    },
+    {
+      "id": "A04",
+      "route": "/admin/reports/PTG-2026-0101",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "MacArthur Highway"
+      ]
+    },
+    {
+      "id": "A05",
+      "route": "/admin/verification",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Verification queue"
+      ]
+    },
+    {
+      "id": "A06",
+      "route": "/admin/verification/PTG-2026-0101",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Review the report"
+      ]
+    },
+    {
+      "id": "A07",
+      "route": "/admin/duplicates",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Possible duplicates"
+      ]
+    },
+    {
+      "id": "A08",
+      "route": "/admin/map",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Pothole map"
+      ]
+    },
+    {
+      "id": "A09",
+      "route": "/admin/assignments",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Assignment management"
+      ]
+    },
+    {
+      "id": "A10",
+      "route": "/admin/assignments/new/PTG-2026-0103",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Assign a maintenance team"
+      ]
+    },
+    {
+      "id": "A11",
+      "route": "/admin/teams",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Maintenance teams"
+      ]
+    },
+    {
+      "id": "A12",
+      "route": "/admin/teams/team-1",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Maintenance team"
+      ]
+    },
+    {
+      "id": "A13",
+      "route": "/admin/completions",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Repair verification"
+      ]
+    },
+    {
+      "id": "A14",
+      "route": "/admin/completions/PTG-2026-0107",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Verify completed repair"
+      ]
+    },
+    {
+      "id": "A15",
+      "route": "/admin/users",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "User accounts"
+      ]
+    },
+    {
+      "id": "A16",
+      "route": "/admin/users/citizen-1",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "User details"
+      ]
+    },
+    {
+      "id": "A17",
+      "route": "/admin/analytics",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Community reports, in perspective."
+      ]
+    },
+    {
+      "id": "A18",
+      "route": "/admin/exports",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Export center"
+      ]
+    },
+    {
+      "id": "A19",
+      "route": "/admin/notifications",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Notifications"
+      ]
+    },
+    {
+      "id": "A20",
+      "route": "/admin/settings",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Workspace settings"
+      ]
+    },
+    {
+      "id": "A21",
+      "route": "/admin/activity",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Report history"
+      ]
+    },
+    {
+      "id": "M01",
+      "route": "/maintenance/login",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Better roads.Built together."
+      ]
+    },
+    {
+      "id": "M02",
+      "route": "/maintenance/dashboard",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Your day on the road"
+      ]
+    },
+    {
+      "id": "M03",
+      "route": "/maintenance/assignments",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "My assignments"
+      ]
+    },
+    {
+      "id": "M04",
+      "route": "/maintenance/assignments/PTG-2026-0104",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Mabini Street"
+      ]
+    },
+    {
+      "id": "M05",
+      "route": "/maintenance/map",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Assigned task map"
+      ]
+    },
+    {
+      "id": "M06",
+      "route": "/maintenance/progress",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Repairs in progress"
+      ]
+    },
+    {
+      "id": "M07",
+      "route": "/maintenance/progress/PTG-2026-0106",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Cabanas Road"
+      ]
+    },
+    {
+      "id": "M08",
+      "route": "/maintenance/repairs/PTG-2026-0106/document",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Document the repair"
+      ]
+    },
+    {
+      "id": "M09",
+      "route": "/maintenance/repairs/PTG-2026-0106/submit",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Review completion evidence"
+      ]
+    },
+    {
+      "id": "M10",
+      "route": "/maintenance/repairs/PTG-2026-0106/success",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Work submitted.One step closer to patag."
+      ]
+    },
+    {
+      "id": "M11",
+      "route": "/maintenance/submissions",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Completion submissions"
+      ]
+    },
+    {
+      "id": "M12",
+      "route": "/maintenance/history",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Repair history"
+      ]
+    },
+    {
+      "id": "M13",
+      "route": "/maintenance/notifications",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Notifications"
+      ]
+    },
+    {
+      "id": "M14",
+      "route": "/maintenance/profile",
+      "width": 1440,
+      "theme": "light",
+      "overflow": false,
+      "heading": [
+        "Profile & settings"
+      ]
+    },
+    {
+      "id": "C07",
+      "route": "/citizen/home",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "May lubaksa daan?"
+      ]
+    },
+    {
+      "id": "C08",
+      "route": "/citizen/report/new",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Show us the road."
+      ]
+    },
+    {
+      "id": "C09",
+      "route": "/citizen/report/success/PTG-2026-0101",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Na-tag naang lubak!"
+      ]
+    },
+    {
+      "id": "C10",
+      "route": "/citizen/reports",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Your tags.Their progress."
+      ]
+    },
+    {
+      "id": "C11",
+      "route": "/citizen/reports/PTG-2026-0101",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "MacArthur Highway"
+      ]
+    },
+    {
+      "id": "C12",
+      "route": "/citizen/map",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Know theroad ahead."
+      ]
+    },
+    {
+      "id": "C13",
+      "route": "/citizen/map/reports/PTG-2026-0101",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "MacArthur Highway"
+      ]
+    },
+    {
+      "id": "C14",
+      "route": "/citizen/notifications",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Notifications"
+      ]
+    },
+    {
+      "id": "C15",
+      "route": "/citizen/reports/PTG-2026-0108/feedback",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "How wasthe repair?"
+      ]
+    },
+    {
+      "id": "C16",
+      "route": "/citizen/profile",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Alex Dela Cruz"
+      ]
+    },
+    {
+      "id": "C17",
+      "route": "/citizen/profile/edit",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Edit profile"
+      ]
+    },
+    {
+      "id": "C18",
+      "route": "/citizen/settings",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Settings"
+      ]
+    },
+    {
+      "id": "C19",
+      "route": "/citizen/help",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "A good report goes further."
+      ]
+    },
+    {
+      "id": "C20",
+      "route": "/citizen/about",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "I-tag ang lubak. Tungo sa patag."
+      ]
+    },
+    {
+      "id": "A01",
+      "route": "/admin/login",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Better roads.Built together."
+      ]
+    },
+    {
+      "id": "A02",
+      "route": "/admin/dashboard",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Roads overview"
+      ]
+    },
+    {
+      "id": "A03",
+      "route": "/admin/reports",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "All reports"
+      ]
+    },
+    {
+      "id": "A04",
+      "route": "/admin/reports/PTG-2026-0101",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "MacArthur Highway"
+      ]
+    },
+    {
+      "id": "A05",
+      "route": "/admin/verification",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Verification queue"
+      ]
+    },
+    {
+      "id": "A06",
+      "route": "/admin/verification/PTG-2026-0101",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Review the report"
+      ]
+    },
+    {
+      "id": "A07",
+      "route": "/admin/duplicates",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Possible duplicates"
+      ]
+    },
+    {
+      "id": "A08",
+      "route": "/admin/map",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Pothole map"
+      ]
+    },
+    {
+      "id": "A09",
+      "route": "/admin/assignments",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Assignment management"
+      ]
+    },
+    {
+      "id": "A10",
+      "route": "/admin/assignments/new/PTG-2026-0103",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Assign a maintenance team"
+      ]
+    },
+    {
+      "id": "A11",
+      "route": "/admin/teams",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Maintenance teams"
+      ]
+    },
+    {
+      "id": "A12",
+      "route": "/admin/teams/team-1",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Maintenance team"
+      ]
+    },
+    {
+      "id": "A13",
+      "route": "/admin/completions",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Repair verification"
+      ]
+    },
+    {
+      "id": "A14",
+      "route": "/admin/completions/PTG-2026-0107",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Verify completed repair"
+      ]
+    },
+    {
+      "id": "A15",
+      "route": "/admin/users",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "User accounts"
+      ]
+    },
+    {
+      "id": "A16",
+      "route": "/admin/users/citizen-1",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "User details"
+      ]
+    },
+    {
+      "id": "A17",
+      "route": "/admin/analytics",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Community reports, in perspective."
+      ]
+    },
+    {
+      "id": "A18",
+      "route": "/admin/exports",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Export center"
+      ]
+    },
+    {
+      "id": "A19",
+      "route": "/admin/notifications",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Notifications"
+      ]
+    },
+    {
+      "id": "A20",
+      "route": "/admin/settings",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Workspace settings"
+      ]
+    },
+    {
+      "id": "A21",
+      "route": "/admin/activity",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Report history"
+      ]
+    },
+    {
+      "id": "M01",
+      "route": "/maintenance/login",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Better roads.Built together."
+      ]
+    },
+    {
+      "id": "M02",
+      "route": "/maintenance/dashboard",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Your day on the road"
+      ]
+    },
+    {
+      "id": "M03",
+      "route": "/maintenance/assignments",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "My assignments"
+      ]
+    },
+    {
+      "id": "M04",
+      "route": "/maintenance/assignments/PTG-2026-0104",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Mabini Street"
+      ]
+    },
+    {
+      "id": "M05",
+      "route": "/maintenance/map",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Assigned task map"
+      ]
+    },
+    {
+      "id": "M06",
+      "route": "/maintenance/progress",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Repairs in progress"
+      ]
+    },
+    {
+      "id": "M07",
+      "route": "/maintenance/progress/PTG-2026-0106",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Cabanas Road"
+      ]
+    },
+    {
+      "id": "M08",
+      "route": "/maintenance/repairs/PTG-2026-0106/document",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Document the repair"
+      ]
+    },
+    {
+      "id": "M09",
+      "route": "/maintenance/repairs/PTG-2026-0106/submit",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Review completion evidence"
+      ]
+    },
+    {
+      "id": "M10",
+      "route": "/maintenance/repairs/PTG-2026-0106/success",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Work submitted.One step closer to patag."
+      ]
+    },
+    {
+      "id": "M11",
+      "route": "/maintenance/submissions",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Completion submissions"
+      ]
+    },
+    {
+      "id": "M12",
+      "route": "/maintenance/history",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Repair history"
+      ]
+    },
+    {
+      "id": "M13",
+      "route": "/maintenance/notifications",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Notifications"
+      ]
+    },
+    {
+      "id": "M14",
+      "route": "/maintenance/profile",
+      "width": 320,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Profile & settings"
+      ]
+    },
+    {
+      "id": "C07",
+      "route": "/citizen/home",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "May lubaksa daan?"
+      ]
+    },
+    {
+      "id": "C08",
+      "route": "/citizen/report/new",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Show us the road."
+      ]
+    },
+    {
+      "id": "C09",
+      "route": "/citizen/report/success/PTG-2026-0101",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Na-tag naang lubak!"
+      ]
+    },
+    {
+      "id": "C10",
+      "route": "/citizen/reports",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Your tags.Their progress."
+      ]
+    },
+    {
+      "id": "C11",
+      "route": "/citizen/reports/PTG-2026-0101",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "MacArthur Highway"
+      ]
+    },
+    {
+      "id": "C12",
+      "route": "/citizen/map",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Know theroad ahead."
+      ]
+    },
+    {
+      "id": "C13",
+      "route": "/citizen/map/reports/PTG-2026-0101",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "MacArthur Highway"
+      ]
+    },
+    {
+      "id": "C14",
+      "route": "/citizen/notifications",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Notifications"
+      ]
+    },
+    {
+      "id": "C15",
+      "route": "/citizen/reports/PTG-2026-0108/feedback",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "How wasthe repair?"
+      ]
+    },
+    {
+      "id": "C16",
+      "route": "/citizen/profile",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Alex Dela Cruz"
+      ]
+    },
+    {
+      "id": "C17",
+      "route": "/citizen/profile/edit",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Edit profile"
+      ]
+    },
+    {
+      "id": "C18",
+      "route": "/citizen/settings",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Settings"
+      ]
+    },
+    {
+      "id": "C19",
+      "route": "/citizen/help",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "A good report goes further."
+      ]
+    },
+    {
+      "id": "C20",
+      "route": "/citizen/about",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "I-tag ang lubak. Tungo sa patag."
+      ]
+    },
+    {
+      "id": "A01",
+      "route": "/admin/login",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Better roads.Built together."
+      ]
+    },
+    {
+      "id": "A02",
+      "route": "/admin/dashboard",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Roads overview"
+      ]
+    },
+    {
+      "id": "A03",
+      "route": "/admin/reports",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "All reports"
+      ]
+    },
+    {
+      "id": "A04",
+      "route": "/admin/reports/PTG-2026-0101",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "MacArthur Highway"
+      ]
+    },
+    {
+      "id": "A05",
+      "route": "/admin/verification",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Verification queue"
+      ]
+    },
+    {
+      "id": "A06",
+      "route": "/admin/verification/PTG-2026-0101",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Review the report"
+      ]
+    },
+    {
+      "id": "A07",
+      "route": "/admin/duplicates",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Possible duplicates"
+      ]
+    },
+    {
+      "id": "A08",
+      "route": "/admin/map",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Pothole map"
+      ]
+    },
+    {
+      "id": "A09",
+      "route": "/admin/assignments",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Assignment management"
+      ]
+    },
+    {
+      "id": "A10",
+      "route": "/admin/assignments/new/PTG-2026-0103",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Assign a maintenance team"
+      ]
+    },
+    {
+      "id": "A11",
+      "route": "/admin/teams",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Maintenance teams"
+      ]
+    },
+    {
+      "id": "A12",
+      "route": "/admin/teams/team-1",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Maintenance team"
+      ]
+    },
+    {
+      "id": "A13",
+      "route": "/admin/completions",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Repair verification"
+      ]
+    },
+    {
+      "id": "A14",
+      "route": "/admin/completions/PTG-2026-0107",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Verify completed repair"
+      ]
+    },
+    {
+      "id": "A15",
+      "route": "/admin/users",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "User accounts"
+      ]
+    },
+    {
+      "id": "A16",
+      "route": "/admin/users/citizen-1",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "User details"
+      ]
+    },
+    {
+      "id": "A17",
+      "route": "/admin/analytics",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Community reports, in perspective."
+      ]
+    },
+    {
+      "id": "A18",
+      "route": "/admin/exports",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Export center"
+      ]
+    },
+    {
+      "id": "A19",
+      "route": "/admin/notifications",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Notifications"
+      ]
+    },
+    {
+      "id": "A20",
+      "route": "/admin/settings",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Workspace settings"
+      ]
+    },
+    {
+      "id": "A21",
+      "route": "/admin/activity",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Report history"
+      ]
+    },
+    {
+      "id": "M01",
+      "route": "/maintenance/login",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Better roads.Built together."
+      ]
+    },
+    {
+      "id": "M02",
+      "route": "/maintenance/dashboard",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Your day on the road"
+      ]
+    },
+    {
+      "id": "M03",
+      "route": "/maintenance/assignments",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "My assignments"
+      ]
+    },
+    {
+      "id": "M04",
+      "route": "/maintenance/assignments/PTG-2026-0104",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Mabini Street"
+      ]
+    },
+    {
+      "id": "M05",
+      "route": "/maintenance/map",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Assigned task map"
+      ]
+    },
+    {
+      "id": "M06",
+      "route": "/maintenance/progress",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Repairs in progress"
+      ]
+    },
+    {
+      "id": "M07",
+      "route": "/maintenance/progress/PTG-2026-0106",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Cabanas Road"
+      ]
+    },
+    {
+      "id": "M08",
+      "route": "/maintenance/repairs/PTG-2026-0106/document",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Document the repair"
+      ]
+    },
+    {
+      "id": "M09",
+      "route": "/maintenance/repairs/PTG-2026-0106/submit",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Review completion evidence"
+      ]
+    },
+    {
+      "id": "M10",
+      "route": "/maintenance/repairs/PTG-2026-0106/success",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Work submitted.One step closer to patag."
+      ]
+    },
+    {
+      "id": "M11",
+      "route": "/maintenance/submissions",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Completion submissions"
+      ]
+    },
+    {
+      "id": "M12",
+      "route": "/maintenance/history",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Repair history"
+      ]
+    },
+    {
+      "id": "M13",
+      "route": "/maintenance/notifications",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Notifications"
+      ]
+    },
+    {
+      "id": "M14",
+      "route": "/maintenance/profile",
+      "width": 1440,
+      "theme": "dark",
+      "overflow": false,
+      "heading": [
+        "Profile & settings"
+      ]
+    }
+  ],
+  "navigation": [
+    {
+      "role": "admin",
+      "theme": "light",
+      "desktopPersistence": true,
+      "refreshPersistence": true,
+      "themePersistence": true,
+      "mobileCloses": true,
+      "drawerAboveMap": true,
+      "escape": true
+    },
+    {
+      "role": "maintenance",
+      "theme": "light",
+      "desktopPersistence": true,
+      "refreshPersistence": true,
+      "themePersistence": true,
+      "mobileCloses": true,
+      "drawerAboveMap": true,
+      "escape": true
+    },
+    {
+      "role": "admin",
+      "theme": "dark",
+      "desktopPersistence": true,
+      "refreshPersistence": true,
+      "themePersistence": true,
+      "mobileCloses": true,
+      "drawerAboveMap": true,
+      "escape": true
+    },
+    {
+      "role": "maintenance",
+      "theme": "dark",
+      "desktopPersistence": true,
+      "refreshPersistence": true,
+      "themePersistence": true,
+      "mobileCloses": true,
+      "drawerAboveMap": true,
+      "escape": true
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,1327 @@
+{
+ "url": "http://127.0.0.1:8080/#/citizen/login",
+ "at": "2026-10-24T08:05:27.562Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 1,
+   "filled": [
+    0.72
+   ],
+   "motion": {
+    "elements": 4,
+    "css": 1,
+    "transitions": 3,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 900,
+     "screens": 1,
+     "words": 70,
+     "img": 2,
+     "video": 0,
+     "canvas": 0,
+     "svg": 1,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 1,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "agwMCAAAABEH9X+2QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Welcome back",
+     "words": 2,
+     "chars": 12,
+     "lines": 1,
+     "size": 32,
+     "vw": 2.2,
+     "font": "Montserrat",
+     "weight": 600,
+     "tracking": -0.04,
+     "leading": 1.05,
+     "top": 183,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Welcome back",
+     "words": 2,
+     "lines": 1,
+     "size": 32,
+     "font": "Montserrat"
+    },
+    "headings": [
+     {
+      "text": "Welcome back",
+      "words": 2,
+      "chars": 12,
+      "lines": 1,
+      "size": 32,
+      "vw": 2.2,
+      "font": "Montserrat",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.27,
+      "top": 183,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Safer roads start here.",
+      "words": 4,
+      "chars": 23,
+      "lines": 2,
+      "size": 43.2,
+      "vw": 3,
+      "font": "Montserrat",
+      "weight": 600,
+      "tracking": -0.045,
+      "leading": 1.02,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.23,
+      "top": 671,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Montserrat",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      11,
+      12,
+      13,
+      14,
+      18,
+      32,
+      43
+     ],
+     "sizeCount": 7,
+     "notLoaded": [],
+     "body": null,
+     "measureChars": null,
+     "max": {
+      "size": 43.2,
+      "vw": 3,
+      "font": "Montserrat",
+      "text": "Safer roads start here."
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.07,
+     "smallText": 4
+    },
+    "eyebrows": [
+     {
+      "text": "Citizen account",
+      "above": "Welcome back",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 14,
+      "top": 128
+     },
+     {
+      "text": "Sa bawat tag, may daang umaayos.",
+      "above": "Safer roads start here.",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 14,
+      "top": 637
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#26272c",
+     "bodyBgHsl": {
+      "h": 230,
+      "s": 0.07,
+      "l": 0.16
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#26272c",
+       "top": 32,
+       "hsl": {
+        "h": 230,
+        "s": 0.07,
+        "l": 0.16
+       }
+      },
+      {
+       "color": "#1b1c20",
+       "top": 71,
+       "hsl": {
+        "h": 228,
+        "s": 0.08,
+        "l": 0.12
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#b5b5be",
+       "share": 0.39
+      },
+      {
+       "color": "#f8f8f8",
+       "share": 0.21
+      },
+      {
+       "color": "#e8c9b9",
+       "share": 0.18
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.14
+      },
+      {
+       "color": "#d2dce8",
+       "share": 0.08
+      }
+     ],
+     "button": {
+      "bg": "#182b49",
+      "hsl": {
+       "h": 217,
+       "s": 0.51,
+       "l": 0.19
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 2,
+     "radius": 10,
+     "height": 50,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Log in"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 2,
+     "hairlineSamples": [
+      "div.auth-links 420px",
+      "details.auth-demo 420px"
+     ],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 1,
+     "boxRadius": 28,
+     "squareMedia": 0,
+     "roundedMedia": 1,
+     "mediaRadius": 28,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": null,
+    "fontsLoaded": [
+     "montserrat"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 900,
+    "margins": {
+     "left": 242,
+     "right": 276
+    },
+    "sections": [],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Welcome back",
+      "size": 32,
+      "top": 183,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 744,
+      "n": 2
+     },
+     {
+      "x": 242,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 3,
+    "bodySize": 14,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0.14,
+    "voidBox": {
+     "x": 0,
+     "y": 120,
+     "w": 240,
+     "h": 780
+    }
+   },
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": true,
+    "ground": "#26272c",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 16,
+     "right": 16
+    },
+    "hero": {
+     "text": "Welcome back",
+     "words": 2,
+     "chars": 12,
+     "lines": 1,
+     "size": 32,
+     "vw": 2.2,
+     "font": "Montserrat",
+     "weight": 600,
+     "tracking": -0.04,
+     "leading": 1.05,
+     "top": 183,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 1,
+     "firstScreen": 1,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 2,
+     "radii": [
+      [
+       28,
+       1
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0.18,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      11,
+      12,
+      13,
+      14,
+      18,
+      32,
+      43
+     ]
+    },
+    "title": {
+     "text": "Welcome back",
+     "size": 32,
+     "top": 183
+    },
+    "colourShare": 0.047
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 1,
+   "filled": [
+    1
+   ],
+   "motion": {
+    "elements": 4,
+    "css": 1,
+    "transitions": 3,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 1024,
+     "screens": 1,
+     "words": 56,
+     "img": 2,
+     "video": 0,
+     "canvas": 0,
+     "svg": 1,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Welcome back",
+     "words": 2,
+     "chars": 12,
+     "lines": 1,
+     "size": 28,
+     "vw": 3.6,
+     "font": "Montserrat",
+     "weight": 600,
+     "tracking": -0.04,
+     "leading": 1.05,
+     "top": 281,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Welcome back",
+     "words": 2,
+     "lines": 1,
+     "size": 28,
+     "font": "Montserrat"
+    },
+    "headings": [
+     {
+      "text": "Welcome back",
+      "words": 2,
+      "chars": 12,
+      "lines": 1,
+      "size": 28,
+      "vw": 3.6,
+      "font": "Montserrat",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.44,
+      "top": 281,
+      "tag": "h1",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 1,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": null,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Montserrat",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      11,
+      12,
+      13,
+      14,
+      18,
+      24,
+      28
+     ],
+     "sizeCount": 7,
+     "notLoaded": [],
+     "body": null,
+     "measureChars": null,
+     "max": {
+      "size": 28,
+      "vw": 3.6,
+      "font": "Montserrat",
+      "text": "Welcome back"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.09,
+     "smallText": 4
+    },
+    "eyebrows": [
+     {
+      "text": "Citizen account",
+      "above": "Welcome back",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 14,
+      "top": 228
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#26272c",
+     "bodyBgHsl": {
+      "h": 230,
+      "s": 0.07,
+      "l": 0.16
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#26272c",
+       "top": 32,
+       "hsl": {
+        "h": 230,
+        "s": 0.07,
+        "l": 0.16
+       }
+      },
+      {
+       "color": "#1b1c20",
+       "top": 32,
+       "hsl": {
+        "h": 228,
+        "s": 0.08,
+        "l": 0.12
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#b5b5be",
+       "share": 0.48
+      },
+      {
+       "color": "#f8f8f8",
+       "share": 0.26
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.17
+      },
+      {
+       "color": "#d2dce8",
+       "share": 0.1
+      }
+     ],
+     "button": {
+      "bg": "#182b49",
+      "hsl": {
+       "h": 217,
+       "s": 0.51,
+       "l": 0.19
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 2,
+     "radius": 10,
+     "height": 50,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Log in"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 2,
+     "hairlineSamples": [
+      "div.auth-links 516px",
+      "details.auth-demo 516px"
+     ],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": null,
+    "fontsLoaded": [
+     "montserrat"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 1024,
+    "margins": {
+     "left": 22,
+     "right": 18
+    },
+    "sections": [
+     {
+      "sel": "aside.auth-story",
+      "tag": "aside",
+      "top": 32,
+      "height": 157,
+      "words": 4,
+      "media": 0,
+      "middle": 415,
+      "heading": {
+       "text": "Safer roads start here.",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 22,
+      "right": 18,
+      "textLeft": 22,
+      "textRight": 562,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.auth-panel",
+      "tag": "section",
+      "top": 189,
+      "height": 760,
+      "words": 47,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Welcome back",
+       "size": 28,
+       "tag": "h1"
+      },
+      "left": 126,
+      "right": 126,
+      "textLeft": 126,
+      "textRight": 126,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Welcome back",
+      "size": 28,
+      "top": 281,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 126,
+      "n": 2
+     },
+     {
+      "x": 22,
+      "n": 1
+     }
+    ],
+    "leftBlocks": 3,
+    "bodySize": 13,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": true,
+    "ground": "#26272c",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 16,
+     "right": 16
+    },
+    "hero": {
+     "text": "Welcome back",
+     "words": 2,
+     "chars": 12,
+     "lines": 1,
+     "size": 28,
+     "vw": 3.6,
+     "font": "Montserrat",
+     "weight": 600,
+     "tracking": -0.04,
+     "leading": 1.05,
+     "top": 281,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 0,
+     "firstScreen": 0,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 0,
+     "radii": [],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0.23,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      11,
+      12,
+      13,
+      14,
+      18,
+      24,
+      28
+     ]
+    },
+    "title": {
+     "text": "Welcome back",
+     "size": 28,
+     "top": 281
+    },
+    "colourShare": 0.059
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.99,
+    0.99
+   ],
+   "motion": {
+    "elements": 4,
+    "css": 1,
+    "transitions": 3,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 949,
+     "screens": 1.1,
+     "words": 49,
+     "img": 2,
+     "video": 0,
+     "canvas": 0,
+     "svg": 1,
+     "sections": 1,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Welcome back",
+     "words": 2,
+     "chars": 12,
+     "lines": 1,
+     "size": 28,
+     "vw": 7.2,
+     "font": "Montserrat",
+     "weight": 600,
+     "tracking": -0.04,
+     "leading": 1.05,
+     "top": 281,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Welcome back",
+     "words": 2,
+     "lines": 1,
+     "size": 28,
+     "font": "Montserrat"
+    },
+    "headings": [
+     {
+      "text": "Safer roads start here.",
+      "words": 4,
+      "chars": 23,
+      "lines": 2,
+      "size": 24,
+      "vw": 6.2,
+      "font": "Montserrat",
+      "weight": 600,
+      "tracking": -0.045,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.55,
+      "top": 119,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Welcome back",
+      "words": 2,
+      "chars": 12,
+      "lines": 1,
+      "size": 28,
+      "vw": 7.2,
+      "font": "Montserrat",
+      "weight": 600,
+      "tracking": -0.04,
+      "leading": 1.05,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.87,
+      "top": 281,
+      "tag": "h1",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 4,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Montserrat",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      11,
+      12,
+      13,
+      14,
+      18,
+      24,
+      28
+     ],
+     "sizeCount": 7,
+     "notLoaded": [],
+     "body": null,
+     "measureChars": null,
+     "max": {
+      "size": 28,
+      "vw": 7.2,
+      "font": "Montserrat",
+      "text": "Welcome back"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.1,
+     "smallText": 3
+    },
+    "eyebrows": [
+     {
+      "text": "Citizen account",
+      "above": "Welcome back",
+      "upper": false,
+      "tracked": false,
+      "mono": false,
+      "pill": false,
+      "size": 14,
+      "top": 228
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#26272c",
+     "bodyBgHsl": {
+      "h": 230,
+      "s": 0.07,
+      "l": 0.16
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#26272c",
+       "top": 32,
+       "hsl": {
+        "h": 230,
+        "s": 0.07,
+        "l": 0.16
+       }
+      },
+      {
+       "color": "#1b1c20",
+       "top": 32,
+       "hsl": {
+        "h": 228,
+        "s": 0.08,
+        "l": 0.12
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#b5b5be",
+       "share": 0.53
+      },
+      {
+       "color": "#f8f8f8",
+       "share": 0.29
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.19
+      }
+     ],
+     "button": {
+      "bg": "#182b49",
+      "hsl": {
+       "h": 217,
+       "s": 0.51,
+       "l": 0.19
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 2,
+     "inHero": 1,
+     "radius": 10,
+     "height": 50,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Log in"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 2,
+     "hairlineSamples": [
+      "div.auth-links 346px",
+      "details.auth-demo 346px"
+     ],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 0,
+     "boxRadius": 0,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": null,
+    "fontsLoaded": [
+     "montserrat"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 949,
+    "margins": {
+     "left": 22,
+     "right": 15
+    },
+    "sections": [
+     {
+      "sel": "aside.auth-story",
+      "tag": "aside",
+      "top": 32,
+      "height": 157,
+      "words": 4,
+      "media": 0,
+      "middle": 35,
+      "heading": {
+       "text": "Safer roads start here.",
+       "size": 24,
+       "tag": "h2"
+      },
+      "left": 22,
+      "right": 15,
+      "textLeft": 22,
+      "textRight": 184,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "section.auth-panel",
+      "tag": "section",
+      "top": 189,
+      "height": 760,
+      "words": 47,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Welcome back",
+       "size": 28,
+       "tag": "h1"
+      },
+      "left": 22,
+      "right": 22,
+      "textLeft": 22,
+      "textRight": 22,
+      "fullBleed": false,
+      "footer": true,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Welcome back",
+      "size": 28,
+      "top": 281,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 22,
+      "n": 3
+     }
+    ],
+    "leftBlocks": 3,
+    "bodySize": 13,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "dark": true,
+    "ground": "#26272c",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 16,
+     "right": 15
+    },
+    "hero": {
+     "text": "Welcome back",
+     "words": 2,
+     "chars": 12,
+     "lines": 1,
+     "size": 28,
+     "vw": 7.2,
+     "font": "Montserrat",
+     "weight": 600,
+     "tracking": -0.04,
+     "leading": 1.05,
+     "top": 281,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 0,
+     "firstScreen": 0,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 0,
+     "radii": [],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 0,
+     "tabularShare": null,
+     "kpiMax": null
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0.14,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      11,
+      12,
+      13,
+      14,
+      18,
+      24,
+      28
+     ]
+    },
+    "title": {
+     "text": "Welcome back",
+     "size": 28,
+     "top": 281
+    },
+    "colourShare": 0.082
+   },
+   "consoleErrors": []
+  }
+ ],
+ "findings": [],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "C:\\Users\\user\\Downloads\\PATAG\\.taste-skill\\after-login\\desktop-fold.jpg",
+   "pages": [
+    "C:\\Users\\user\\Downloads\\PATAG\\.taste-skill\\after-login\\desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "C:\\Users\\user\\Downloads\\PATAG\\.taste-skill\\after-login\\tablet-fold.jpg",
+   "pages": [
+    "C:\\Users\\user\\Downloads\\PATAG\\.taste-skill\\after-login\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "C:\\Users\\user\\Downloads\\PATAG\\.taste-skill\\after-login\\mobile-fold.jpg",
+   "pages": [
+    "C:\\Users\\user\\Downloads\\PATAG\\.taste-skill\\after-login\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

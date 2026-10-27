@@ -1,0 +1,140 @@
+
+--- PAGE 1 ---
+BULACAN STATE UNIIVERSITY  
+College of Information and Communications Technology 
+IT 305 -ADVANCE WEB DEVELOPMENT 
+FINAL STUDENT OUTPUT 
+____________________________________________________________________________________________________________ 
+IT305 – ADVANCE WEB DEVELOPMENT                                                        BSIT-WMAD 
+          
+Project Title:  Development of a Web and Mobile -Based Road Pothole Reporting and 
+Monitoring System for Local Government Units 
+Section:  BSIT 3H G1 / BSIT 3H G2 
+Grouping:   Minimum 4 members, Maximum 5 members 
+Period Timeline: October 12 – 30, 2026 
+Submission Date: November 02, 2026  
+ 
+1. Project Overview 
+The Web- and Mobile-Based Road Potholes Reporting System is a software application 
+designed to help citizens report road potholes and to enable authorized government personnel, 
+such as local government units (LGUs) and road maintenance teams, to monitor, verify, prioritize, 
+and resolve reported road damage. 
+The system will provide a web -based administrative dashboard and a mobile -friendly 
+interface for citizens to submit pothole reports using photos, GPS coordinates, descriptions, and 
+location details. It will improve communication between citizens and road m aintenance 
+authorities, promote transparency, and help prioritize road repairs. 
+ 
+2. Project Objectives 
+The system aims to: 
+1. Provide a convenient way for citizens to report road potholes. 
+2. Capture the location of potholes using GPS or manual map selection. 
+3. Allow users to upload photos as evidence of road damage. 
+4. Enable administrators to review, verify, and manage submitted reports. 
+5. Track the progress of pothole repairs from submission to completion. 
+6. Notify users of status updates regarding their reports. 
+7. Provide maps, statistics, and reports to support road maintenance planning. 
+8. Reduce duplicate reports and improve the efficiency of road maintenance operations. 
+ 
+3. System Users and Roles 
+1. Citizen / Reporter 
+• Register and log in to the system, if required. 
+• Submit pothole reports with photos and location information. 
+• View submitted reports and their current status. 
+• Receive notifications about report progress. 
+• View public pothole reports on a map. 
+2. Administrator / LGU Personnel 
+• Access the administrative dashboard. 
+• Review, verify, reject, or flag reports. 
+• Assign verified reports to maintenance personnel. 
+• Update report statuses. 
+• Manage user accounts and system settings. 
+• Generate summary reports and statistics. 
+3. Road Maintenance Personnel 
+• View assigned pothole reports. 
+• Check the location and severity of road damage. 
+• Update repair progress. 
+• Upload before-and-after photos. 
+• Mark repair work as completed for administrative verification. 
+ 
+4. Functional Requirements 
+Functional requirements describe what the system must be able to do. 
+ID Requirement Description 
+FR-01 User Registration and Login Allow users to create accounts and securely log in, where authentication is required. 
+FR-02 Pothole Reporting Allow citizens to submit pothole reports through a web browser or mobile device. 
+FR-03 Photo Upload Allow users to upload one or more images showing the pothole. 
+FR-04 GPS Location Automatically capture coordinates when permission is granted. 
+
+--- PAGE 2 ---
+BULACAN STATE UNIIVERSITY  
+College of Information and Communications Technology 
+IT 305 -ADVANCE WEB DEVELOPMENT 
+FINAL STUDENT OUTPUT 
+____________________________________________________________________________________________________________ 
+IT305 – ADVANCE WEB DEVELOPMENT                                                        BSIT-WMAD 
+FR-05 Manual Location Selection Allow users to pin the pothole location on a map or enter an address. 
+FR-06 Report Description Allow users to describe the pothole, road name, landmarks, and observed hazards. 
+FR-07 Severity Classification Categorize potholes by severity, such as low, medium, or high. 
+FR-08 Report Management Allow administrators to view, search, filter, verify, and manage reports. 
+FR-09 Status Tracking Display the current status of each report. 
+FR-10 Assignment Management Allow administrators to assign verified reports to maintenance teams. 
+FR-11 Notifications Notify relevant users when report statuses change. 
+FR-12 Interactive Map Display reported potholes on a map using their geographic coordinates. 
+FR-13 Repair Documentation Allow maintenance personnel to submit repair notes and completion photos. 
+FR-14 Dashboard and Analytics Display report totals, pending cases, completed repairs, and other relevant statistics. 
+FR-15 Report History Maintain a history of report updates and actions. 
+FR-16 Duplicate Detection Identify possible duplicate reports based on proximity, location, and report details. 
+FR-17 Feedback Allow reporters to provide feedback on completed repairs. 
+FR-18 Report Export Allow authorized personnel to export reports in formats such as CSV or PDF. 
+ 
+5. Pothole Reporting Workflow 
+1. Citizen submits a report (Photo, location, description, and severity) 
+2. System validates the report (Check required fields and possible duplicates) 
+3. Administrator reviews the report (Verify location, evidence, and reported severity) 
+4. Maintenance team is assigned (Inspect the site and perform repairs) 
+5. Repair completion is documented (Upload completion photos and repair notes) 
+6. Report is verified and closed (Update the citizen and record the final status) 
+ 
+Recommended report statuses 
+• Submitted — The report has been received. 
+• Under Review — An administrator is checking the report. 
+• Verified — The pothole report has been confirmed. 
+• Assigned — A maintenance team has been assigned. 
+• In Progress — Inspection or repair work has started. 
+• Resolved — Repairs have been completed and verified. 
+• Rejected — The report is invalid or outside the responsible agency's jurisdiction. 
+• Duplicate — The report refers to an existing case. 
+6. Technical Requirements 
+• The following is one practical technology stack for a student or local government project. 
+Equivalent technologies may be used if they meet the requirements. 
+ 
+
+
+--- PAGE 3 ---
+BULACAN STATE UNIIVERSITY  
+College of Information and Communications Technology 
+IT 305 -ADVANCE WEB DEVELOPMENT 
+FINAL STUDENT OUTPUT 
+____________________________________________________________________________________________________________ 
+IT305 – ADVANCE WEB DEVELOPMENT                                                        BSIT-WMAD 
+ 
+7. User Interface Requirements 
+The system should contain the following screens. 
+ 
+8. System Constraints and Assumptions 
+1. GPS functionality depends on device hardware, browser permissions, and signal availability. 
+2. Users may manually select a location when GPS is unavailable or inaccurate. 
+3. The responsible LGU or road agency must have authorized personnel to review and process 
+reports. 
+4. Internet access is required for real-time synchronization unless offline reporting is specifically 
+implemented. 
+5. The system should identify the agency responsible for each road or provide a way to forward 
+reports to the appropriate authority. 
+6. Publicly displayed reports should not expose unnecessary personal information. 
+7. Reports should not automatically be considered verified solely because a citizen submitted 
+them. 
+ 
+9. Expected Project Outcome 
+The expected outcome is a working web and mobile -based pothole reporting system that 
+connects citizens with road maintenance authorities. It will provide a centralized database of 
+reported road damage, location-based monitoring, report status tracking, repair documentation, 
+and administrative analytics. 

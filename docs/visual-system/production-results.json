@@ -1,0 +1,282 @@
+{
+  "routes": [
+    {
+      "portal": "admin",
+      "route": "dashboard",
+      "title": "Roads overview"
+    },
+    {
+      "portal": "admin",
+      "route": "reports",
+      "title": "All reports"
+    },
+    {
+      "portal": "admin",
+      "route": "reports/PTG-2026-0101",
+      "title": "MacArthur Highway"
+    },
+    {
+      "portal": "admin",
+      "route": "verification",
+      "title": "Verification queue"
+    },
+    {
+      "portal": "admin",
+      "route": "verification/PTG-2026-0101",
+      "title": "Review the report"
+    },
+    {
+      "portal": "admin",
+      "route": "duplicates",
+      "title": "Possible duplicates"
+    },
+    {
+      "portal": "admin",
+      "route": "map",
+      "title": "Pothole map"
+    },
+    {
+      "portal": "admin",
+      "route": "assignments",
+      "title": "Assignment management"
+    },
+    {
+      "portal": "admin",
+      "route": "assignments/new/PTG-2026-0103",
+      "title": "Assign a maintenance team"
+    },
+    {
+      "portal": "admin",
+      "route": "teams",
+      "title": "Maintenance teams"
+    },
+    {
+      "portal": "admin",
+      "route": "teams/team-1",
+      "title": "Maintenance team"
+    },
+    {
+      "portal": "admin",
+      "route": "completions",
+      "title": "Repair verification"
+    },
+    {
+      "portal": "admin",
+      "route": "completions/PTG-2026-0107",
+      "title": "Verify completed repair"
+    },
+    {
+      "portal": "admin",
+      "route": "users",
+      "title": "User accounts"
+    },
+    {
+      "portal": "admin",
+      "route": "users/citizen-1",
+      "title": "User details"
+    },
+    {
+      "portal": "admin",
+      "route": "analytics",
+      "title": "Community reports, in perspective."
+    },
+    {
+      "portal": "admin",
+      "route": "exports",
+      "title": "Export center"
+    },
+    {
+      "portal": "admin",
+      "route": "notifications",
+      "title": "Notifications"
+    },
+    {
+      "portal": "admin",
+      "route": "settings",
+      "title": "Workspace settings"
+    },
+    {
+      "portal": "admin",
+      "route": "activity",
+      "title": "Report history"
+    },
+    {
+      "portal": "maintenance",
+      "route": "dashboard",
+      "title": "Your day on the road"
+    },
+    {
+      "portal": "maintenance",
+      "route": "assignments",
+      "title": "My assignments"
+    },
+    {
+      "portal": "maintenance",
+      "route": "assignments/PTG-2026-0104",
+      "title": "Mabini Street"
+    },
+    {
+      "portal": "maintenance",
+      "route": "map",
+      "title": "Assigned task map"
+    },
+    {
+      "portal": "maintenance",
+      "route": "progress",
+      "title": "Repairs in progress"
+    },
+    {
+      "portal": "maintenance",
+      "route": "progress/PTG-2026-0106",
+      "title": "Cabanas Road"
+    },
+    {
+      "portal": "maintenance",
+      "route": "repairs/PTG-2026-0106/document",
+      "title": "Document the repair"
+    },
+    {
+      "portal": "maintenance",
+      "route": "repairs/PTG-2026-0106/submit",
+      "title": "Review completion evidence"
+    },
+    {
+      "portal": "maintenance",
+      "route": "repairs/PTG-2026-0107/success",
+      "title": "Work submitted.One step closer to patag."
+    },
+    {
+      "portal": "maintenance",
+      "route": "submissions",
+      "title": "Completion submissions"
+    },
+    {
+      "portal": "maintenance",
+      "route": "history",
+      "title": "Repair history"
+    },
+    {
+      "portal": "maintenance",
+      "route": "notifications",
+      "title": "Notifications"
+    },
+    {
+      "portal": "maintenance",
+      "route": "profile",
+      "title": "Profile & settings"
+    }
+  ],
+  "widths": [
+    {
+      "portal": "admin",
+      "width": 320,
+      "overflow": false
+    },
+    {
+      "portal": "admin",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "portal": "admin",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "portal": "admin",
+      "width": 430,
+      "overflow": false
+    },
+    {
+      "portal": "admin",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "portal": "admin",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "portal": "admin",
+      "width": 1280,
+      "overflow": false
+    },
+    {
+      "portal": "admin",
+      "width": 1366,
+      "overflow": false
+    },
+    {
+      "portal": "admin",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "portal": "admin",
+      "width": 1920,
+      "overflow": false
+    },
+    {
+      "portal": "maintenance",
+      "width": 320,
+      "overflow": false
+    },
+    {
+      "portal": "maintenance",
+      "width": 375,
+      "overflow": false
+    },
+    {
+      "portal": "maintenance",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "portal": "maintenance",
+      "width": 430,
+      "overflow": false
+    },
+    {
+      "portal": "maintenance",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "portal": "maintenance",
+      "width": 1024,
+      "overflow": false
+    },
+    {
+      "portal": "maintenance",
+      "width": 1280,
+      "overflow": false
+    },
+    {
+      "portal": "maintenance",
+      "width": 1366,
+      "overflow": false
+    },
+    {
+      "portal": "maintenance",
+      "width": 1440,
+      "overflow": false
+    },
+    {
+      "portal": "maintenance",
+      "width": 1920,
+      "overflow": false
+    }
+  ],
+  "errors": [],
+  "consoleErrors": [],
+  "workflows": [
+    "Admin search and severity filtering",
+    "Admin verified and assigned API-created citizen report",
+    "CSV and PDF export blobs validated; native browser file writes are canceled by this sandbox",
+    "Mobile sidebar navigation, scrollable report table, map zoom/recenter and marker popup",
+    "Maintenance route guard blocks admin user-management view",
+    "Maintenance started work, saved progress, uploaded a photo and submitted completion",
+    "Admin resolved repair; citizen API received history/notification and submitted feedback"
+  ]
+}

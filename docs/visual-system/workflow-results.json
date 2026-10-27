@@ -1,0 +1,36 @@
+{
+  "pages": [
+    "Citizen home",
+    "LGU portal",
+    "Maintenance portal"
+  ],
+  "widths": [
+    {
+      "role": "citizen",
+      "width": 320,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 390,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 768,
+      "overflow": false
+    },
+    {
+      "role": "citizen",
+      "width": 1440,
+      "overflow": false
+    }
+  ],
+  "errors": [],
+  "workflow": [
+    "Citizen photo/location/details/review submission: PTG-2026-74DE1EBC",
+    "LGU verified and assigned citizen report",
+    "Crew started repair and submitted evidence",
+    "LGU resolved; citizen saw resolution and submitted feedback"
+  ]
+}

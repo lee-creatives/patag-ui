@@ -17,3 +17,6 @@ playwright-report/
 browser-preview/.build/
 
 .kotlin/
+
+.playwright-mcp/
+docs/qa-downloads/

@@ -30,12 +30,12 @@ Base: web `VITE_API_URL=http://127.0.0.1:4100/api`; Android emulator `--dart-def
 |---|---|---|
 | GET /health | public | local demo health |
 | POST /auth/demo | public, local-only | `{ "role": "admin" }` -> token + user; supports citizen and maintenance |
-| POST /auth/register | public | name, email, password -> citizen token + user |
+| POST /auth/register | public | name, email, address {line?, barangay, city, province}, password -> citizen token + user |
 | POST /auth/login | public | email, password -> token + user |
 | POST /auth/recovery | public | email -> demo confirmation, no email sent |
 | POST /auth/logout | authenticated | invalidates current token |
 | GET /bootstrap | authenticated | reports owned by citizen/team or all for admin; teams, authorized users, scoped notifications, user, statuses |
-| GET /public/reports | public | safe reports, excludes Rejected/Duplicate and reporter identity/assignment/jurisdiction/reviewer actor |
+| GET /public/reports | public | allowlisted road/status/evidence records, excludes Rejected/Duplicate, identity, assignment, internal notes, landmarks and feedback |
 | GET /reports/:id | owner/team/admin | report detail |
 | POST /uploads | authenticated | data (base64 PNG/JPEG/WebP <=8 MB), name, kind -> ReportPhoto |
 | POST /reports | citizen | report fields below; service sets owner, Submitted status and history |
@@ -51,6 +51,8 @@ Base: web `VITE_API_URL=http://127.0.0.1:4100/api`; Android emulator `--dart-def
 ```json
 {"title":"Damaged outer lane","description":"Pothole beside the crossing.","hazards":"Water collects after rain.","severity":"High","photos":[{"id":"upload-id","url":"/uploads/uuid.png","name":"road.png","kind":"before"}],"location":{"road":"Test Road","barangay":"Guinhawa","city":"Malolos","province":"Bulacan","landmark":"Waiting shed","coordinates":{"lat":14.852,"lng":120.811}}}
 ```
+
+Maintenance can also send `before-photos` with uploaded `photos` while Assigned or In Progress (except while awaiting verification); original evidence is retained.
 
 ## Event examples
 
@@ -70,3 +72,18 @@ Base: web `VITE_API_URL=http://127.0.0.1:4100/api`; Android emulator `--dart-def
 ```
 
 CSV/PDF exports are generated in the admin frontend from its authorized report snapshot, not by an export server endpoint. Production should provide a server-authorized export endpoint with filters, audit and file retention. In-app notifications are polling-based mock events; there is no push/email transport. JSON fixtures demonstrate one jurisdiction and two teams; there is no production LGU directory.
+
+## Connected workspace operations (24 October)
+
+- Bootstrap now includes shared `settings: {agency, city, province}`, dynamic `teams`, and `demo: true` in the local demonstration service.
+- Admin `PATCH /settings` validates and saves shared agency/city/province. New reports inherit the configured agency.
+- Admin `POST /teams` creates a team; `PATCH /teams` edits its name/active state. Teams with active members or open work cannot be deactivated.
+- Admin `POST /users` takes name/email/password/role/teamId and creates an account. Maintenance roles require an active team. `PATCH /users` also updates team membership. Password material is never returned by these endpoints.
+- Demo-only `GET /auth/demo/accounts` lists active fictional accounts; `POST /auth/demo` optionally selects `userId` within a role. Do not expose demo authentication publicly.
+- Admin report event `{action:"publication", approved:true|false}` controls public photo visibility. New before/after evidence clears approval. Original photos remain available to authorized roles. This is a publication workflow, not automatic face/plate redaction or secure object-storage authorization.
+
+## Authentication follow-up
+
+Citizen signup now requires name (1–100 characters), normalized email (maximum 254), private address (barangay, city or municipality, province; optional street/house number), and a password of 15–128 characters; the same creation policy applies to staff provisioning. Optional `role` on `/auth/login` must match the account. `/auth/register` ignores role/team/active injection and always creates an active citizen with `emailVerified:false`.
+
+Sessions expire after eight hours and are revoked on logout. Registration/login are limited to 20 requests per minute per client/endpoint in the Node service. Demo endpoints only select seeded accounts without password hashes; `createServer({allowDemo:false})` disables them. `/me` allows the citizen to correct the private address with the same validation. It cannot change email without a verified recovery workflow. See `docs/auth-flow/README.md` for preview boundaries and test evidence.
