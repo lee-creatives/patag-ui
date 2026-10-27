@@ -119,8 +119,10 @@ void main() {
 
     expect(find.text('PTG-2026-0104'), findsOneWidget);
     expect(find.text('Paseo del Congreso'), findsOneWidget);
+    expect(find.text('TASK PROGRESS'), findsOneWidget);
+    expect(find.text('Add Before Photo'), findsOneWidget);
+    expect(find.text('Add After Photo'), findsOneWidget);
     expect(find.text('Start Inspection / Repair'), findsOneWidget);
-    expect(find.text('Add Before-Repair Photo'), findsOneWidget);
   });
 
   testWidgets('SubmissionSuccessScreen displays celebration and return CTA',

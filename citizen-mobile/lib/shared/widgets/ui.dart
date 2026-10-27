@@ -261,7 +261,7 @@ class EmptyState extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
       child: Column(children: [
-        mascot(width: 100),
+        mascot(width: 100, dance: true),
         gap(),
         heading(context, title),
         gap(10),

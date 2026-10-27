@@ -290,31 +290,35 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: dark
-                                  ? const Color(0x26FF5D1A)
-                                  : const Color(0xFFFFF7ED),
-                              borderRadius: BorderRadius.circular(999),
-                              border: Border.all(
-                                color: dark
-                                    ? const Color(0x4DFF5D1A)
-                                    : const Color(0xFFFFEDD5),
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 9,
+                                vertical: 4,
                               ),
-                            ),
-                            child: Text(
-                              'CITIZEN ACCOUNT',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.8,
+                              decoration: BoxDecoration(
                                 color: dark
-                                    ? const Color(0xFFFFAA91)
-                                    : const Color(0xFFC2410C),
+                                    ? const Color(0x26FF5D1A)
+                                    : const Color(0xFFFFF7ED),
+                                borderRadius: BorderRadius.circular(999),
+                                border: Border.all(
+                                  color: dark
+                                      ? const Color(0x4DFF5D1A)
+                                      : const Color(0xFFFFEDD5),
+                                ),
+                              ),
+                              child: Text(
+                                'MAINTENANCE ACCOUNT',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.5,
+                                  color: dark
+                                      ? const Color(0xFFFFAA91)
+                                      : const Color(0xFFC2410C),
+                                ),
                               ),
                             ),
                           ),
@@ -355,7 +359,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Sign in to report a pothole and follow its repair.',
+                        'Sign in to view assignments and update road repairs.',
                         style: TextStyle(
                           fontSize: 13,
                           color: dark ? const Color(0xFF94A3B8) : slate,
@@ -495,7 +499,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Enter the password for your citizen account.',
+                        'Enter the password for your maintenance staff account.',
                         style: TextStyle(
                           fontSize: 12,
                           color: dark ? const Color(0xFF94A3B8) : slate,
@@ -535,7 +539,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                       const SizedBox(height: 18),
                       SizedBox(
                         width: double.infinity,
-                        height: 46,
+                        height: 42,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             backgroundColor: dark
@@ -554,7 +558,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                             _loading ? 'Signing in…' : 'Log in',
                             style: const TextStyle(
                               fontSize: 14,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
@@ -563,25 +567,14 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                       Wrap(
                         alignment: WrapAlignment.spaceBetween,
                         crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 12,
                         runSpacing: 8,
                         children: [
-                          InkWell(
-                            onTap: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Citizen accounts can also be created on the Citizen App.',
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              'Create an account',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: dark ? Colors.white : ink,
-                              ),
+                          Text(
+                            'Account assigned by LGU Admin',
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              color: dark ? const Color(0xFF94A3B8) : slate,
                             ),
                           ),
                           InkWell(
@@ -589,7 +582,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text(
-                                    'Contact your administrator to reset credentials.',
+                                    'Maintenance accounts are assigned and managed by the LGU Admin. Contact your supervisor to reset credentials.',
                                   ),
                                 ),
                               );
@@ -598,8 +591,8 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                               'Forgot password?',
                               style: TextStyle(
                                 fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                                color: dark ? Colors.white : ink,
+                                fontWeight: FontWeight.w600,
+                                color: dark ? const Color(0xFFFFAA91) : orange,
                               ),
                             ),
                           ),
@@ -1267,6 +1260,36 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     }
   }
 
+  Future<void> _uploadAfterPhoto(PotholeReport report) async {
+    final picker = ImagePicker();
+    final file = await picker.pickImage(source: ImageSource.gallery);
+    if (file == null) return;
+
+    setState(() => _loading = true);
+    try {
+      final photoData = await store.upload(file, kind: 'after');
+      await store.event(report.id, 'upload_evidence', payload: {
+        'photo': photoData,
+        'note': 'After-repair completion photo recorded by crew.',
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('After-repair photo uploaded.')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Upload failed: ${PatagMaintenanceStore.clean(e)}'),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final report = store.getReportById(widget.reportId);
@@ -1280,11 +1303,19 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
       );
     }
 
+    final beforePhotos =
+        report.photos.where((p) => p.kind != 'after').toList();
+    final afterPhotos =
+        report.photos.where((p) => p.kind == 'after').toList();
+
     return Screen(
       title: report.id,
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
+          // Orange Task Progress Bar on Top
+          TaskProgressBar(report.status),
+          gap(10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -1306,22 +1337,43 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             ),
           ),
           gap(18),
-          if (report.photos.isNotEmpty) ...[
+          if (beforePhotos.isNotEmpty) ...[
             const Text(
-              'Citizen Evidence Photos',
+              'Before-Repair Inspection Photos',
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
             gap(10),
             SizedBox(
-              height: 180,
+              height: 170,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
-                itemCount: report.photos.length,
+                itemCount: beforePhotos.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemBuilder: (context, i) => PhotoWidget(
-                  report.photos[i],
-                  width: 240,
-                  height: 180,
+                  beforePhotos[i],
+                  width: 230,
+                  height: 170,
+                ),
+              ),
+            ),
+            gap(16),
+          ],
+          if (afterPhotos.isNotEmpty) ...[
+            const Text(
+              'After-Repair Completion Photos',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+            ),
+            gap(10),
+            SizedBox(
+              height: 170,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: afterPhotos.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 12),
+                itemBuilder: (context, i) => PhotoWidget(
+                  afterPhotos[i],
+                  width: 230,
+                  height: 170,
                 ),
               ),
             ),
@@ -1368,13 +1420,80 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             ),
           ),
           gap(20),
-          if (report.status == 'Assigned') ...[
-            OutlinedButton.icon(
-              icon: const Icon(Icons.camera_alt_outlined),
-              label: const Text('Add Before-Repair Photo'),
-              onPressed: _loading ? null : () => _uploadBeforePhoto(report),
+          // Clear Photo Action Buttons Card
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: dark ? const Color(0xFF1B1E26) : const Color(0xFFF8FAFC),
+              borderRadius: BorderRadius.circular(PatagTokens.radius),
+              border: Border.all(
+                color: dark
+                    ? const Color(0xFF2E3545)
+                    : const Color(0xFFE2E8F0),
+              ),
             ),
-            gap(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.photo_camera_outlined,
+                        size: 18, color: orange),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Repair Evidence Documentation',
+                      style:
+                          TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
+                gap(6),
+                Text(
+                  'Take or upload inspection photos before commencing repair, and completed photos after patching.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: dark ? const Color(0xFF94A3B8) : slate,
+                    height: 1.4,
+                  ),
+                ),
+                gap(14),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.camera_alt_outlined, size: 17),
+                        label: const Text(
+                          'Add Before Photo',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        onPressed: _loading
+                            ? null
+                            : () => _uploadBeforePhoto(report),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.add_a_photo_outlined, size: 17),
+                        label: const Text(
+                          'Add After Photo',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        onPressed: _loading
+                            ? null
+                            : () => _uploadAfterPhoto(report),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          gap(16),
+          // Workflow Action Buttons
+          if (report.status == 'Assigned') ...[
             action(
               _loading ? 'Updating…' : 'Start Inspection / Repair',
               _loading ? null : () => _startRepair(report),
@@ -1413,6 +1532,129 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               ),
             ),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+class TaskProgressBar extends StatelessWidget {
+  final String status;
+  const TaskProgressBar(this.status, {super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final int step;
+    final double progress;
+    final String stepName;
+
+    switch (status) {
+      case 'Assigned':
+        step = 1;
+        progress = 0.33;
+        stepName = 'Assigned to Crew';
+        break;
+      case 'In Progress':
+        step = 2;
+        progress = 0.66;
+        stepName = 'Repair In Progress';
+        break;
+      case 'Resolved':
+      case 'Completed':
+        step = 3;
+        progress = 1.0;
+        stepName = 'Completed & Verified';
+        break;
+      default:
+        step = 1;
+        progress = 0.20;
+        stepName = status;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: dark ? const Color(0xFF1B1E26) : const Color(0xFFFFF7ED),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: dark ? const Color(0x33FF5D1A) : const Color(0xFFFFEDD5),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  const Icon(Icons.flash_on_rounded, size: 16, color: orange),
+                  const SizedBox(width: 6),
+                  Text(
+                    'TASK PROGRESS',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.8,
+                      color: dark
+                          ? const Color(0xFFFFAA91)
+                          : const Color(0xFFC2410C),
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                '${(progress * 100).toInt()}% · $stepName',
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  color: orange,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 8,
+              backgroundColor:
+                  dark ? const Color(0xFF2C3240) : const Color(0xFFFFE0CA),
+              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFF5D1A)),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '1. Assigned',
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: step >= 1 ? FontWeight.w700 : FontWeight.w500,
+                  color: step >= 1 ? (dark ? Colors.white : ink) : slate,
+                ),
+              ),
+              Text(
+                '2. In Progress',
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: step >= 2 ? FontWeight.w700 : FontWeight.w500,
+                  color: step >= 2 ? (dark ? Colors.white : ink) : slate,
+                ),
+              ),
+              Text(
+                '3. Resolved',
+                style: TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: step >= 3 ? FontWeight.w700 : FontWeight.w500,
+                  color: step >= 3 ? (dark ? Colors.white : ink) : slate,
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );

@@ -163,23 +163,7 @@ ThemeData patagMaintenanceTheme({Brightness brightness = Brightness.light}) {
         backgroundColor: colors.primary,
         foregroundColor: colors.onPrimary,
         elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(PatagTokens.fieldRadius),
-        ),
-        textStyle: const TextStyle(
-          fontFamily: 'Montserrat',
-          fontWeight: FontWeight.w600,
-          fontSize: 15,
-        ),
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: colors.onSurface,
-        minimumSize: const Size.fromHeight(50),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        side: BorderSide(color: colors.outlineVariant),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(PatagTokens.fieldRadius),
         ),
@@ -187,6 +171,22 @@ ThemeData patagMaintenanceTheme({Brightness brightness = Brightness.light}) {
           fontFamily: 'Montserrat',
           fontWeight: FontWeight.w600,
           fontSize: 14,
+        ),
+      ),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom(
+        foregroundColor: colors.onSurface,
+        minimumSize: const Size(48, 42),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        side: BorderSide(color: colors.outlineVariant),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(PatagTokens.fieldRadius),
+        ),
+        textStyle: const TextStyle(
+          fontFamily: 'Montserrat',
+          fontWeight: FontWeight.w500,
+          fontSize: 13.5,
         ),
       ),
     ),

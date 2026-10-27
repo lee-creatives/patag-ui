@@ -154,23 +154,12 @@ Widget action(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           foregroundColor: dark ? Colors.white : const Color(0xFF20180F),
-          minimumSize: const Size.fromHeight(50),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
         ),
         onPressed: press,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Flexible(
-              child: Text(
-                label,
-                textAlign: TextAlign.center,
-                style:
-                    const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
-              ),
-            ),
+            Flexible(child: Text(label, textAlign: TextAlign.center)),
             const SizedBox(width: 10),
             Icon(icon, size: 18),
           ],

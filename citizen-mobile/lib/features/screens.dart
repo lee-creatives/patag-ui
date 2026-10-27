@@ -41,7 +41,7 @@ class _SplashState extends State<Splash> {
                     Colors.white,
                     BlendMode.srcIn,
                   ),
-                  child: mascot(width: 180),
+                  child: mascot(width: 180, dance: true),
                 ),
                 gap(24),
                 ColorFiltered(
@@ -116,7 +116,9 @@ class _OnboardingState extends State<Onboarding> {
                               gap(12),
                             ],
                             Center(
-                                child: mascot(width: index == 2 ? 160 : 210)),
+                                child: mascot(
+                                    width: index == 2 ? 160 : 210,
+                                    dance: true)),
                             if (index == 2) ...[
                               gap(20),
                               const Row(
@@ -966,7 +968,7 @@ class ReportSuccess extends StatelessWidget {
           padding: const EdgeInsets.all(28),
           children: [
             gap(24),
-            mascot(width: 200),
+            mascot(width: 200, dance: true),
             gap(20),
             heading(context, 'Na-tag na ang lubak!'),
             gap(12),
@@ -1095,7 +1097,7 @@ class _FeedbackState extends State<FeedbackScreen> {
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          mascot(width: 120),
+          mascot(width: 120, dance: true),
           gap(20),
           heading(
             context,
@@ -1417,7 +1419,7 @@ class InfoScreen extends StatelessWidget {
         body: ListView(
           padding: const EdgeInsets.all(24),
           children: [
-            mascot(width: 140),
+            mascot(width: 140, dance: true),
             gap(24),
             heading(
               context,
