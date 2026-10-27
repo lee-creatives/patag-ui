@@ -14,9 +14,10 @@ void main() {
     );
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('Welcome back, crew.'), findsOneWidget);
-    expect(find.text('Continue as Road Crew Alpha'), findsOneWidget);
-    expect(find.text('Sign in to workspace'), findsOneWidget);
+    expect(find.text('Safer roads start here.'), findsOneWidget);
+    expect(find.text('Welcome back'), findsOneWidget);
+    expect(find.text('Log in'), findsNWidgets(2)); // header and button
+    expect(find.text('Explore fictional demo data'), findsOneWidget);
   });
 
   testWidgets('Maintenance splash screen displays title and logo',
@@ -47,7 +48,7 @@ void main() {
         ),
       );
       await tester.pump(const Duration(milliseconds: 300));
-      expect(find.text('Welcome back, crew.'), findsOneWidget);
+      expect(find.text('Welcome back'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }

@@ -8,7 +8,8 @@ import '../shared/widgets/ui.dart';
 
 class TaskMapScreen extends StatefulWidget {
   final String? initialReportId;
-  const TaskMapScreen({super.key, this.initialReportId});
+  final ValueChanged<int>? onNavigateToTab;
+  const TaskMapScreen({super.key, this.initialReportId, this.onNavigateToTab});
 
   @override
   State<TaskMapScreen> createState() => _TaskMapScreenState();

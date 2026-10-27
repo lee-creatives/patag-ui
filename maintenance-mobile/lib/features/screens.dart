@@ -172,6 +172,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
   final _passwordController = TextEditingController();
   bool _obscure = true;
   bool _loading = false;
+  bool _showDemoDetails = false;
   String? _error;
 
   @override
@@ -220,189 +221,491 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
     final dark = theme.brightness == Brightness.dark;
 
     return Scaffold(
+      backgroundColor: dark ? const Color(0xFF0B0D11) : const Color(0xFFF1F3F7),
       body: SafeArea(
-        child: Form(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              Container(
-                padding: const EdgeInsets.fromLTRB(22, 14, 22, 26),
-                decoration: BoxDecoration(
-                  gradient: dark
-                      ? PatagTokens.crewGradient
-                      : const LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [Color(0xFFFFE7DA), Color(0xFFFFC6A4)],
-                        ),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(34),
-                    bottomRight: Radius.circular(34),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                // Top Inset Orange Card (replicated from Citizen Mobile App)
+                Container(
+                  margin: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+                  padding: const EdgeInsets.fromLTRB(22, 26, 22, 22),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: const LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFFFF8233),
+                        Color(0xFFF65C19),
+                        Color(0xFFDB4306),
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFFF65C19).withOpacity(0.3),
+                        blurRadius: 18,
+                        offset: const Offset(0, 6),
+                      ),
+                    ],
                   ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        logo(width: 112),
-                        const Spacer(),
-                        const ThemeToggle(),
-                      ],
-                    ),
-                    gap(24),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Ayusin natin\nang maayos.',
-                                style: theme.textTheme.headlineLarge?.copyWith(
-                                  color: dark
-                                      ? Colors.white
-                                      : const Color(0xFF20180F),
-                                  fontSize: 30,
-                                ),
-                              ),
-                              gap(10),
-                              Text(
-                                'Your crew workspace for safer, smoother roads.',
-                                style: TextStyle(
-                                  color: dark
-                                      ? const Color(0xFFDCE4EE)
-                                      : const Color(0xFF493326),
-                                  fontSize: 13,
-                                  height: 1.45,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        mascot(width: 104, dance: true),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(22, 28, 22, 30),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome back, crew.',
-                      style: theme.textTheme.headlineMedium,
-                    ),
-                    gap(7),
-                    Text(
-                      'Sign in with your LGU maintenance account.',
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurfaceVariant,
-                        fontSize: 13,
-                      ),
-                    ),
-                    gap(22),
-                    const Text(
-                      'Staff email',
-                      style:
-                          TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-                    ),
-                    gap(8),
-                    TextFormField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      autofillHints: const [AutofillHints.email],
-                      decoration: const InputDecoration(
-                        hintText: 'crew@malolos.gov.ph',
-                        prefixIcon: Icon(Icons.email_outlined),
-                      ),
-                    ),
-                    gap(16),
-                    const Text(
-                      'Password',
-                      style:
-                          TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-                    ),
-                    gap(8),
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: _obscure,
-                      autofillHints: const [AutofillHints.password],
-                      decoration: InputDecoration(
-                        hintText: 'Enter your password',
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        suffixIcon: IconButton(
-                          tooltip: _obscure ? 'Show password' : 'Hide password',
-                          icon: Icon(
-                            _obscure
-                                ? Icons.visibility_outlined
-                                : Icons.visibility_off_outlined,
-                          ),
-                          onPressed: () => setState(() => _obscure = !_obscure),
-                        ),
-                      ),
-                    ),
-                    if (_error != null) ...[
-                      gap(14),
-                      Text(
-                        _error!,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      logo(width: 104, forceWhite: true),
+                      const SizedBox(height: 18),
+                      const Text(
+                        'Safer roads start here.',
                         style: TextStyle(
-                          color: theme.colorScheme.error,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Montserrat',
+                          fontSize: 25,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                          letterSpacing: -0.6,
+                          height: 1.15,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Report clearly. Track progress. See the repair through.',
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          color: Colors.white.withOpacity(0.88),
+                          height: 1.45,
                         ),
                       ),
                     ],
-                    gap(22),
-                    action(
-                      _loading ? 'Connecting…' : 'Sign in to workspace',
-                      _loading ? null : _submit,
-                    ),
-                    gap(20),
-                    Row(
-                      children: [
-                        Expanded(
-                            child: Divider(
-                                color: theme.colorScheme.outlineVariant)),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Text(
-                            'or preview the app',
-                            style: TextStyle(
-                              color: theme.colorScheme.onSurfaceVariant,
-                              fontSize: 11,
+                  ),
+                ),
+                // Form Panel
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(22, 16, 22, 28),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Badge & Theme Switcher
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: dark
+                                  ? const Color(0x26FF5D1A)
+                                  : const Color(0xFFFFF7ED),
+                              borderRadius: BorderRadius.circular(999),
+                              border: Border.all(
+                                color: dark
+                                    ? const Color(0x4DFF5D1A)
+                                    : const Color(0xFFFFEDD5),
+                              ),
+                            ),
+                            child: Text(
+                              'CITIZEN ACCOUNT',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.8,
+                                color: dark
+                                    ? const Color(0xFFFFAA91)
+                                    : const Color(0xFFC2410C),
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            borderRadius: BorderRadius.circular(999),
+                            onTap: () => themeController.toggle(theme.brightness),
+                            child: Container(
+                              width: 36,
+                              height: 36,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: dark
+                                    ? const Color(0xFF1E222B)
+                                    : const Color(0xFFF1F5F9),
+                              ),
+                              child: Icon(
+                                dark
+                                    ? Icons.nightlight_round
+                                    : Icons.light_mode_outlined,
+                                size: 18,
+                                color: dark
+                                    ? Colors.white70
+                                    : const Color(0xFF334155),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Welcome back',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.6,
+                          color: dark ? Colors.white : ink,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Sign in to report a pothole and follow its repair.',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: dark ? const Color(0xFF94A3B8) : slate,
+                          height: 1.45,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(
+                        'Log in',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: dark ? Colors.white : ink,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        'Email address',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: dark ? const Color(0xFFF1F5F9) : ink,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        autofillHints: const [AutofillHints.email],
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: dark ? Colors.white : ink,
+                        ),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          filled: true,
+                          fillColor: dark
+                              ? const Color(0xFF1B1F28)
+                              : const Color(0xFFF8FAFC),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 13,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: dark
+                                  ? const Color(0xFF2D3341)
+                                  : const Color(0xFFE2E8F0),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: dark
+                                  ? const Color(0xFF2D3341)
+                                  : const Color(0xFFE2E8F0),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: orange,
+                              width: 1.5,
                             ),
                           ),
                         ),
-                        Expanded(
-                            child: Divider(
-                                color: theme.colorScheme.outlineVariant)),
-                      ],
-                    ),
-                    gap(16),
-                    OutlinedButton.icon(
-                      onPressed: _loading ? null : _demoLogin,
-                      icon: const Icon(Icons.play_arrow_rounded, color: orange),
-                      label: const Text('Continue as Road Crew Alpha'),
-                    ),
-                    gap(22),
-                    Center(
-                      child: Text(
-                        'Authorized maintenance staff only · Academic demo',
-                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        'Password',
                         style: TextStyle(
-                          fontSize: 10,
-                          color: theme.colorScheme.onSurfaceVariant,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: dark ? const Color(0xFFF1F5F9) : ink,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 6),
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: _obscure,
+                        autofillHints: const [AutofillHints.password],
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: dark ? Colors.white : ink,
+                        ),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          filled: true,
+                          fillColor: dark
+                              ? const Color(0xFF1B1F28)
+                              : const Color(0xFFF8FAFC),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 13,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: dark
+                                  ? const Color(0xFF2D3341)
+                                  : const Color(0xFFE2E8F0),
+                            ),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(
+                              color: dark
+                                  ? const Color(0xFF2D3341)
+                                  : const Color(0xFFE2E8F0),
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: const BorderSide(
+                              color: orange,
+                              width: 1.5,
+                            ),
+                          ),
+                          suffixIcon: IconButton(
+                            tooltip: _obscure
+                                ? 'Show password'
+                                : 'Hide password',
+                            icon: Icon(
+                              _obscure
+                                  ? Icons.visibility_outlined
+                                  : Icons.visibility_off_outlined,
+                              size: 18,
+                              color: dark
+                                  ? const Color(0xFF94A3B8)
+                                  : slate,
+                            ),
+                            onPressed: () =>
+                                setState(() => _obscure = !_obscure),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Enter the password for your citizen account.',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: dark ? const Color(0xFF94A3B8) : slate,
+                        ),
+                      ),
+                      if (_error != null) ...[
+                        const SizedBox(height: 14),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: dark
+                                ? const Color(0xFF3B1912)
+                                : const Color(0xFFFFF0EB),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: dark
+                                  ? const Color(0xFF61261A)
+                                  : const Color(0xFFEBC3B5),
+                            ),
+                          ),
+                          child: Text(
+                            _error!,
+                            style: TextStyle(
+                              color: dark
+                                  ? const Color(0xFFFFAA91)
+                                  : const Color(0xFF8C3212),
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 18),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 46,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: dark
+                                ? Colors.white
+                                : const Color(0xFF0F172A),
+                            foregroundColor: dark
+                                ? const Color(0xFF0F172A)
+                                : Colors.white,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            elevation: 0,
+                          ),
+                          onPressed: _loading ? null : _submit,
+                          child: Text(
+                            _loading ? 'Signing in…' : 'Log in',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        runSpacing: 8,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Citizen accounts can also be created on the Citizen App.',
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'Create an account',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: dark ? Colors.white : ink,
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                    'Contact your administrator to reset credentials.',
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Text(
+                              'Forgot password?',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: dark ? Colors.white : ink,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                      // Explore fictional demo data container
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: dark
+                              ? const Color(0xFF1B1F28)
+                              : const Color(0xFFFAFAFA),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: dark
+                                ? const Color(0xFF2D3341)
+                                : const Color(0xFFE2E8F0),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            InkWell(
+                              onTap: () => setState(
+                                () => _showDemoDetails = !_showDemoDetails,
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      'Explore fictional demo data',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: dark ? Colors.white : ink,
+                                      ),
+                                    ),
+                                  ),
+                                  Icon(
+                                    _showDemoDetails
+                                        ? Icons.keyboard_arrow_up_rounded
+                                        : Icons.keyboard_arrow_down_rounded,
+                                    size: 20,
+                                    color: dark
+                                        ? const Color(0xFF94A3B8)
+                                        : slate,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (_showDemoDetails) ...[
+                              const SizedBox(height: 8),
+                              Text(
+                                'Separate test access for the seeded crew account.',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: dark
+                                      ? const Color(0xFF94A3B8)
+                                      : slate,
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 40,
+                                child: OutlinedButton(
+                                  style: OutlinedButton.styleFrom(
+                                    backgroundColor: dark
+                                        ? const Color(0xFF222733)
+                                        : Colors.white,
+                                    side: BorderSide(
+                                      color: dark
+                                          ? const Color(0xFF384050)
+                                          : const Color(0xFFCBD5E1),
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  onPressed: _loading ? null : _demoLogin,
+                                  child: Text(
+                                    _loading
+                                        ? 'Opening…'
+                                        : 'Open maintenance demo',
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      color: dark ? Colors.white : ink,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -428,17 +731,28 @@ class _MainShellState extends State<MainShell> {
   }
 
   @override
+  void didUpdateWidget(MainShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialTab != widget.initialTab) {
+      _currentIndex = widget.initialTab;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screens = [
       DashboardTab(onNavigateToTab: (i) => setState(() => _currentIndex = i)),
-      const AssignmentsTab(),
-      const InProgressTab(),
-      const TaskMapScreen(),
-      const ProfileTab(),
+      AssignmentsTab(onNavigateToTab: (i) => setState(() => _currentIndex = i)),
+      InProgressTab(onNavigateToTab: (i) => setState(() => _currentIndex = i)),
+      TaskMapScreen(onNavigateToTab: (i) => setState(() => _currentIndex = i)),
+      ProfileTab(onNavigateToTab: (i) => setState(() => _currentIndex = i)),
     ];
 
     return Scaffold(
-      body: screens[_currentIndex],
+      body: IndexedStack(
+        index: _currentIndex,
+        children: screens,
+      ),
       bottomNavigationBar: PatagMaintenanceNavigation(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),

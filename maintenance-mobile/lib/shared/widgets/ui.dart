@@ -11,22 +11,22 @@ Widget gap([double size = 16]) => SizedBox(height: size, width: size);
 Widget heading(BuildContext c, String text) =>
     Text(text, style: Theme.of(c).textTheme.headlineMedium);
 
-Widget logo({double width = 135}) => Builder(
+Widget logo({double width = 135, bool forceWhite = false}) => Builder(
       builder: (context) => Image.asset(
         'assets/images/patag-logo.png',
         width: width,
-        color: Theme.of(context).brightness == Brightness.dark
+        color: forceWhite || Theme.of(context).brightness == Brightness.dark
             ? Colors.white
             : null,
         colorBlendMode: BlendMode.srcIn,
         semanticLabel: 'PATAG',
-        errorBuilder: (_, __, ___) => const Text(
+        errorBuilder: (_, __, ___) => Text(
           'PATAG',
           style: TextStyle(
             fontFamily: 'Lilita One',
             fontSize: 24,
             letterSpacing: 1.5,
-            color: ink,
+            color: forceWhite ? Colors.white : ink,
           ),
         ),
       ),
@@ -568,6 +568,7 @@ class Screen extends StatelessWidget {
   final int? selected;
   final List<Widget>? actions;
   final ValueChanged<int>? onTabSelected;
+  final bool showBottomNav;
 
   const Screen({
     required this.title,
@@ -575,6 +576,7 @@ class Screen extends StatelessWidget {
     this.selected,
     this.actions,
     this.onTabSelected,
+    this.showBottomNav = false,
     super.key,
   });
 
@@ -629,9 +631,8 @@ class Screen extends StatelessWidget {
           ],
         ),
       ),
-      bottomNavigationBar: selected == null
-          ? null
-          : PatagMaintenanceNavigation(
+      bottomNavigationBar: (selected != null && showBottomNav)
+          ? PatagMaintenanceNavigation(
               currentIndex: selected!,
               onTap: onTabSelected ??
                   (index) {
@@ -655,7 +656,8 @@ class Screen extends StatelessWidget {
                         break;
                     }
                   },
-            ),
+            )
+          : null,
     );
   }
 }
