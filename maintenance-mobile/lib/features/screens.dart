@@ -497,14 +497,6 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Enter the password for your maintenance staff account.',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: dark ? const Color(0xFF94A3B8) : slate,
-                        ),
-                      ),
                       if (_error != null) ...[
                         const SizedBox(height: 14),
                         Container(
