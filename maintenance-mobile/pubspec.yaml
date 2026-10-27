@@ -1,0 +1,32 @@
+name: patag_maintenance
+description: PATAG road maintenance crew mobile application for the IT 305 academic project.
+publish_to: none
+version: 1.0.0+1
+environment:
+  sdk: '>=3.6.0 <4.0.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  http: ^1.5.0
+  flutter_map: ^8.3.2
+  latlong2: ^0.9.1
+  geolocator: ^14.1.2
+  image_picker: ^1.2.4
+  shared_preferences: ^2.5.3
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/logos/
+    - assets/mascot/
+  fonts:
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat.ttf
+    - family: Lilita One
+      fonts:
+        - asset: assets/fonts/LilitaOne-Regular.ttf
