@@ -11,7 +11,7 @@ export async function createServer({persist=true,allowDemo=true}={}){
  workspace(db);
  const save=async()=>{if(persist)await writeFile(path.join(dataDir,'db.json'),JSON.stringify(db,null,2));};
  const server=http.createServer(async(req,res)=>{
-  res.setHeader('Access-Control-Allow-Origin',req.headers.origin&&/^http:\/\/(127\.0\.0\.1|localhost):(5173|5174|8080|8081|8082)$/.test(req.headers.origin)?req.headers.origin:'*');res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');res.setHeader('Access-Control-Allow-Methods','GET,POST,PATCH,OPTIONS');res.setHeader('Vary','Origin');
+  res.setHeader('Access-Control-Allow-Origin',req.headers.origin&&/^http:\/\/(127\.0\.0\.1|localhost):(5173|5174|8080|8081|8082|8085)$/.test(req.headers.origin)?req.headers.origin:'*');res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');res.setHeader('Access-Control-Allow-Methods','GET,POST,PATCH,OPTIONS');res.setHeader('Vary','Origin');
   const send=(status,data)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(data));};
   try{
    if(req.method==='OPTIONS'){res.writeHead(204);res.end();return;}

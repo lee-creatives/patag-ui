@@ -5,7 +5,6 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const webRoot = path.resolve(__dirname, '../maintenance-mobile/build/web');
-const PORT = 8082;
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
@@ -26,7 +25,7 @@ const MIME_TYPES = {
   '.otf': 'font/otf'
 };
 
-const server = http.createServer((req, res) => {
+function handleRequest(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
@@ -41,16 +40,17 @@ const server = http.createServer((req, res) => {
     return;
   }
 
-  const parsedUrl = new URL(req.url, `http://127.0.0.1:${PORT}`);
+  const parsedUrl = new URL(req.url, 'http://127.0.0.1');
   let safePath = path.normalize(decodeURIComponent(parsedUrl.pathname)).replace(/^(\.\.[/\\])+/, '');
   if (safePath === '/' || safePath === '') {
     safePath = '/index.html';
   }
 
-  // If service worker is requested, return self.skipWaiting() and unregister logic
+  // If service worker is requested, return script that unregisters itself
   if (safePath === '/flutter_service_worker.js') {
     res.writeHead(200, {
       'Content-Type': 'application/javascript; charset=utf-8',
+      'Clear-Site-Data': '"cache", "storage"',
       'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0'
     });
     res.end('self.addEventListener("install", () => self.skipWaiting()); self.addEventListener("activate", () => self.registration.unregister());');
@@ -74,16 +74,38 @@ const server = http.createServer((req, res) => {
         res.end('Error: ' + err.message);
         return;
       }
-      // Bust browser cache and unregister old service workers
+      // Bust browser cache, send Clear-Site-Data, and unregister old service workers
       const uncacheScript = `<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><script>if("serviceWorker" in navigator){navigator.serviceWorker.getRegistrations().then(rs=>{for(let r of rs)r.unregister()})};if("caches" in window){caches.keys().then(ns=>{for(let n of ns)caches.delete(n)})};</script>`;
       const cleanHtml = html.replace('<head>', '<head>' + uncacheScript);
       res.writeHead(200, {
         'Content-Type': 'text/html; charset=utf-8',
+        'Clear-Site-Data': '"cache"',
         'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
         'Pragma': 'no-cache',
         'Expires': '0'
       });
       res.end(cleanHtml);
+    });
+    return;
+  }
+
+  if (filePath.endsWith('flutter_bootstrap.js')) {
+    fs.readFile(filePath, 'utf8', (err, js) => {
+      if (err) {
+        res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+        res.end('Error: ' + err.message);
+        return;
+      }
+      // Remove service worker settings so no service worker is registered
+      const cleanJs = js.replace(/serviceWorkerSettings:\s*\{[\s\S]*?\},?/, 'serviceWorkerSettings: null,');
+      res.writeHead(200, {
+        'Content-Type': 'application/javascript; charset=utf-8',
+        'Clear-Site-Data': '"cache"',
+        'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
+      res.end(cleanJs);
     });
     return;
   }
@@ -102,8 +124,15 @@ const server = http.createServer((req, res) => {
     });
     res.end(data);
   });
+}
+
+// Serve on both 8082 and fresh origin 8085
+const server8082 = http.createServer(handleRequest);
+server8082.listen(8082, '127.0.0.1', () => {
+  console.log('Maintenance Mobile listening on http://127.0.0.1:8082/');
 });
 
-server.listen(PORT, '127.0.0.1', () => {
-  console.log(`Flutter Maintenance Mobile web server running at http://127.0.0.1:${PORT}/`);
+const server8085 = http.createServer(handleRequest);
+server8085.listen(8085, '127.0.0.1', () => {
+  console.log('Maintenance Mobile (Fresh Cache-Free Port) listening on http://127.0.0.1:8085/');
 });
