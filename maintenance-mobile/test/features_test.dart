@@ -121,8 +121,25 @@ void main() {
     expect(find.text('Paseo del Congreso'), findsOneWidget);
     expect(find.text('TASK PROGRESS'), findsOneWidget);
     expect(find.text('Add Before Photo'), findsOneWidget);
-    expect(find.text('Add After Photo'), findsOneWidget);
+    expect(find.text('Add After Photo'), findsNothing);
     expect(find.text('Start Inspection / Repair'), findsOneWidget);
+  });
+
+  testWidgets('TaskDetailsScreen for In Progress task shows Add After Photo and submit',
+      (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: patagMaintenanceTheme(),
+        home: const TaskDetailsScreen('PTG-2026-0106'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('PTG-2026-0106'), findsOneWidget);
+    expect(find.text('MacArthur Highway'), findsOneWidget);
+    expect(find.text('Add After Photo'), findsOneWidget);
+    expect(find.text('Add Before Photo'), findsNothing);
+    expect(find.text('Document & Submit Completion'), findsOneWidget);
   });
 
   testWidgets('SubmissionSuccessScreen displays celebration and return CTA',

@@ -1412,86 +1412,114 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             ),
           ),
           gap(20),
-          // Clear Photo Action Buttons Card
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: dark ? const Color(0xFF1B1E26) : const Color(0xFFF8FAFC),
-              borderRadius: BorderRadius.circular(PatagTokens.radius),
-              border: Border.all(
-                color: dark
-                    ? const Color(0xFF2E3545)
-                    : const Color(0xFFE2E8F0),
+          // Actions and Photo Evidence specific to each workflow state
+          if (report.status == 'Assigned') ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: dark ? const Color(0xFF1B1E26) : const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(PatagTokens.radius),
+                border: Border.all(
+                  color: dark
+                      ? const Color(0xFF2E3545)
+                      : const Color(0xFFE2E8F0),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.photo_camera_outlined,
+                          size: 18, color: orange),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'Before-Repair Inspection',
+                        style: TextStyle(
+                            fontSize: 13.5, fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                  gap(6),
+                  Text(
+                    'Record a photo of the damaged road before repair work starts.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: dark ? const Color(0xFF94A3B8) : slate,
+                      height: 1.4,
+                    ),
+                  ),
+                  gap(14),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.camera_alt_outlined, size: 17),
+                      label: const Text('Add Before Photo'),
+                      onPressed: _loading
+                          ? null
+                          : () => _uploadBeforePhoto(report),
+                    ),
+                  ),
+                ],
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Icons.photo_camera_outlined,
-                        size: 18, color: orange),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Repair Evidence Documentation',
-                      style:
-                          TextStyle(fontSize: 13.5, fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                ),
-                gap(6),
-                Text(
-                  'Take or upload inspection photos before commencing repair, and completed photos after patching.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: dark ? const Color(0xFF94A3B8) : slate,
-                    height: 1.4,
-                  ),
-                ),
-                gap(14),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        icon: const Icon(Icons.camera_alt_outlined, size: 17),
-                        label: const Text(
-                          'Add Before Photo',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        onPressed: _loading
-                            ? null
-                            : () => _uploadBeforePhoto(report),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        icon: const Icon(Icons.add_a_photo_outlined, size: 17),
-                        label: const Text(
-                          'Add After Photo',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        onPressed: _loading
-                            ? null
-                            : () => _uploadAfterPhoto(report),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          gap(16),
-          // Workflow Action Buttons
-          if (report.status == 'Assigned') ...[
+            gap(16),
             action(
               _loading ? 'Updating…' : 'Start Inspection / Repair',
               _loading ? null : () => _startRepair(report),
               icon: Icons.play_arrow_rounded,
             ),
           ] else if (report.status == 'In Progress') ...[
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: dark ? const Color(0xFF1B1E26) : const Color(0xFFF8FAFC),
+                borderRadius: BorderRadius.circular(PatagTokens.radius),
+                border: Border.all(
+                  color: dark
+                      ? const Color(0xFF2E3545)
+                      : const Color(0xFFE2E8F0),
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.add_a_photo_outlined,
+                          size: 18, color: orange),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'After-Repair Completion Evidence',
+                        style: TextStyle(
+                            fontSize: 13.5, fontWeight: FontWeight.w700),
+                      ),
+                    ],
+                  ),
+                  gap(6),
+                  Text(
+                    'Add photos of the patched road surface before submitting the completion report.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: dark ? const Color(0xFF94A3B8) : slate,
+                      height: 1.4,
+                    ),
+                  ),
+                  gap(14),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.add_a_photo_outlined, size: 17),
+                      label: const Text('Add After Photo'),
+                      onPressed: _loading
+                          ? null
+                          : () => _uploadAfterPhoto(report),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            gap(16),
             action(
               'Document & Submit Completion',
               () {

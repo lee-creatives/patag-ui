@@ -159,7 +159,16 @@ Widget action(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Flexible(child: Text(label, textAlign: TextAlign.center)),
+            Flexible(
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                ),
+              ),
+            ),
             const SizedBox(width: 10),
             Icon(icon, size: 18),
           ],
