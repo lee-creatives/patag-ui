@@ -125,7 +125,8 @@ void main() {
     expect(find.text('Start Inspection / Repair'), findsOneWidget);
   });
 
-  testWidgets('TaskDetailsScreen for In Progress task shows Add After Photo and submit',
+  testWidgets(
+      'TaskDetailsScreen for In Progress task shows Add After Photo and submit',
       (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -140,6 +141,32 @@ void main() {
     expect(find.text('Add After Photo'), findsOneWidget);
     expect(find.text('Add Before Photo'), findsNothing);
     expect(find.text('Document & Submit Completion'), findsOneWidget);
+  });
+
+  testWidgets('TaskDetailsScreen waits for LGU verification after completion',
+      (tester) async {
+    final i = store.reports.indexWhere((r) => r.id == 'PTG-2026-0106');
+    store.reports[i] = PotholeReport({
+      ...store.reports[i].json,
+      'completion': {
+        'state': 'Awaiting Verification',
+        'note': 'Patched.',
+        'photos': [],
+        'at': '2026-10-27T01:00:00.000Z',
+      },
+    });
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: patagMaintenanceTheme(),
+        home: const TaskDetailsScreen('PTG-2026-0106'),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Waiting for the LGU'), findsOneWidget);
+    expect(find.textContaining('Awaiting LGU Verification'), findsOneWidget);
+    expect(find.text('Add After Photo'), findsNothing);
+    expect(find.text('Document & Submit Completion'), findsNothing);
   });
 
   testWidgets('SubmissionSuccessScreen displays celebration and return CTA',

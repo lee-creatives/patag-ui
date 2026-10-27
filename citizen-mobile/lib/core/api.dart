@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:latlong2/latlong.dart';
 import 'models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class PatagStore extends ChangeNotifier {
@@ -14,6 +15,15 @@ class PatagStore extends ChangeNotifier {
   Timer? timer;
   String? networkError;
   bool showUnread = true;
+
+  /// A spot chosen on the full-screen map before signing in; the report form
+  /// opens with it once the citizen is signed in.
+  LatLng? pendingReportPin;
+  LatLng? takePendingReportPin() {
+    final pin = pendingReportPin;
+    pendingReportPin = null;
+    return pin;
+  }
   void setUnreadPreference(bool value) {
     showUnread=value;
     notifyListeners();

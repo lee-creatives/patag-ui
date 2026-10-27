@@ -449,57 +449,71 @@ class PhotoWidget extends StatelessWidget {
         ),
       );
     }
-    return ClipRRect(
-      borderRadius: br,
-      child: Container(
-        height: height,
-        width: width ?? double.infinity,
-        color: Theme.of(context).brightness == Brightness.dark
-            ? const Color(0xFF27292E)
-            : const Color(0xFFE9ECEB),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Align(
-              alignment: const Alignment(0, -.35),
-              child: Transform.rotate(
-                angle: -.08,
-                child: Container(
-                  width: (width ?? 120) * .8,
-                  height: 10,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(.88),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-              ),
-            ),
-            Align(
-              alignment: const Alignment(0, .38),
-              child: Container(
-                width: (width ?? 120) * .62,
-                height: height * .28,
-                decoration: BoxDecoration(
-                  color: ink,
-                  borderRadius: BorderRadius.circular(40),
-                  border: Border.all(
-                    color: const Color(0xFF4B5563),
-                    width: 7,
-                  ),
-                ),
-              ),
-            ),
-            const Positioned(
-              left: 8,
-              top: 8,
-              child: Icon(
-                Icons.photo_camera_outlined,
-                size: 15,
-                color: Color(0xFF5F6870),
-              ),
-            ),
-          ],
+    // Uploaded evidence is served by the API; SVG demo illustrations keep the placeholder.
+    if (photo.url.startsWith('/') && !photo.url.endsWith('.svg')) {
+      return ClipRRect(
+        borderRadius: br,
+        child: Image.network(
+          PatagMaintenanceStore.photoUrl(photo.url),
+          height: height,
+          width: width ?? double.infinity,
+          fit: BoxFit.cover,
+          errorBuilder: (context, _, __) => _placeholder(context),
         ),
+      );
+    }
+    return ClipRRect(borderRadius: br, child: _placeholder(context));
+  }
+
+  Widget _placeholder(BuildContext context) {
+    return Container(
+      height: height,
+      width: width ?? double.infinity,
+      color: Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF27292E)
+          : const Color(0xFFE9ECEB),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Align(
+            alignment: const Alignment(0, -.35),
+            child: Transform.rotate(
+              angle: -.08,
+              child: Container(
+                width: (width ?? 120) * .8,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(.88),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ),
+          Align(
+            alignment: const Alignment(0, .38),
+            child: Container(
+              width: (width ?? 120) * .62,
+              height: height * .28,
+              decoration: BoxDecoration(
+                color: ink,
+                borderRadius: BorderRadius.circular(40),
+                border: Border.all(
+                  color: const Color(0xFF4B5563),
+                  width: 7,
+                ),
+              ),
+            ),
+          ),
+          const Positioned(
+            left: 8,
+            top: 8,
+            child: Icon(
+              Icons.photo_camera_outlined,
+              size: 15,
+              color: Color(0xFF5F6870),
+            ),
+          ),
+        ],
       ),
     );
   }

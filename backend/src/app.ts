@@ -63,6 +63,26 @@ const sanitizePhoto = (p: z.infer<typeof photoRef>, kind: string): Photo =>
 
 const uploadName = (url: string) => url.slice('/uploads/'.length);
 
+function eventTitle(r: Report, action: string, teams: { id: string; name: string }[]) {
+  switch (action) {
+    case 'assign': return `${r.id} assigned to ${teams.find(t => t.id === r.teamId)?.name ?? 'a road crew'}`;
+    case 'start': return `${r.id}: repair started`;
+    case 'progress': return `${r.id}: repair progress updated`;
+    case 'before-photos': return `${r.id}: before-repair photos added`;
+    case 'complete': return `${r.id}: repair ready for LGU verification`;
+    case 'return': return `${r.id}: more work requested`;
+    case 'resolve': return `${r.id}: repair verified and resolved`;
+    default: return `${r.id}: ${r.status}`;
+  }
+}
+
+/** Exact origins, plus "http://localhost:*" / "http://127.0.0.1:*" for any local port (Flutter web dev). */
+export function originAllowed(origin: string, allowed: string[]) {
+  if (allowed.includes(origin)) return true;
+  const m = /^(http:\/\/(?:localhost|127\.0\.0\.1)):\d{1,5}$/.exec(origin);
+  return !!m && allowed.includes(`${m[1]}:*`);
+}
+
 export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], logger = false, bodyLimit = BODY_LIMIT }: AppOptions) {
   const app = Fastify({ logger, bodyLimit });
 
@@ -74,7 +94,7 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
 
   app.addHook('onRequest', async (req, reply) => {
     const origin = req.headers.origin;
-    if (origin && corsOrigins.includes(origin)) {
+    if (origin && originAllowed(origin, corsOrigins)) {
       reply.header('Access-Control-Allow-Origin', origin);
       reply.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
       reply.header('Access-Control-Allow-Methods', 'GET,POST,PATCH,OPTIONS');
@@ -310,11 +330,14 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
         if (!r) fail(404, 'Report not found.');
         if (!canSee(user, r!)) fail(403, 'This report belongs to another account or team.');
         if (e.action === 'duplicate' && (!e.duplicateOf || e.duplicateOf === r!.id || !(await tx.reportExists(e.duplicateOf)))) fail(400, 'Original report not found.');
-        const kind = e.action === 'complete' ? 'after' : 'before';
-        const photos = e.photos?.map(p => sanitizePhoto(p, kind));
-        transition(r!, user.role, e.action, { ...e, photos }, e.action === 'assign' ? await tx.listTeams() : []);
+        // complete = after photos, before-photos = before; progress photos default to after.
+        const kindOf = (p: z.infer<typeof photoRef>) =>
+          e.action === 'complete' ? 'after' : e.action === 'before-photos' ? 'before' : p.kind === 'before' ? 'before' : 'after';
+        const photos = e.photos?.map(p => sanitizePhoto(p, kindOf(p)));
+        const teams = e.action === 'assign' ? await tx.listTeams() : [];
+        transition(r!, user.role, e.action, { ...e, photos }, teams);
         await tx.saveReport(r!);
-        await notify(tx, r!, e.action === 'complete' ? 'Repair ready for LGU verification' : `${r!.id}: ${r!.status}`);
+        await notify(tx, r!, eventTitle(r!, e.action, teams));
         return r;
       });
     });

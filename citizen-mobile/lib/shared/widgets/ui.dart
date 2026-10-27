@@ -7,8 +7,12 @@ import '../../core/models.dart';
 
 void go(BuildContext context, String route) =>
     Navigator.of(context).pushNamed(route);
-void home(BuildContext context) =>
-    Navigator.of(context).pushNamedAndRemoveUntil('/home', (route) => false);
+void home(BuildContext context) {
+  final navigator = Navigator.of(context);
+  navigator.pushNamedAndRemoveUntil('/home', (route) => false);
+  // Continue a report started from the map before signing in.
+  if (store.pendingReportPin != null) navigator.pushNamed('/report/new');
+}
 void message(BuildContext context, String text) =>
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
 Widget logo({double width = 135}) => Builder(

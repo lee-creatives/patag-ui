@@ -6,6 +6,8 @@ import 'app/theme.dart';
 import 'core/api.dart';
 import 'features/screens.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([
@@ -15,6 +17,8 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   store.showUnread = prefs.getBool('maintenance-notifications') ?? true;
   await themeController.load();
+  store.onSessionExpired = () => navigatorKey.currentState
+      ?.pushNamedAndRemoveUntil('/login', (_) => false);
   runApp(const PatagMaintenanceApp());
 }
 
@@ -27,6 +31,7 @@ class PatagMaintenanceApp extends StatelessWidget {
       animation: Listenable.merge([store, themeController]),
       builder: (context, _) => MaterialApp(
         title: 'PATAG Maintenance',
+        navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
         theme: patagMaintenanceTheme(),
         darkTheme: patagMaintenanceTheme(brightness: Brightness.dark),

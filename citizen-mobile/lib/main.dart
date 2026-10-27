@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app/theme.dart';
 import 'core/api.dart';
@@ -52,7 +53,9 @@ class PatagApp extends StatelessWidget {
             } else if (route == '/home') {
               screen = const CitizenHome();
             } else if (route == '/report/new') {
-              screen = const ReportWizard();
+              screen = ReportWizard(
+                  initialPin: settings.arguments as LatLng? ??
+                      store.takePendingReportPin());
             } else if (route.startsWith('/report/success/')) {
               screen = ReportSuccess(parts.last);
             } else if (route == '/reports') {

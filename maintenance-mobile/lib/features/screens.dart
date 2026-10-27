@@ -168,7 +168,7 @@ class MaintenanceLogin extends StatefulWidget {
 }
 
 class _MaintenanceLoginState extends State<MaintenanceLogin> {
-  final _emailController = TextEditingController(text: 'crew@malolos.gov.ph');
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscure = true;
   bool _loading = false;
@@ -324,7 +324,8 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                           ),
                           InkWell(
                             borderRadius: BorderRadius.circular(999),
-                            onTap: () => themeController.toggle(theme.brightness),
+                            onTap: () =>
+                                themeController.toggle(theme.brightness),
                             child: Container(
                               width: 36,
                               height: 36,
@@ -480,17 +481,14 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                             ),
                           ),
                           suffixIcon: IconButton(
-                            tooltip: _obscure
-                                ? 'Show password'
-                                : 'Hide password',
+                            tooltip:
+                                _obscure ? 'Show password' : 'Hide password',
                             icon: Icon(
                               _obscure
                                   ? Icons.visibility_outlined
                                   : Icons.visibility_off_outlined,
                               size: 18,
-                              color: dark
-                                  ? const Color(0xFF94A3B8)
-                                  : slate,
+                              color: dark ? const Color(0xFF94A3B8) : slate,
                             ),
                             onPressed: () =>
                                 setState(() => _obscure = !_obscure),
@@ -534,12 +532,10 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                         height: 42,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: dark
-                                ? Colors.white
-                                : const Color(0xFF0F172A),
-                            foregroundColor: dark
-                                ? const Color(0xFF0F172A)
-                                : Colors.white,
+                            backgroundColor:
+                                dark ? Colors.white : const Color(0xFF0F172A),
+                            foregroundColor:
+                                dark ? const Color(0xFF0F172A) : Colors.white,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -633,9 +629,8 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                                         ? Icons.keyboard_arrow_up_rounded
                                         : Icons.keyboard_arrow_down_rounded,
                                     size: 20,
-                                    color: dark
-                                        ? const Color(0xFF94A3B8)
-                                        : slate,
+                                    color:
+                                        dark ? const Color(0xFF94A3B8) : slate,
                                   ),
                                 ],
                               ),
@@ -646,9 +641,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                                 'Separate test access for the seeded crew account.',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: dark
-                                      ? const Color(0xFF94A3B8)
-                                      : slate,
+                                  color: dark ? const Color(0xFF94A3B8) : slate,
                                 ),
                               ),
                               const SizedBox(height: 12),
@@ -1199,8 +1192,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   Future<void> _startRepair(PotholeReport report) async {
     setState(() => _loading = true);
     try {
-      await store.event(report.id, 'start_repair', payload: {
-        'note': 'Crew Alpha initiated on-site road surface repair.',
+      await store.event(report.id, 'start', payload: {
+        'note': 'Crew started on-site road surface repair.',
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1230,8 +1223,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     setState(() => _loading = true);
     try {
       final photoData = await store.upload(file, kind: 'before');
-      await store.event(report.id, 'upload_evidence', payload: {
-        'photo': photoData,
+      await store.event(report.id, 'before-photos', payload: {
+        'photos': [photoData],
         'note': 'Before-repair inspection photo recorded by crew.',
       });
       if (mounted) {
@@ -1260,9 +1253,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     setState(() => _loading = true);
     try {
       final photoData = await store.upload(file, kind: 'after');
-      await store.event(report.id, 'upload_evidence', payload: {
-        'photo': photoData,
-        'note': 'After-repair completion photo recorded by crew.',
+      // Recorded as a progress update; reused when the crew submits completion.
+      await store.event(report.id, 'progress', payload: {
+        'phase': 'Repair',
+        'photos': [photoData],
+        'note': 'After-repair photo recorded by crew.',
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -1295,10 +1290,13 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
       );
     }
 
-    final beforePhotos =
-        report.photos.where((p) => p.kind != 'after').toList();
-    final afterPhotos =
-        report.photos.where((p) => p.kind == 'after').toList();
+    final beforePhotos = report.photos.where((p) => p.kind != 'after').toList();
+    final afterPhotos = afterRepairPhotos(report);
+    final completionState = report.completion?.state;
+    final awaitingVerification = completionState == 'Awaiting Verification';
+    final returnNote = completionState == 'Additional Work Requested'
+        ? lastHistoryNote(report, 'return')
+        : null;
 
     return Screen(
       title: report.id,
@@ -1306,7 +1304,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         padding: const EdgeInsets.all(20),
         children: [
           // Orange Task Progress Bar on Top
-          TaskProgressBar(report.status),
+          TaskProgressBar(report.status, completionState: completionState),
           gap(10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1420,9 +1418,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 color: dark ? const Color(0xFF1B1E26) : const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(PatagTokens.radius),
                 border: Border.all(
-                  color: dark
-                      ? const Color(0xFF2E3545)
-                      : const Color(0xFFE2E8F0),
+                  color:
+                      dark ? const Color(0xFF2E3545) : const Color(0xFFE2E8F0),
                 ),
               ),
               child: Column(
@@ -1455,9 +1452,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.camera_alt_outlined, size: 17),
                       label: const Text('Add Before Photo'),
-                      onPressed: _loading
-                          ? null
-                          : () => _uploadBeforePhoto(report),
+                      onPressed:
+                          _loading ? null : () => _uploadBeforePhoto(report),
                     ),
                   ),
                 ],
@@ -1469,16 +1465,31 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               _loading ? null : () => _startRepair(report),
               icon: Icons.play_arrow_rounded,
             ),
+          ] else if (report.status == 'In Progress' &&
+              awaitingVerification) ...[
+            const InfoPanel(
+              icon: Icons.hourglass_top_rounded,
+              text:
+                  'Repair submitted. Waiting for the LGU to verify your evidence before the task is resolved.',
+            ),
           ] else if (report.status == 'In Progress') ...[
+            if (returnNote != null) ...[
+              InfoPanel(
+                icon: Icons.assignment_return_outlined,
+                text: returnNote.isEmpty
+                    ? 'The LGU requested more work on this repair.'
+                    : 'More work requested by the LGU: $returnNote',
+              ),
+              gap(16),
+            ],
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: dark ? const Color(0xFF1B1E26) : const Color(0xFFF8FAFC),
                 borderRadius: BorderRadius.circular(PatagTokens.radius),
                 border: Border.all(
-                  color: dark
-                      ? const Color(0xFF2E3545)
-                      : const Color(0xFFE2E8F0),
+                  color:
+                      dark ? const Color(0xFF2E3545) : const Color(0xFFE2E8F0),
                 ),
               ),
               child: Column(
@@ -1511,9 +1522,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.add_a_photo_outlined, size: 17),
                       label: const Text('Add After Photo'),
-                      onPressed: _loading
-                          ? null
-                          : () => _uploadAfterPhoto(report),
+                      onPressed:
+                          _loading ? null : () => _uploadAfterPhoto(report),
                     ),
                   ),
                 ],
@@ -1560,7 +1570,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
 
 class TaskProgressBar extends StatelessWidget {
   final String status;
-  const TaskProgressBar(this.status, {super.key});
+  final String? completionState;
+  const TaskProgressBar(this.status, {this.completionState, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -1577,8 +1588,12 @@ class TaskProgressBar extends StatelessWidget {
         break;
       case 'In Progress':
         step = 2;
-        progress = 0.66;
-        stepName = 'Repair In Progress';
+        progress = completionState == 'Awaiting Verification' ? 0.85 : 0.66;
+        stepName = completionState == 'Awaiting Verification'
+            ? 'Awaiting LGU Verification'
+            : completionState == 'Additional Work Requested'
+                ? 'More Work Requested'
+                : 'Repair In Progress';
         break;
       case 'Resolved':
       case 'Completed':
@@ -1642,7 +1657,8 @@ class TaskProgressBar extends StatelessWidget {
               minHeight: 8,
               backgroundColor:
                   dark ? const Color(0xFF2C3240) : const Color(0xFFFFE0CA),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFF5D1A)),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(Color(0xFFFF5D1A)),
             ),
           ),
           const SizedBox(height: 8),
@@ -1699,6 +1715,13 @@ class _RepairDocumentationScreenState extends State<RepairDocumentationScreen> {
   bool _loading = false;
 
   @override
+  void initState() {
+    super.initState();
+    final report = store.getReportById(widget.reportId);
+    if (report != null) _afterPhotos.addAll(afterRepairPhotos(report));
+  }
+
+  @override
   void dispose() {
     _notesController.dispose();
     super.dispose();
@@ -1730,6 +1753,14 @@ class _RepairDocumentationScreenState extends State<RepairDocumentationScreen> {
   }
 
   Future<void> _submitCompletion() async {
+    if (_notesController.text.trim().isEmpty || _afterPhotos.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Add at least one after photo and describe the work.'),
+        ),
+      );
+      return;
+    }
     setState(() => _loading = true);
     try {
       await store.event(widget.reportId, 'complete', payload: {
@@ -1870,11 +1901,36 @@ class SubmissionSuccessScreen extends StatelessWidget {
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
 
+  Future<void> _markRead(BuildContext context, String id) async {
+    try {
+      await store.markRead(id);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(PatagMaintenanceStore.clean(e))),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final list = store.notifications;
+    return ListenableBuilder(
+      listenable: store,
+      builder: (context, _) => _build(context, store.notifications),
+    );
+  }
+
+  Widget _build(BuildContext context, List<Notice> list) {
     return Screen(
       title: 'Notifications',
+      actions: [
+        if (list.any((n) => !n.read))
+          TextButton(
+            onPressed: () => _markRead(context, 'all'),
+            child: const Text('Mark all read'),
+          ),
+      ],
       body: list.isEmpty
           ? const EmptyState(
               'All caught up',
@@ -1900,6 +1956,14 @@ class NotificationsScreen extends StatelessWidget {
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   subtitle: Text(item.reportId),
+                  onTap: () async {
+                    await _markRead(context, item.id);
+                    if (context.mounted &&
+                        store.getReportById(item.reportId) != null) {
+                      Navigator.of(context)
+                          .pushNamed('/assignments/${item.reportId}');
+                    }
+                  },
                 );
               },
             ),
@@ -2017,6 +2081,56 @@ class ProfileTab extends StatelessWidget {
                 Navigator.of(context).pushReplacementNamed('/login');
               }
             },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// After-repair photos: completion evidence plus photos recorded in progress updates.
+List<Photo> afterRepairPhotos(PotholeReport report) {
+  final seen = <String>{};
+  return [
+    ...?report.completion?.photos,
+    ...report.updates.expand((u) => u.photos).where((p) => p.kind == 'after'),
+  ].where((p) => seen.add(p.url)).toList();
+}
+
+/// Note of the most recent history entry with this action, if any.
+String? lastHistoryNote(PotholeReport report, String action) {
+  for (final h in report.history.reversed) {
+    if (h is Map && h['action'] == action) return (h['note'] as String?) ?? '';
+  }
+  return null;
+}
+
+class InfoPanel extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  const InfoPanel({required this.icon, required this.text, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: dark ? const Color(0xFF1B1E26) : const Color(0xFFFFF7ED),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: dark ? const Color(0x33FF5D1A) : const Color(0xFFFFEDD5),
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: orange),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontWeight: FontWeight.w600, height: 1.35),
+            ),
           ),
         ],
       ),

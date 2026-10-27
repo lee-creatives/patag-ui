@@ -31,12 +31,18 @@ class RoadMap extends StatefulWidget {
   final List<PotholeReport> reports;
   final LatLng? pin;
   final ValueChanged<LatLng>? onPin;
-  final double height;
+
+  /// Fixed height; null fills the parent (full-screen map).
+  final double? height;
+
+  /// Shows the full-screen button.
+  final bool expandable;
   const RoadMap(
       {this.reports = const [],
       this.pin,
       this.onPin,
       this.height = 300,
+      this.expandable = true,
       super.key});
   @override
   State<RoadMap> createState() => _RoadMapState();
@@ -49,6 +55,31 @@ class _RoadMapState extends State<RoadMap> {
   void dispose() {
     controller.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(RoadMap old) {
+    super.didUpdateWidget(old);
+    // Bring a pin set elsewhere (GPS, full-screen picker) into view.
+    final pin = widget.pin;
+    if (pin != null && pin != old.pin) {
+      try {
+        if (!controller.camera.visibleBounds.contains(pin)) {
+          controller.move(pin, controller.camera.zoom);
+        }
+      } catch (_) {}
+    }
+  }
+
+  /// Opens this map full screen. When the map picks a location, the chosen
+  /// point is handed back through [RoadMap.onPin].
+  Future<void> expand() async {
+    final picking = widget.onPin != null;
+    final picked = await Navigator.of(context).push<LatLng>(MaterialPageRoute(
+        fullscreenDialog: true,
+        builder: (_) => FullMapScreen(
+            reports: widget.reports, initialPin: widget.pin, picking: picking)));
+    if (picked != null && picking) widget.onPin!(picked);
   }
 
   void openReport(PotholeReport report) {
@@ -79,7 +110,7 @@ class _RoadMapState extends State<RoadMap> {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(widget.height == null ? 0 : 18),
         child: SizedBox(
           height: widget.height,
           child: Stack(children: [
@@ -163,6 +194,14 @@ class _RoadMapState extends State<RoadMap> {
                 top: 10,
                 right: 10,
                 child: Column(children: [
+                  if (widget.expandable) ...[
+                    FloatingActionButton.small(
+                        heroTag: null,
+                        tooltip: 'Full screen map',
+                        onPressed: expand,
+                        child: const Icon(Icons.fullscreen)),
+                    gap(4),
+                  ],
                   FloatingActionButton.small(
                       heroTag: null,
                       tooltip: 'Zoom in',
@@ -198,6 +237,150 @@ class _RoadMapState extends State<RoadMap> {
                               style: TextStyle(fontSize: 11))))),
           ]),
         ));
+  }
+}
+
+/// Edge-to-edge map. In [picking] mode it returns the chosen point with
+/// "Use this location"; otherwise the citizen can drop a pin and start a
+/// report there.
+class FullMapScreen extends StatefulWidget {
+  final List<PotholeReport> reports;
+  final LatLng? initialPin;
+  final bool picking;
+  const FullMapScreen(
+      {this.reports = const [],
+      this.initialPin,
+      this.picking = false,
+      super.key});
+  @override
+  State<FullMapScreen> createState() => _FullMapScreenState();
+}
+
+class _FullMapScreenState extends State<FullMapScreen> {
+  LatLng? pin;
+  bool locating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    pin = widget.initialPin;
+  }
+
+  Future<void> useGps() async {
+    setState(() => locating = true);
+    try {
+      final point = await locate();
+      if (mounted) setState(() => pin = point);
+    } catch (e) {
+      if (mounted) message(context, PatagStore.clean(e));
+    }
+    if (mounted) setState(() => locating = false);
+  }
+
+  void reportHere() {
+    final point = pin!;
+    if (store.token == null) {
+      // Kept until sign-in finishes, then the report form opens with it.
+      store.pendingReportPin = point;
+      message(context, 'Sign in to report this pothole.');
+      Navigator.of(context).pushNamed('/login');
+      return;
+    }
+    Navigator.of(context).pushNamed('/report/new', arguments: point);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final hint = widget.picking
+        ? 'Tap the map to place the pothole pin.'
+        : 'Tap a pin for details, or tap the road to report a pothole there.';
+    return Scaffold(
+      body: SizedBox.expand(
+          child: Stack(children: [
+        Positioned.fill(
+            child: RoadMap(
+                reports: widget.reports,
+                pin: pin,
+                onPin: (point) => setState(() => pin = point),
+                height: null,
+                expandable: false)),
+        Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: SafeArea(
+                child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 64, 0),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            FloatingActionButton.small(
+                heroTag: null,
+                tooltip: 'Close full screen map',
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Icon(Icons.close)),
+            const SizedBox(width: 8),
+            Flexible(
+                child: Material(
+              color: theme.colorScheme.surface.withValues(alpha: .94),
+              borderRadius: BorderRadius.circular(14),
+              child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  child: Text(hint, style: const TextStyle(fontSize: 13))),
+            )),
+          ]),
+        ))),
+        Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: SafeArea(
+                child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Material(
+                elevation: 6,
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(20),
+                child: Padding(
+                  padding: const EdgeInsets.all(14),
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    if (pin != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: Text(
+                            'Pin: ${pin!.latitude.toStringAsFixed(5)}, ${pin!.longitude.toStringAsFixed(5)}',
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: theme.colorScheme.onSurfaceVariant)),
+                      ),
+                    Row(children: [
+                      Expanded(
+                          child: OutlinedButton.icon(
+                              onPressed: locating ? null : useGps,
+                              icon: const Icon(Icons.my_location),
+                              label: Text(locating ? 'Locating…' : 'My GPS'))),
+                      const SizedBox(width: 10),
+                      Expanded(
+                          flex: 2,
+                          child: FilledButton.icon(
+                              onPressed: pin == null
+                                  ? null
+                                  : widget.picking
+                                      ? () => Navigator.of(context).pop(pin)
+                                      : reportHere,
+                              icon: Icon(widget.picking
+                                  ? Icons.check
+                                  : Icons.add_location_alt_outlined),
+                              label: Text(widget.picking
+                                  ? 'Use this location'
+                                  : 'Report a pothole here'))),
+                    ]),
+                  ]),
+                ),
+              ),
+            ))),
+      ])),
+    );
   }
 }
 

@@ -11,7 +11,9 @@ import '../shared/widgets/ui.dart';
 import 'report_map.dart';
 
 class ReportWizard extends StatefulWidget {
-  const ReportWizard({super.key});
+  /// Location chosen on the full-screen map; replaces any saved draft location.
+  final LatLng? initialPin;
+  const ReportWizard({this.initialPin, super.key});
   @override
   State<ReportWizard> createState() => _ReportWizardState();
 }
@@ -73,6 +75,16 @@ class _ReportWizardState extends State<ReportWizard> {
   }
 
   Future<void> load() async {
+    await loadDraft();
+    final start = widget.initialPin;
+    if (start != null && mounted) {
+      setPin(start);
+      message(context,
+          'Location set from the map. Add a photo, then check the road details.');
+    }
+  }
+
+  Future<void> loadDraft() async {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString('patag-draft');
     if (raw == null) return;
@@ -404,7 +416,8 @@ class _ReportWizardState extends State<ReportWizard> {
                             fontSize: 12),
                       ),
                       gap(),
-                      if (pin != null) RoadMap(pin: pin, height: 180),
+                      if (pin != null)
+                        RoadMap(pin: pin, height: 180, expandable: false),
                       gap(),
                       StatusChip(severity),
                       gap(),
