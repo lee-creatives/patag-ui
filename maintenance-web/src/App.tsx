@@ -311,14 +311,14 @@ function Login() {
           </div>
           <div className="login-story-body">
             <h1>
-              {admin ? "Better roads." : "Safe roads."}
+              {admin ? "Better roads." : "Safer roads start here."}
               <br />
-              {admin ? "Built together." : "Repaired fast."}
+              {admin ? "Built together." : ""}
             </h1>
             <p className="login-story-desc">
               {admin
                 ? "Turn community reports into coordinated municipal action."
-                : "One repair at a time. Make the way safer for everyone."}
+                : "Report clearly. Track progress. See the repair through."}
             </p>
           </div>
           <small className="login-story-footer">
@@ -335,15 +335,15 @@ function Login() {
             </svg>
           </div>
           <span className="pill-label">
-            {admin ? "LGU administrator" : "Road maintenance"}
+            {admin ? "LGU administrator" : "Citizen account"}
           </span>
-          <h2>{recovery ? "Recover access" : (admin ? "Welcome to LGU Portal" : "Crew Workspace Sign In")}</h2>
+          <h2>{recovery ? "Recover access" : (admin ? "Welcome to LGU Portal" : "Welcome back")}</h2>
           <p className="login-subtitle">
             {recovery
               ? "Request a password reset for your staff account."
               : (admin
                   ? "Access your tasks, reports, and teams anytime, anywhere — all in one place."
-                  : "Access assigned road work orders, document repairs, and record evidence.")}
+                  : "Sign in to report a pothole and follow its repair.")}
           </p>
           <form onSubmit={run}>
             <label>
@@ -353,7 +353,8 @@ function Login() {
                 type="email"
                 autoComplete="email"
                 required
-                placeholder="you@example.test"
+                placeholder="crew@malolos.gov.ph"
+                defaultValue={admin ? "admin@malolos.gov.ph" : "crew@malolos.gov.ph"}
               />
             </label>
             {!recovery && (
@@ -391,7 +392,7 @@ function Login() {
                 ? "Connecting…"
                 : recovery
                   ? "Request recovery"
-                  : "Sign in"}
+                  : "Log in"}
               <ArrowRight size={16} />
             </button>
           </form>
@@ -411,11 +412,10 @@ function Login() {
             <summary>Explore fictional demo data</summary>
             <strong>Explore the working demo</strong>
             <p>
-              Fictional reports, local API, and role-based workflows. No official
-              LGU records.
+              Separate test access for the seeded crew account.
             </p>
             <button onClick={demo} disabled={loading} className="demo-action-btn">
-              Continue as {admin ? "LGU administrator" : "Road Crew Alpha"}
+              {admin ? "Continue as LGU administrator" : "Open maintenance demo"}
               <ArrowUpRight size={16} />
             </button>
           </details>
