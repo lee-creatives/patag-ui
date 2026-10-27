@@ -154,6 +154,7 @@ Widget action(
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           foregroundColor: dark ? Colors.white : const Color(0xFF20180F),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         ),
         onPressed: press,
         child: Row(
@@ -164,8 +165,8 @@ Widget action(
                 label,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14.5,
                 ),
               ),
             ),
