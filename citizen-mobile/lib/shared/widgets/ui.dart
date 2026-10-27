@@ -351,13 +351,17 @@ class PatagNavigation extends StatelessWidget {
               child: Row(
                   children: List.generate(5, (i) {
                 final active = selected == i;
-                final color = i == 2
+                final isCenter = i == 2;
+                final color = isCenter
                     ? orange
                     : active
                         ? Colors.white
                         : Colors.transparent;
-                final foreground =
-                    i == 2 || active ? ink : const Color(0xFFDCE4EE);
+                final foreground = isCenter
+                    ? Colors.black
+                    : active
+                        ? ink
+                        : const Color(0xFFDCE4EE);
                 return Expanded(
                     child: Semantics(
                         selected: active,
@@ -369,11 +373,16 @@ class PatagNavigation extends StatelessWidget {
                           'My reports',
                           'Profile'
                         ][i],
-                        child: Material(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 3,
+                            vertical: 2,
+                          ),
+                          child: Material(
                             color: color,
-                            borderRadius: BorderRadius.circular(32),
+                            borderRadius: BorderRadius.circular(18),
                             child: InkWell(
-                                borderRadius: BorderRadius.circular(32),
+                                borderRadius: BorderRadius.circular(18),
                                 onTap: () {
                                   final route = [
                                     '/home',
@@ -391,8 +400,10 @@ class PatagNavigation extends StatelessWidget {
                                 },
                                 child: Padding(
                                     padding: const EdgeInsets.symmetric(
-                                        vertical: 10),
+                                        vertical: 6),
                                     child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Icon(
@@ -404,8 +415,8 @@ class PatagNavigation extends StatelessWidget {
                                                 Icons.person_outline
                                               ][i],
                                               color: foreground,
-                                              size: 22),
-                                          const SizedBox(height: 5),
+                                              size: 20),
+                                          const SizedBox(height: 2),
                                           Text(
                                               [
                                                 'Home',
@@ -414,13 +425,17 @@ class PatagNavigation extends StatelessWidget {
                                                 'My reports',
                                                 'Profile'
                                               ][i],
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
                                                   color: foreground,
                                                   fontSize: 10,
-                                                  fontWeight: active
-                                                      ? FontWeight.w600
+                                                  fontWeight: active || isCenter
+                                                      ? FontWeight.w700
                                                       : FontWeight.normal))
-                                        ]))))));
+                                        ]))),
+                          ),
+                        )));
               })))));
 }
 

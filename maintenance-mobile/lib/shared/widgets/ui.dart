@@ -700,7 +700,7 @@ class PatagMaintenanceNavigation extends StatelessWidget {
                         ? Colors.white
                         : Colors.transparent;
                 final foreground = isCenter
-                    ? const Color(0xFF20180F)
+                    ? Colors.black
                     : active
                         ? ink
                         : const Color(0xFFDCE4EE);
@@ -719,37 +719,43 @@ class PatagMaintenanceNavigation extends StatelessWidget {
                     selected: active,
                     button: true,
                     label: labels[i],
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(22),
-                        onTap: () {
-                          onTap(i);
-                        },
-                        child: Container(
-                          height: 52,
-                          decoration: BoxDecoration(
-                            color: color,
-                            gradient:
-                                isCenter ? PatagTokens.primaryGradient : null,
-                            borderRadius: BorderRadius.circular(22),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(icons[i], size: 20, color: foreground),
-                              const SizedBox(height: 2),
-                              Text(
-                                labels[i],
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: active || isCenter
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: foreground,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 4,
+                        vertical: 2,
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(18),
+                          onTap: () {
+                            onTap(i);
+                          },
+                          child: Container(
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: color,
+                              gradient:
+                                  isCenter ? PatagTokens.primaryGradient : null,
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(icons[i], size: 19, color: foreground),
+                                const SizedBox(height: 2),
+                                Text(
+                                  labels[i],
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: active || isCenter
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: foreground,
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
