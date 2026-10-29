@@ -68,12 +68,22 @@ export class Store {
       [u.id ?? null, u.name, u.email, u.role, u.active, u.teamId, json(u.address), u.emailVerified, u.passwordHash]);
     return rows[0] ? toUser(rows[0]) : null;
   }
+  async emailTaken(email: string, exceptId: string | null) {
+    const { rows } = await this.db.query('select 1 from users where lower(email) = lower($1) and id is distinct from $2', [email, exceptId]);
+    return rows.length > 0;
+  }
   async updateUser(u: User) {
     await this.db.query(
-      `update users set name = $2, role = $3, active = $4, team_id = $5, address = $6::jsonb, password_hash = $7, updated_at = now() where id = $1`,
-      [u.id, u.name, u.role, u.active, u.teamId, json(u.address), u.passwordHash]);
+      `update users set name = $2, email = $3, role = $4, active = $5, team_id = $6, address = $7::jsonb, password_hash = $8, updated_at = now() where id = $1`,
+      [u.id, u.name, u.email, u.role, u.active, u.teamId, json(u.address), u.passwordHash]);
     // A disabled account loses its sessions immediately (role changes apply on the next request).
     if (!u.active) await this.db.query('delete from sessions where user_id = $1', [u.id]);
+  }
+  async deleteUser(id: string, fallbackReporterId: string) {
+    await this.db.query('update reports set reporter_id = $2 where reporter_id = $1', [id, fallbackReporterId]);
+    await this.db.query('delete from sessions where user_id = $1', [id]);
+    await this.db.query('delete from notifications where user_id = $1', [id]);
+    await this.db.query('delete from users where id = $1', [id]);
   }
 
   /** Self-service profile edit: touches only name/address, never role, team, active or password. */

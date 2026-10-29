@@ -74,6 +74,10 @@ test('workspace settings, crew provisioning and public photo approval connect ac
   assert.equal((await call(`/reports/${id}/events`,{action:'publication',approved:true},admin)).status,200);
   assert.ok((await publicPhotos()).some(p=>p.url===upload.url));
   await call(`/reports/${id}/events`,{action:'publication',approved:false},admin);assert.ok(!(await publicPhotos()).some(p=>p.url===upload.url));
+  assert.equal((await call('/users',{id:account.data.id,name:'Crew Updated',email:'crew-updated@example.test',password:'Updated-Pass-1!'},admin,'PATCH')).status,200);
+  assert.equal((await call('/auth/login',{email:'crew-updated@example.test',password:'Updated-Pass-1!'})).status,200);
+  assert.equal((await call('/users',{id:account.data.id},admin,'DELETE')).status,200);
+  assert.ok(!(await call('/bootstrap',undefined,admin)).data.users.some(u=>u.id===account.data.id));
  }finally{await new Promise(r=>server.close(r));}
 });
 
@@ -83,7 +87,7 @@ test('registration normalization, portal restriction, session revocation and thr
  const call=async(p,body,token)=>{const r=await fetch(base+p,{method:body?'POST':'GET',headers:{'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},body:body?JSON.stringify(body):undefined});return {status:r.status,data:await r.json()};};
  try{
   assert.equal((await call('/auth/demo',{role:'admin'})).status,404);
-  const input={name:'  Test Reporter  ',email:'  NORMALIZED@example.test ',password:'Several roads lead home!',address:{line:' 12 Mabini St ',barangay:' Guinhawa ',city:' Malolos ',province:' Bulacan '},role:'admin',active:false,teamId:'team-1'};
+  const input={name:'  Test Reporter  ',email:'  NORMALIZED@example.test ',password:'Several1!roads',address:{line:' 12 Mabini St ',barangay:' Guinhawa ',city:' Malolos ',province:' Bulacan '},role:'admin',active:false,teamId:'team-1'};
   assert.equal((await call('/auth/register',{...input,address:{}})).status,400);
   const created=await call('/auth/register',input);assert.equal(created.status,201);assert.deepEqual(created.data.user.address,{line:'12 Mabini St',barangay:'Guinhawa',city:'Malolos',province:'Bulacan'});assert.equal(created.data.user.role,'citizen');assert.equal(created.data.user.email,'normalized@example.test');assert.equal(created.data.user.active,true);assert.equal(created.data.user.teamId,undefined);assert.equal(created.data.user.emailVerified,false);
   assert.equal((await call('/auth/register',{...input,email:'normalized@example.test'})).status,409);

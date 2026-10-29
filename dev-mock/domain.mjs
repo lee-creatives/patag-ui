@@ -65,7 +65,13 @@ export function manageWorkspace(db,user,p,body,method){
  if(p==='/users'){
   const u=method==='POST'?{id:crypto.randomUUID(),active:true}:db.users.find(u=>u.id===body.id);
   if(!u)fail('Account not found.',404);
-  if(u.id===user.id)fail('Manage your own profile in Settings.');
+  if(u.id===user.id)fail(method==='DELETE'?'You cannot delete your own account.':'Manage your own profile in Settings.');
+  if(method==='DELETE'){
+   db.users=db.users.filter(x=>x.id!==u.id);
+   for(const r of db.reports)if(r.reporterId===u.id)r.reporterId=user.id;
+   for(const t of db.teams)t.members=db.users.filter(x=>x.active&&x.role==='maintenance'&&x.teamId===t.id).map(x=>x.name);
+   return {ok:true,id:u.id};
+  }
   const role=body.role||u.role;
   if(!['admin','citizen','maintenance'].includes(role))fail('Choose a valid role.');
   const teamId=body.teamId||u.teamId;
@@ -74,6 +80,17 @@ export function manageWorkspace(db,user,p,body,method){
    if(!body.name?.trim()||!/^\S+@\S+\.\S+$/.test(body.email||''))fail('Name and valid email are required.');
    const email=body.email.trim().toLowerCase();if(db.users.some(x=>x.email.toLowerCase()===email))fail('Email is already registered.',409);
    u.name=body.name.trim();u.email=email;
+  }else{
+   if(typeof body.name==='string'&&body.name.trim()){
+    if(body.name.trim().length>100)fail('Enter your name (up to 100 characters).');
+    u.name=body.name.trim();
+   }
+   if(typeof body.email==='string'&&body.email.trim()){
+    const email=body.email.trim().toLowerCase();
+    if(email.length>254||!/^\S+@\S+\.\S+$/.test(email))fail('Enter a valid email address.');
+    if(db.users.some(x=>x.id!==u.id&&x.email.toLowerCase()===email))fail('Email is already registered.',409);
+    u.email=email;
+   }
   }
   u.role=role;u.teamId=role==='maintenance'?teamId:undefined;if(typeof body.active==='boolean')u.active=body.active;
   if(method==='POST')db.users.push(u);
@@ -89,14 +106,18 @@ export function addressFields(raw={},required=true) {
  if(Object.values(address).some(value=>value.length>120))throw Object.assign(Error('Keep each address field within 120 characters.'),{status:400});
  return address;
 }
+export function validatePassword(password) {
+ if(typeof password!=='string'||[...password].length<8||[...password].length>128||!/[a-z]/.test(password)||!/[A-Z]/.test(password)||!/[0-9]/.test(password)||!/[^A-Za-z0-9]/.test(password)) {
+  throw Object.assign(Error('Password must be at least 8 characters and include lowercase, uppercase, number, and special character.'),{status:400});
+ }
+ return password;
+}
 export function registrationFields(body,{addressRequired=false}={}) {
  const name=typeof body.name==='string'?body.name.trim():'';
  const email=typeof body.email==='string'?body.email.trim().toLowerCase():'';
- const password=body.password;
  if(!name||name.length>100)throw Object.assign(Error('Enter your name (up to 100 characters).'),{status:400});
  if(email.length>254||!/^\S+@\S+\.\S+$/.test(email))throw Object.assign(Error('Enter a valid email address.'),{status:400});
- if(typeof password!=='string'||[...password].length<15||[...password].length>128)throw Object.assign(Error('Use a password of 15 to 128 characters. A few unrelated words work well.'),{status:400});
- if(/^(.)\1+$/.test(password)||['passwordpassword','123456789012345','qwertyuiopasdfgh'].includes(password.toLowerCase()))throw Object.assign(Error('Choose a less predictable password.'),{status:400});
+ const password=validatePassword(body.password);
  const address=addressFields(body.address||{},addressRequired);
  return {name,email,password,address};
 }

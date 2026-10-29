@@ -1,6 +1,6 @@
 const publicUser=({hash,salt,...u})=>u;
 async function passwordHash(password,salt,iterations=600000){const key=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);const bytes=await crypto.subtle.deriveBits({name:'PBKDF2',salt:new TextEncoder().encode(salt),iterations,hash:'SHA-256'},key,256);return Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');}
-import {seed,teams,statuses,candidates,transition,publicReport,workspace,manageWorkspace,registrationFields,addressFields} from './domain.mjs';
+import {seed,teams,statuses,candidates,transition,publicReport,workspace,manageWorkspace,registrationFields,addressFields,validatePassword} from './domain.mjs';
 const KEY='patag-hosted-preview-v1';
 let memory;const attempts=new Map();
 function read(){try{return workspace(JSON.parse(localStorage.getItem(KEY))||seed())}catch{return workspace(memory||seed())}}
@@ -41,11 +41,12 @@ export function installPreviewApi(){
    if(p==='/bootstrap')return response({user:publicUser(user),reports:db.reports.filter(r=>user.role==='admin'||(user.role==='maintenance'?r.teamId===user.teamId:r.reporterId===user.id)),teams:db.teams,settings:db.settings,demo:true,users:user.role==='admin'?db.users.map(publicUser):[],notifications:db.notifications.filter(n=>n.role===user.role&&(n.role!=='citizen'||n.userId===user.id)&&(n.role!=='maintenance'||n.teamId===user.teamId)),statuses});
    if(p==='/auth/logout'){delete db.sessions[token];save(db);sessionStorage.removeItem('patag-token');return response({ok:true})}
    if(p==='/me'){if(!body.name?.trim()||!/^\S+@\S+\.\S+$/.test(body.email))return response({error:'Enter a name and valid email.'},400);if(body.email.trim().toLowerCase()!==user.email.toLowerCase())return response({error:'Email changes require verified account recovery and are unavailable in this preview.'},400);const address=body.address?addressFields(body.address):null;user.name=body.name.trim();if(address&&user.role==='citizen')user.address=address;save(db);return response(publicUser(user))}
-   if(['/settings','/teams','/users'].includes(p)&&['POST','PATCH'].includes(method)){
+   if(['/settings','/teams','/users'].includes(p)&&['POST','PATCH','DELETE'].includes(method)){
     if(p==='/users'&&method==='POST'&&user.role==='admin')registrationFields(body);
+    if(p==='/users'&&method==='PATCH'&&user.role==='admin'&&typeof body.password==='string'&&body.password.length>0)validatePassword(body.password);
     const result=manageWorkspace(db,user,p,body,method);
-    if(p==='/users'&&method==='POST'){result.iterations=600000;result.salt=crypto.randomUUID();result.hash=await passwordHash(body.password,result.salt);}
-    save(db);return response(p==='/users'?publicUser(result):result,method==='POST'?201:200);
+    if(p==='/users'&&(method==='POST'||(method==='PATCH'&&typeof body.password==='string'&&body.password.length>0))){result.iterations=600000;result.salt=crypto.randomUUID();result.hash=await passwordHash(body.password,result.salt);}
+    save(db);return response(p==='/users'&&method!=='DELETE'?publicUser(result):result,method==='POST'?201:200);
    }
    if(p==='/notifications/read'){db.notifications.filter(n=>n.role===user.role&&(user.role!=='citizen'||n.userId===user.id)&&(user.role!=='maintenance'||n.teamId===user.teamId)&&(body.id==='all'||body.id===n.id)).forEach(n=>n.read=true);save(db);return response({ok:true})}
    if(p==='/uploads'){if(!/^data:image\/(png|jpeg|webp);base64,/.test(body.data||'')||body.data.length>11*1024*1024)return response({error:'Choose a JPEG, PNG or WebP under 8 MB.'},400);return response({id:crypto.randomUUID(),url:body.data,name:body.name||'Preview photo',kind:body.kind||'before'},201)}

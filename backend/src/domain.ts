@@ -179,15 +179,23 @@ export function addressFields(raw: unknown, required = true): Address {
   return address;
 }
 
+export function validatePassword(password: unknown): string {
+  if (typeof password !== 'string' || [...password].length < 8 || [...password].length > 128) {
+    fail(400, 'Password must be at least 8 characters and include lowercase, uppercase, number, and special character.');
+  }
+  const pw = password as string;
+  if (!/[a-z]/.test(pw) || !/[A-Z]/.test(pw) || !/[0-9]/.test(pw) || !/[^A-Za-z0-9]/.test(pw)) {
+    fail(400, 'Password must be at least 8 characters and include lowercase, uppercase, number, and special character.');
+  }
+  return pw;
+}
+
 export function registrationFields(body: Record<string, unknown>, { addressRequired = false } = {}) {
   const name = str(body.name);
   const email = str(body.email).toLowerCase();
-  const password = body.password;
   if (!name || name.length > 100) fail(400, 'Enter your name (up to 100 characters).');
   if (email.length > 254 || !EMAIL.test(email)) fail(400, 'Enter a valid email address.');
-  if (typeof password !== 'string' || [...password].length < 15 || [...password].length > 128) fail(400, 'Use a password of 15 to 128 characters. A few unrelated words work well.');
-  const pw = password as string;
-  if (/^(.)\1+$/.test(pw) || ['passwordpassword', '123456789012345', 'qwertyuiopasdfgh'].includes(pw.toLowerCase())) fail(400, 'Choose a less predictable password.');
+  const pw = validatePassword(body.password);
   const address = addressFields(body.address, addressRequired);
   return { name, email, password: pw, address };
 }

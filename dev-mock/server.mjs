@@ -3,7 +3,7 @@ import {readFile,writeFile,mkdir} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import path from 'node:path';
 import {randomUUID,scryptSync,timingSafeEqual} from 'node:crypto';
-import {seed,teams,statuses,candidates,transition,publicReport,workspace,manageWorkspace,registrationFields,addressFields} from './domain.mjs';
+import {seed,teams,statuses,candidates,transition,publicReport,workspace,manageWorkspace,registrationFields,addressFields,validatePassword} from './domain.mjs';
 export async function createServer({persist=true,allowDemo=true}={}){
  const dir=path.dirname(fileURLToPath(import.meta.url)),dataDir=path.join(dir,'data');let db=seed();const sessions=new Map();const attempts=new Map();
  const issue=u=>{const token=randomUUID();sessions.set(token,{userId:u.id,expires:Date.now()+8*60*60*1000});return {token,user:publicUser(u)};};
@@ -11,7 +11,7 @@ export async function createServer({persist=true,allowDemo=true}={}){
  workspace(db);
  const save=async()=>{if(persist)await writeFile(path.join(dataDir,'db.json'),JSON.stringify(db,null,2));};
  const server=http.createServer(async(req,res)=>{
-  res.setHeader('Access-Control-Allow-Origin',req.headers.origin&&/^http:\/\/(127\.0\.0\.1|localhost):(5173|5174|8080|8081|8082|8085)$/.test(req.headers.origin)?req.headers.origin:'*');res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');res.setHeader('Access-Control-Allow-Methods','GET,POST,PATCH,OPTIONS');res.setHeader('Vary','Origin');
+  res.setHeader('Access-Control-Allow-Origin',req.headers.origin&&/^http:\/\/(127\.0\.0\.1|localhost):(5173|5174|8080|8081|8082|8085)$/.test(req.headers.origin)?req.headers.origin:'*');res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');res.setHeader('Access-Control-Allow-Methods','GET,POST,PATCH,DELETE,OPTIONS');res.setHeader('Vary','Origin');
   const send=(status,data)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(data));};
   try{
    if(req.method==='OPTIONS'){res.writeHead(204);res.end();return;}
@@ -19,7 +19,7 @@ export async function createServer({persist=true,allowDemo=true}={}){
    if(p==='/health'){send(200,{ok:true,mode:'local-development-demo'});return;}
    if(p==='/demo-evidence.svg'||p==='/demo-after.svg'){res.writeHead(200,{'Content-Type':'image/svg+xml'});res.end(`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="450" viewBox="0 0 800 450"><rect width="800" height="450" fill="#dde2e4"/><path d="M0 100L800 25V450H0" fill="#636b72"/><path d="M0 270L800 190" stroke="#f7f1eb" stroke-width="9" stroke-dasharray="90 60"/>${p.includes('after')?'<path d="M280 260l190-45 90 90-220 40z" fill="#414951"/>':'<path d="M250 255l100-54 144 25 80 65-92 70-175-20z" fill="#26313b"/><path d="M270 262l90-37 120 22 48 40-62 39-143-10z" fill="#182b49"/>'}<rect x="25" y="24" width="240" height="34" rx="6" fill="#f7f1eb"/><text x="40" y="47" font-family="Arial" font-size="17" fill="#182b49">Illustrated demo ${p.includes('after')?'repair':'evidence'}</text></svg>`);return;}
    if(p.startsWith('/uploads/')){const n=path.basename(p);if(!/^[a-f0-9-]+\.(png|jpg|webp)$/.test(n))throw Error('Invalid file.');const ext=path.extname(n);res.writeHead(200,{'Content-Type':ext==='.jpg'?'image/jpeg':`image/${ext.slice(1)}`,'X-Content-Type-Options':'nosniff'});res.end(await readFile(path.join(dataDir,n)));return;}
-   let body={};if(['POST','PATCH'].includes(req.method)){let raw='';for await(const chunk of req){raw+=chunk;if(raw.length>12*1024*1024){send(413,{error:'Photo must be under 8 MB.'});return;}}try{body=JSON.parse(raw||'{}');}catch{send(400,{error:'Invalid JSON.'});return;}}
+   let body={};if(['POST','PATCH','DELETE'].includes(req.method)){let raw='';for await(const chunk of req){raw+=chunk;if(raw.length>12*1024*1024){send(413,{error:'Photo must be under 8 MB.'});return;}}try{body=JSON.parse(raw||'{}');}catch{send(400,{error:'Invalid JSON.'});return;}}
    if(p.startsWith('/auth/demo')&&!allowDemo){send(404,{error:'Endpoint not found.'});return;}
    if(p==='/auth/demo/accounts'){send(200,db.users.filter(u=>u.active&&!u.hash).map(publicUser));return;}
    if(p==='/auth/demo'&&req.method==='POST'){const u=db.users.find(u=>u.role===body.role&&u.active&&!u.hash&&(!body.userId||u.id===body.userId));if(!u){send(403,{error:'Demo role unavailable.'});return;}send(200,issue(u));return;}
@@ -44,11 +44,12 @@ export async function createServer({persist=true,allowDemo=true}={}){
    if(p==='/auth/logout'){sessions.delete((req.headers.authorization||'').replace('Bearer ',''));send(200,{ok:true});return;}
    if(p==='/me'&&req.method==='PATCH'){if(!body.name?.trim()||!/^\S+@\S+\.\S+$/.test(body.email)){send(400,{error:'Name and valid email are required.'});return;}if(body.email.trim().toLowerCase()!==user.email.toLowerCase()){send(400,{error:'Email changes require verified account recovery.'});return;}const address=body.address?addressFields(body.address):null;user.name=body.name.trim();if(address&&user.role==='citizen')user.address=address;await save();send(200,publicUser(user));return;}
    if(p==='/bootstrap'){send(200,{reports:db.reports.filter(r=>user.role==='admin'||(user.role==='citizen'?r.reporterId===user.id:r.teamId===user.teamId)),teams:db.teams,settings:db.settings,demo:true,users:user.role==='admin'?db.users.map(publicUser):[],notifications:db.notifications.filter(n=>n.role===user.role&&(n.role!=='citizen'||n.userId===user.id)&&(n.role!=='maintenance'||n.teamId===user.teamId)),user:publicUser(user),statuses});return;}
-   if(['/settings','/teams','/users'].includes(p)&&['POST','PATCH'].includes(req.method)){
+   if(['/settings','/teams','/users'].includes(p)&&['POST','PATCH','DELETE'].includes(req.method)){
     if(p==='/users'&&req.method==='POST'&&user.role==='admin')registrationFields(body);
+    if(p==='/users'&&req.method==='PATCH'&&user.role==='admin'&&typeof body.password==='string'&&body.password.length>0)validatePassword(body.password);
     const result=manageWorkspace(db,user,p,body,req.method);
-    if(p==='/users'&&req.method==='POST'){result.salt=randomUUID();result.hash=scryptSync(body.password,result.salt,64).toString('hex');}
-    await save();send(req.method==='POST'?201:200,p==='/users'?publicUser(result):result);return;
+    if(p==='/users'&&(req.method==='POST'||(req.method==='PATCH'&&typeof body.password==='string'&&body.password.length>0))){result.salt=randomUUID();result.hash=scryptSync(body.password,result.salt,64).toString('hex');}
+    await save();send(req.method==='POST'?201:200,p==='/users'&&req.method!=='DELETE'?publicUser(result):result);return;
    }
    if(p==='/notifications/read'&&req.method==='POST'){db.notifications.filter(n=>n.role===user.role&&(n.role!=='citizen'||n.userId===user.id)&&(n.role!=='maintenance'||n.teamId===user.teamId)&&(body.id==='all'||body.id===n.id)).forEach(n=>n.read=true);await save();send(200,{ok:true});return;}
    if(p==='/uploads'&&req.method==='POST'){const m=/^data:image\/(png|jpeg|webp);base64,([A-Za-z0-9+/=]+)$/.exec(body.data||'');if(!m){send(400,{error:'Choose a PNG, JPEG or WebP image.'});return;}const bytes=Buffer.from(m[2],'base64');if(bytes.length>8*1024*1024||bytes.length<8){send(400,{error:'Invalid image or file exceeds 8 MB.'});return;}const magic=m[1]==='png'?bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])):m[1]==='jpeg'?bytes[0]===255&&bytes[1]===216:bytes.toString('ascii',0,4)==='RIFF'&&bytes.toString('ascii',8,12)==='WEBP';if(!magic){send(400,{error:'Image content does not match its type.'});return;}await mkdir(dataDir,{recursive:true});const name=randomUUID()+'.'+(m[1]==='jpeg'?'jpg':m[1]);await writeFile(path.join(dataDir,name),bytes);send(201,{id:randomUUID(),url:'/uploads/'+name,name:body.name||name,kind:body.kind||'before'});return;}

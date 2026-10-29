@@ -228,14 +228,14 @@ function Modal({
   return (
     <dialog
       ref={ref}
-      onCancel={close}
-      onClick={(e) => {
-        if (e.target === ref.current) close();
+      onCancel={(e) => {
+        e.preventDefault();
       }}
     >
       <header>
         <h2>{title}</h2>
         <button
+          type="button"
           className="icon-button"
           aria-label="Close dialog"
           onClick={close}
@@ -2212,13 +2212,61 @@ function UsersPage() {
   const [q, setQ] = useState(""),
     [filter, setFilter] = useState("All"),
     [selected, setSelected] = useState<User | null>(null),
+    [deleting, setDeleting] = useState<User | null>(null),
+    [showPw, setShowPw] = useState(false),
     [error, setError] = useState("");
+  const emptyDraft = {
+    name: "",
+    email: "",
+    password: "",
+    teamId: "",
+    role: "citizen" as User["role"],
+    active: true,
+  };
+  const [draft, setDraft] = useState(emptyDraft);
+
+  const openAdd = () => {
+    setError("");
+    setShowPw(false);
+    setSelected({
+      id: "",
+      name: draft.name,
+      email: draft.email,
+      role: draft.role,
+      teamId: draft.teamId || undefined,
+      active: draft.active,
+    });
+  };
+
+  const openEdit = (u: User) => {
+    setError("");
+    setShowPw(false);
+    setSelected(u);
+  };
+
+  const isValidPassword = (pw: string) =>
+    [...pw].length >= 8 &&
+    [...pw].length <= 128 &&
+    /[a-z]/.test(pw) &&
+    /[A-Z]/.test(pw) &&
+    /[0-9]/.test(pw) &&
+    /[^A-Za-z0-9]/.test(pw);
+
   return (
     <>
+      {id && (
+        <Link className="back-link" to={base + "/users"}>
+          <ArrowLeft size={16} /> All user accounts
+        </Link>
+      )}
       <Header
         title={id ? "User details" : "User accounts"}
-        description="Manage accounts, roles and maintenance team membership."
-        action={<button className="primary" onClick={() => {setError("");setSelected({id:"",name:"",email:"",role:"citizen",active:true});}}>Add account <Users size={16}/></button>}
+        description="Create, update, manage roles, assign teams, or delete workspace accounts."
+        action={
+          <button className="primary" onClick={openAdd}>
+            Add account <Users size={16} />
+          </button>
+        }
       />
       <div className="filters">
         <label className="search">
@@ -2249,6 +2297,7 @@ function UsersPage() {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Role</th>
+                <th>Team</th>
                 <th>Account status</th>
                 <th>Action</th>
               </tr>
@@ -2271,15 +2320,29 @@ function UsersPage() {
                     <td>{u.email}</td>
                     <td>{u.role}</td>
                     <td>
+                      {data.teams.find((t) => t.id === u.teamId)?.name || "—"}
+                    </td>
+                    <td>
                       <Badge value={u.active ? "Active" : "Inactive"} />
                     </td>
                     <td>
-                      <button
-                        disabled={u.id === data.user.id}
-                        onClick={() => setSelected(u)}
-                      >
-                        Manage
-                      </button>
+                      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+                        <button
+                          disabled={u.id === data.user.id}
+                          onClick={() => openEdit(u)}
+                        >
+                          Manage
+                        </button>
+                        <button
+                          disabled={u.id === data.user.id}
+                          onClick={() => {
+                            setError("");
+                            setDeleting(u);
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -2293,38 +2356,154 @@ function UsersPage() {
           close={() => setSelected(null)}
         >
           <form
+            key={selected.id || "add-account"}
             onSubmit={async (e) => {
               e.preventDefault();
+              setError("");
               const f = new FormData(e.currentTarget);
+              const name = String(f.get("name") || "").trim();
+              const email = String(f.get("email") || "").trim();
+              const password = String(f.get("password") || "");
+              const teamId = String(f.get("teamId") || "");
+              const selectedRole = String(f.get("role") || "citizen");
+              const active = f.get("active") === "true";
+
+              if (!selected.id || password.length > 0) {
+                if (!isValidPassword(password)) {
+                  setError(
+                    "Password must be at least 8 characters and include lowercase, uppercase, number, and special character.",
+                  );
+                  return;
+                }
+              }
+
               try {
                 await request(
                   "/users",
                   {
                     id: selected.id,
-                    name: f.get("name"), email:f.get("email"),password:f.get("password"),teamId:f.get("teamId"),
-                    role: f.get("role"),
-                    active: f.get("active") === "true",
+                    name,
+                    email,
+                    ...(password ? { password } : {}),
+                    teamId,
+                    role: selectedRole,
+                    active,
                   },
                   selected.id ? "PATCH" : "POST",
                 );
                 await refresh();
+                if (!selected.id) setDraft(emptyDraft);
                 setSelected(null);
-                notify("Account updated.");
+                notify(selected.id ? "Account updated." : "Account created.");
               } catch (e) {
                 setError((e as Error).message);
               }
             }}
           >
-            {!selected.id && <>
-              <label>Full name<input name="name" required autoComplete="name"/></label>
-              <label>Email address<input name="email" type="email" required autoComplete="off"/></label>
-              <label>Temporary demo password<input name="password" type="password" minLength={15} maxLength={128} required autoComplete="new-password"/></label>
-              <p>Use fictional details and a demo-only password.</p>
-            </>}
-            <label>Maintenance team<select name="teamId" aria-label="Maintenance team" defaultValue={selected.teamId || ""}><option value="">Not assigned (non-maintenance roles)</option>{data.teams.filter(t=>t.active).map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select></label>
+            <label>
+              Full name
+              <input
+                name="name"
+                required
+                maxLength={100}
+                autoComplete="name"
+                defaultValue={selected.id ? selected.name : draft.name}
+                onChange={(e) => {
+                  if (!selected.id)
+                    setDraft((d) => ({ ...d, name: e.target.value }));
+                }}
+              />
+            </label>
+            <label>
+              Email address
+              <input
+                name="email"
+                type="email"
+                required
+                maxLength={254}
+                autoComplete="off"
+                defaultValue={selected.id ? selected.email : draft.email}
+                onChange={(e) => {
+                  if (!selected.id)
+                    setDraft((d) => ({ ...d, email: e.target.value }));
+                }}
+              />
+            </label>
+            <label className="password-label">
+              {selected.id
+                ? "New password (leave blank to keep current)"
+                : "Temporary demo password"}
+              <div className="password-wrap">
+                <input
+                  name="password"
+                  type={showPw ? "text" : "password"}
+                  minLength={8}
+                  maxLength={128}
+                  required={!selected.id}
+                  autoComplete="new-password"
+                  placeholder={
+                    selected.id
+                      ? "Leave blank to keep existing password"
+                      : "Min. 8 chars (Aa1!)"
+                  }
+                  defaultValue={selected.id ? "" : draft.password}
+                  onChange={(e) => {
+                    if (!selected.id)
+                      setDraft((d) => ({ ...d, password: e.target.value }));
+                  }}
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  aria-label={showPw ? "Hide password" : "Show password"}
+                  aria-pressed={showPw}
+                  onClick={() => setShowPw(!showPw)}
+                >
+                  {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </label>
+            <p>
+              Requires at least 8 characters including uppercase, lowercase,
+              number, and special character.
+            </p>
+            <label>
+              Maintenance team
+              <select
+                name="teamId"
+                aria-label="Maintenance team"
+                defaultValue={
+                  selected.id ? selected.teamId || "" : draft.teamId
+                }
+                onChange={(e) => {
+                  if (!selected.id)
+                    setDraft((d) => ({ ...d, teamId: e.target.value }));
+                }}
+              >
+                <option value="">Not assigned (non-maintenance roles)</option>
+                {data.teams
+                  .filter((t) => t.active)
+                  .map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+              </select>
+            </label>
             <label>
               Role
-              <select name="role" aria-label="Role" defaultValue={selected.role}>
+              <select
+                name="role"
+                aria-label="Role"
+                defaultValue={selected.id ? selected.role : draft.role}
+                onChange={(e) => {
+                  if (!selected.id)
+                    setDraft((d) => ({
+                      ...d,
+                      role: e.target.value as User["role"],
+                    }));
+                }}
+              >
                 <option>citizen</option>
                 <option>maintenance</option>
                 <option>admin</option>
@@ -2332,7 +2511,19 @@ function UsersPage() {
             </label>
             <label>
               Account status
-              <select name="active" defaultValue={String(selected.active)}>
+              <select
+                name="active"
+                defaultValue={String(
+                  selected.id ? selected.active : draft.active,
+                )}
+                onChange={(e) => {
+                  if (!selected.id)
+                    setDraft((d) => ({
+                      ...d,
+                      active: e.target.value === "true",
+                    }));
+                }}
+              >
                 <option value="true">Active</option>
                 <option value="false">Inactive</option>
               </select>
@@ -2346,8 +2537,73 @@ function UsersPage() {
               Changing roles or deactivating access takes effect on the next API
               request.
             </p>
-            <button className="primary">Confirm account changes</button>
+            <div className="dialog-actions" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              <button className="primary" type="submit">
+                Confirm account changes
+              </button>
+              {selected.id && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const target = selected;
+                    setSelected(null);
+                    setError("");
+                    setDeleting(target);
+                  }}
+                >
+                  Delete account
+                </button>
+              )}
+              {!selected.id && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDraft(emptyDraft);
+                    setSelected(null);
+                  }}
+                >
+                  Cancel & clear
+                </button>
+              )}
+            </div>
           </form>
+        </Modal>
+      )}
+      {deleting && (
+        <Modal
+          title={"Delete " + deleting.name}
+          close={() => setDeleting(null)}
+        >
+          <p>
+            Are you sure you want to permanently delete the account for{" "}
+            <strong>{deleting.name}</strong> ({deleting.email})?
+          </p>
+          {error && (
+            <p role="alert" className="error">
+              {error}
+            </p>
+          )}
+          <div className="dialog-actions" style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
+            <button
+              className="primary"
+              type="button"
+              onClick={async () => {
+                try {
+                  await request("/users", { id: deleting.id }, "DELETE");
+                  await refresh();
+                  setDeleting(null);
+                  notify("Account deleted.");
+                } catch (e) {
+                  setError((e as Error).message);
+                }
+              }}
+            >
+              Confirm delete
+            </button>
+            <button type="button" onClick={() => setDeleting(null)}>
+              Cancel
+            </button>
+          </div>
         </Modal>
       )}
     </>

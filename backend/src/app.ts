@@ -7,7 +7,7 @@ import type { BlobStore } from './blobs.ts';
 import { demoSvg } from './demo-svg.ts';
 import {
   EMAIL, HttpError, UPLOAD_NAME, UPLOAD_URL, addressFields, candidates, fail, publicReport, publicUser,
-  hiddenFromPublic, registrationFields, roles, statuses, transition, validCoordinates,
+  hiddenFromPublic, registrationFields, roles, statuses, transition, validCoordinates, validatePassword,
   type Photo, type Report, type Role, type User,
 } from './domain.ts';
 import { hashPassword, newToken, sha256, verifyPassword } from './passwords.ts';
@@ -107,7 +107,7 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
     if (origin && originAllowed(origin, corsOrigins)) {
       reply.header('Access-Control-Allow-Origin', origin);
       reply.header('Access-Control-Allow-Headers', 'Content-Type,Authorization');
-      reply.header('Access-Control-Allow-Methods', 'GET,POST,PATCH,OPTIONS');
+      reply.header('Access-Control-Allow-Methods', 'GET,POST,PATCH,DELETE,OPTIONS');
       reply.header('Access-Control-Max-Age', '600');
     }
     reply.header('Vary', 'Origin');
@@ -452,6 +452,21 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
       const user = await store.userById(String(b.id ?? ''));
       if (!user) fail(404, 'Account not found.');
       if (user!.id === me.id) fail(400, 'Manage your own profile in Settings.');
+      if (typeof b.name === 'string' && b.name.trim()) {
+        const name = b.name.trim();
+        if (name.length > 100) fail(400, 'Enter your name (up to 100 characters).');
+        user!.name = name;
+      }
+      if (typeof b.email === 'string' && b.email.trim()) {
+        const email = b.email.trim().toLowerCase();
+        if (email.length > 254 || !EMAIL.test(email)) fail(400, 'Enter a valid email address.');
+        if (await store.emailTaken(email, user!.id)) fail(409, 'Email is already registered.');
+        user!.email = email;
+      }
+      if (typeof b.password === 'string' && b.password.length > 0) {
+        const pw = validatePassword(b.password);
+        user!.passwordHash = await hashPassword(pw);
+      }
       const role = b.role ?? user!.role;
       if (!roles.includes(role)) fail(400, 'Choose a valid role.');
       user!.role = role;
@@ -460,6 +475,18 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
       await store.updateUser(user!);
       return publicUser(user!);
     });
+
+    async function removeUser(req: FastifyRequest, targetId: string) {
+      const me = await admin(req);
+      const user = await store.userById(targetId);
+      if (!user) fail(404, 'Account not found.');
+      if (user!.id === me.id) fail(400, 'You cannot delete your own account.');
+      await store.deleteUser(user!.id, me.id);
+      return { ok: true, id: user!.id };
+    }
+
+    api.delete('/users', async req => removeUser(req, String(body(req).id ?? '')));
+    api.delete('/users/:id', async (req: FastifyRequest<{ Params: { id: string } }>) => removeUser(req, req.params.id));
   }, { prefix: '/api' });
 
   return app;

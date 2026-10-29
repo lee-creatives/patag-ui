@@ -406,12 +406,12 @@ class _AuthState extends State<AuthScreen> {
                       ),
                     ),
                   ),
-                  validator: (s) => s != null && (register ? s.runes.length >= 15 && s.runes.length <= 128 : s.isNotEmpty)
+                  validator: (s) => s != null && (register ? s.runes.length >= 8 && s.runes.length <= 128 && RegExp(r'[a-z]').hasMatch(s) && RegExp(r'[A-Z]').hasMatch(s) && RegExp(r'[0-9]').hasMatch(s) && RegExp(r'[^A-Za-z0-9]').hasMatch(s) : s.isNotEmpty)
                       ? null
-                      : register ? 'Use 15 to 128 characters.' : 'Enter your password.',
+                      : register ? 'Use at least 8 characters with uppercase, lowercase, number, and special character.' : 'Enter your password.',
                 ),
                 gap(),
-                if(register) const Text('Use 15–128 characters. A few unrelated words work well. Email ownership is not verified in this local preview.'),
+                if(register) const Text('Requires at least 8 characters including uppercase, lowercase, number, and special character.'),
                 if (register)
                   CheckboxListTile(
                     contentPadding: EdgeInsets.zero,
