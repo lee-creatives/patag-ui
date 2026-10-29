@@ -194,7 +194,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
       );
       if (mounted) Navigator.of(context).pushReplacementNamed('/dashboard');
     } catch (e) {
-      setState(() => _error = PatagMaintenanceStore.clean(e));
+      if (mounted) setState(() => _error = PatagMaintenanceStore.clean(e));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -209,7 +209,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
       await store.demoLogin();
       if (mounted) Navigator.of(context).pushReplacementNamed('/dashboard');
     } catch (e) {
-      setState(() => _error = PatagMaintenanceStore.clean(e));
+      if (mounted) setState(() => _error = PatagMaintenanceStore.clean(e));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -495,6 +495,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                           ),
                         ),
                       ),
+                      const ServerStatusBanner(),
                       if (_error != null) ...[
                         const SizedBox(height: 14),
                         Container(
@@ -791,7 +792,7 @@ class DashboardTab extends StatelessWidget {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => store.refresh(),
+        onRefresh: () => store.refresh().catchError((Object _) {}),
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
           children: [
@@ -870,7 +871,7 @@ class DashboardTab extends StatelessWidget {
                             ),
                             gap(4),
                             Text(
-                              '${store.myAssignments.length} assigned work orders ready for action.',
+                              '${store.newAssignments.length + store.activeWork.length} work orders ready for action.',
                               style: const TextStyle(
                                 color: Color(0xFF38271D),
                                 fontSize: 12,
@@ -885,10 +886,13 @@ class DashboardTab extends StatelessWidget {
                   gap(16),
                   action(
                     'Review next work order',
-                    store.myAssignments.isEmpty
+                    [...store.newAssignments, ...store.activeWork].isEmpty
                         ? null
                         : () => Navigator.of(context).pushNamed(
-                              '/assignments/${store.myAssignments.first.id}',
+                              '/assignments/${[
+                                ...store.activeWork,
+                                ...store.newAssignments
+                              ].first.id}',
                             ),
                     icon: Icons.arrow_forward_rounded,
                     dark: true,
@@ -1070,7 +1074,11 @@ class _AssignmentsTabState extends State<AssignmentsTab> {
   Widget build(BuildContext context) {
     final list = store.myAssignments.where((r) {
       if (_filter == 'Assigned' && r.status != 'Assigned') return false;
-      if (_filter == 'In Progress' && r.status != 'In Progress') return false;
+      if (_filter == 'In Progress' &&
+          (r.status != 'In Progress' ||
+              r.completion?.state == 'Awaiting Verification')) {
+        return false;
+      }
       if (_filter == 'Resolved' && r.status != 'Resolved') return false;
       if (_search.isNotEmpty) {
         final q = _search.toLowerCase();
@@ -1122,7 +1130,7 @@ class _AssignmentsTabState extends State<AssignmentsTab> {
           ),
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () => store.refresh(),
+              onRefresh: () => store.refresh().catchError((Object _) {}),
               child: list.isEmpty
                   ? const EmptyState(
                       'No matching work orders',
@@ -1158,7 +1166,7 @@ class InProgressTab extends StatelessWidget {
       selected: 2,
       onTabSelected: onNavigateToTab,
       body: RefreshIndicator(
-        onRefresh: () => store.refresh(),
+        onRefresh: () => store.refresh().catchError((Object _) {}),
         child: inProgress.isEmpty
             ? const EmptyState(
                 'No repairs in progress',
@@ -1532,10 +1540,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             gap(16),
             action(
               'Document & Submit Completion',
-              () {
-                Navigator.of(context)
-                    .pushNamed('/repairs/${report.id}/document');
-              },
+              _loading
+                  ? null
+                  : () {
+                      Navigator.of(context)
+                          .pushNamed('/repairs/${report.id}/document');
+                    },
               icon: Icons.file_upload_outlined,
             ),
           ] else if (report.status == 'Resolved') ...[
@@ -1718,7 +1728,7 @@ class _RepairDocumentationScreenState extends State<RepairDocumentationScreen> {
   void initState() {
     super.initState();
     final report = store.getReportById(widget.reportId);
-    if (report != null) _afterPhotos.addAll(afterRepairPhotos(report));
+    if (report != null) _afterPhotos.addAll(newAfterPhotos(report));
   }
 
   @override
@@ -1735,6 +1745,7 @@ class _RepairDocumentationScreenState extends State<RepairDocumentationScreen> {
     setState(() => _loading = true);
     try {
       final photoData = await store.upload(file, kind: 'after');
+      if (!mounted) return;
       setState(() {
         _afterPhotos.add(Photo.fromJson(photoData));
       });
@@ -2086,6 +2097,23 @@ class ProfileTab extends StatelessWidget {
       ),
     );
   }
+}
+
+/// After-photos recorded since the last submission, as real uploads only. Used
+/// to pre-fill the completion form, so returned work needs fresh evidence and
+/// demo illustrations are never resubmitted.
+List<Photo> newAfterPhotos(PotholeReport report) {
+  final since = report.completion?.at ?? '';
+  final seen = <String>{};
+  return report.updates
+      .where((u) => since.isEmpty || u.at.compareTo(since) > 0)
+      .expand((u) => u.photos)
+      .where((p) =>
+          p.kind == 'after' &&
+          !p.demo &&
+          p.url.startsWith('/uploads/') &&
+          seen.add(p.url))
+      .toList();
 }
 
 /// After-repair photos: completion evidence plus photos recorded in progress updates.

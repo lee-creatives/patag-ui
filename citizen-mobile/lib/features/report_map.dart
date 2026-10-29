@@ -283,7 +283,10 @@ class _FullMapScreenState extends State<FullMapScreen> {
       // Kept until sign-in finishes, then the report form opens with it.
       store.pendingReportPin = point;
       message(context, 'Sign in to report this pothole.');
-      Navigator.of(context).pushNamed('/login');
+      Navigator.of(context).pushNamed('/login').then((_) {
+        // Backed out without signing in: don't open a report form later.
+        if (store.token == null) store.pendingReportPin = null;
+      });
       return;
     }
     Navigator.of(context).pushNamed('/report/new', arguments: point);

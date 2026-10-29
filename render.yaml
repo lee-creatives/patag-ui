@@ -1,0 +1,38 @@
+# Render Blueprint for the PATAG API (Dashboard > New > Blueprint > pick this repo).
+# Secrets are marked sync:false: Render asks for them during setup; they never live in git.
+services:
+  - type: web
+    name: patag-api
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    region: singapore
+    plan: free # sleeps after ~15 min idle; the first request then takes ~1 min. Use "starter" for demo day.
+    healthCheckPath: /api/health
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: TRUST_PROXY
+        value: "1"
+      - key: ALLOW_DEMO
+        value: "false"
+      - key: STORAGE_BUCKET
+        value: report-photos
+      - key: SUPABASE_URL
+        value: https://fzivdpjaceoegetsnbta.supabase.co
+      - key: SUPABASE_DB_HOST
+        value: aws-0-ap-northeast-1.pooler.supabase.com
+      - key: SUPABASE_DB_PORT
+        value: "5432"
+      - key: SUPABASE_DB_NAME
+        value: postgres
+      - key: SUPABASE_DB_USER
+        value: postgres.fzivdpjaceoegetsnbta
+      - key: SUPABASE_SECRET_KEY
+        sync: false
+      - key: SUPABASE_DB_PASSWORD
+        sync: false
+      - key: SUPABASE_DB_CA_CERT
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false

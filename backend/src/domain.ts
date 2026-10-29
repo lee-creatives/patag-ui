@@ -14,7 +14,8 @@ export type Role = (typeof roles)[number];
 export interface Coordinates { lat: number; lng: number }
 export interface Location { road: string; barangay: string; city: string; province: string; landmark: string; coordinates: Coordinates }
 export interface Photo { id: string; url: string; name: string; kind: string; demo?: boolean }
-export interface HistoryEntry { id: string; at: string; actor: string; action: string; from: string | null; to: string; note: string }
+/** actor is the role (contract field); actorId/actorName record which account did it. */
+export interface HistoryEntry { id: string; at: string; actor: string; actorId?: string; actorName?: string; action: string; from: string | null; to: string; note: string }
 export interface Assignment { teamId: string; note: string; priority: string; targetDate: string | null; at: string }
 export interface ProgressUpdate { at: string; note: string; phase: string; photos: Photo[] }
 export interface Completion { state: string; note: string; photos: Photo[]; at: string }
@@ -79,7 +80,7 @@ interface EventPayload {
 }
 
 /** Applies one workflow action in place. Throws 409 for anything the state machine disallows. */
-export function transition(report: Report, role: Role, action: string, payload: EventPayload = {}, availableTeams: Pick<Team, 'id' | 'active'>[] = []) {
+export function transition(report: Report, role: Role, action: string, payload: EventPayload = {}, availableTeams: Pick<Team, 'id' | 'active'>[] = [], by?: { id: string; name: string }) {
   const current = report.status;
   let next = current;
   const deny = (m: string) => fail(409, m);
@@ -134,7 +135,13 @@ export function transition(report: Report, role: Role, action: string, payload: 
   } else deny('Only operational roles can change report status.');
   report.status = next;
   report.updatedAt = now();
-  report.history.push({ id: randomUUID(), at: report.updatedAt, actor: role, action, from: current, to: next, note });
+  const entryNote = action === 'publication'
+    ? (payload.approved ? 'Evidence photos approved for the public map.' : 'Evidence photos withdrawn from the public map.') + (note ? ` ${note}` : '')
+    : note;
+  report.history.push({
+    id: randomUUID(), at: report.updatedAt, actor: role, ...(by ? { actorId: by.id, actorName: by.name } : {}),
+    action, from: current, to: next, note: entryNote,
+  });
   return report;
 }
 

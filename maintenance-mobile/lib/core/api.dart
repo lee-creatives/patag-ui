@@ -35,9 +35,43 @@ class PatagMaintenanceStore extends ChangeNotifier {
   String? networkError;
   bool showUnread = true;
 
+  /// Result of the last GET /health; null while reachable or not yet checked.
+  String? serverProblem;
+  bool checkingServer = false;
+  int _serverCheck = 0;
+
+  /// Checks that the backend answers. Waits up to 60 s so a hosted server
+  /// that went to sleep has time to wake up. Only the newest check may
+  /// update the result when several screens check at once.
+  Future<bool> checkServer() async {
+    final check = ++_serverCheck;
+    checkingServer = true;
+    serverProblem = null;
+    notifyListeners();
+    var ok = false;
+    try {
+      final response = await client
+          .get(Uri.parse('$baseUrl/health'))
+          .timeout(const Duration(seconds: 60));
+      ok = response.statusCode == 200;
+    } catch (_) {
+      ok = false;
+    }
+    if (check == _serverCheck) {
+      checkingServer = false;
+      serverProblem =
+          ok ? null : "Can't reach the PATAG server. Is the backend running?";
+      notifyListeners();
+    }
+    return ok;
+  }
+
   void setUnreadPreference(bool value) {
     showUnread = value;
     notifyListeners();
+    SharedPreferences.getInstance()
+        .then((p) => p.setBool('maintenance-notifications', value))
+        .catchError((Object _) => false);
   }
 
   List<PotholeReport> get myAssignments => reports.where((r) {
@@ -45,8 +79,11 @@ class PatagMaintenanceStore extends ChangeNotifier {
         return ['Assigned', 'In Progress', 'Resolved'].contains(r.status);
       }).toList();
 
-  List<PotholeReport> get activeWork =>
-      myAssignments.where((r) => r.status == 'In Progress').toList();
+  List<PotholeReport> get activeWork => myAssignments
+      .where((r) =>
+          r.status == 'In Progress' &&
+          r.completion?.state != 'Awaiting Verification')
+      .toList();
 
   List<PotholeReport> get newAssignments =>
       myAssignments.where((r) => r.status == 'Assigned').toList();
@@ -78,9 +115,10 @@ class PatagMaintenanceStore extends ChangeNotifier {
     String? method,
   }) async {
     final uri = Uri.parse('$baseUrl$path');
+    final sentWith = token;
     final headers = {
       'Content-Type': 'application/json',
-      if (token != null) 'Authorization': 'Bearer $token',
+      if (sentWith != null) 'Authorization': 'Bearer $sentWith',
     };
     // Photos are sent as base64 (up to ~11 MB), so allow time on mobile data.
     const timeout = Duration(seconds: 20);
@@ -108,10 +146,14 @@ class PatagMaintenanceStore extends ChangeNotifier {
     try {
       data = jsonDecode(response.body);
     } catch (_) {
-      throw Exception('Unexpected response from the PATAG server.');
+      // e.g. an HTML 502 page while a hosted server is starting.
+      throw Exception(response.statusCode >= 500
+          ? 'The PATAG server is unavailable (${response.statusCode}). Please retry in a moment.'
+          : 'Unexpected response from the PATAG server (${response.statusCode}).');
     }
     if (response.statusCode >= 400) {
-      if (response.statusCode == 401 && token != null) {
+      // Only expire the session this request was made with (not a newer login).
+      if (response.statusCode == 401 && sentWith != null && sentWith == token) {
         _clearSession();
         onSessionExpired?.call();
       }
@@ -142,8 +184,10 @@ class PatagMaintenanceStore extends ChangeNotifier {
     }
     token = data['token'] as String;
     user = User.fromJson(Map<String, dynamic>.from(data['user']));
-    await refresh();
     startPolling();
+    // A failed first load shows as networkError and is retried by polling,
+    // instead of reporting the sign-in itself as failed.
+    await refresh().catchError((Object _) {});
   }
 
   void startPolling() {
@@ -153,10 +197,15 @@ class PatagMaintenanceStore extends ChangeNotifier {
     });
   }
 
+  bool _refreshing = false;
   Future<void> refresh() async {
-    if (token == null) return;
+    final sessionToken = token;
+    if (sessionToken == null || _refreshing) return;
+    _refreshing = true;
     try {
       final data = await call('/bootstrap');
+      // Signed out or switched accounts while waiting: drop the old answer.
+      if (token != sessionToken) return;
       reports = (data['reports'] as List? ?? [])
           .map((r) => PotholeReport(Map<String, dynamic>.from(r)))
           .toList();
@@ -171,9 +220,13 @@ class PatagMaintenanceStore extends ChangeNotifier {
       networkError = null;
       notifyListeners();
     } catch (e) {
-      networkError = clean(e);
-      notifyListeners();
+      if (token == sessionToken) {
+        networkError = clean(e);
+        notifyListeners();
+      }
       rethrow;
+    } finally {
+      _refreshing = false;
     }
   }
 

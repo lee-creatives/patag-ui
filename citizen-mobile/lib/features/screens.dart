@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:latlong2/latlong.dart';
@@ -340,7 +341,8 @@ class _AuthState extends State<AuthScreen> {
             padding: const EdgeInsets.all(24),
             children: [
               logo(),
-              gap(28),
+              const ServerStatusBanner(),
+              gap(16),
               heading(
                 context,
                 recovery
@@ -1142,7 +1144,7 @@ class _FeedbackState extends State<FeedbackScreen> {
                           '/reports/${widget.id}/feedback',
                           body: {'rating': rating, 'text': text.text.trim()},
                         );
-                        await store.refresh();
+                        unawaited(store.refresh().catchError((Object _) {}));
                         if (mounted) setState(() => done = true);
                       } catch (e) {
                         if (context.mounted) {

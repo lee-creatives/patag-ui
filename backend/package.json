@@ -7,11 +7,13 @@
   },
   "scripts": {
     "dev": "node --env-file-if-exists=.env --watch src/index.ts",
+    "dev:lan": "node --env-file-if-exists=.env --watch src/index.ts --lan",
     "start": "node --env-file-if-exists=.env src/index.ts",
     "migrate": "node --env-file-if-exists=.env scripts/migrate.ts",
     "seed": "node --env-file-if-exists=.env scripts/seed.ts",
     "setup:storage": "node --env-file-if-exists=.env scripts/setup-storage.ts",
     "create-admin": "node --env-file-if-exists=.env scripts/create-admin.ts",
+    "smoke": "node --env-file-if-exists=.env scripts/smoke.ts",
     "typecheck": "tsc --noEmit",
     "test": "node --test --test-concurrency=1 test/*.test.ts"
   },

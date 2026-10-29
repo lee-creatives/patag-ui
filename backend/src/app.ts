@@ -7,8 +7,8 @@ import type { BlobStore } from './blobs.ts';
 import { demoSvg } from './demo-svg.ts';
 import {
   EMAIL, HttpError, UPLOAD_NAME, UPLOAD_URL, addressFields, candidates, fail, publicReport, publicUser,
-  registrationFields, roles, statuses, transition, validCoordinates,
-  type Photo, type Report, type User,
+  hiddenFromPublic, registrationFields, roles, statuses, transition, validCoordinates,
+  type Photo, type Report, type Role, type User,
 } from './domain.ts';
 import { hashPassword, newToken, sha256, verifyPassword } from './passwords.ts';
 import type { Store } from './store.ts';
@@ -20,6 +20,8 @@ export interface AppOptions {
   corsOrigins?: string[];
   logger?: boolean;
   bodyLimit?: number;
+  /** Fastify trustProxy: false locally; hop count or proxy IPs behind a hosting load balancer. */
+  trustProxy?: boolean | number | string[];
 }
 
 const SESSION_MS = 8 * 60 * 60 * 1000;
@@ -45,16 +47,22 @@ const reportInput = z.object({
     coordinates: z.object({ lat: z.number().min(-90).max(90), lng: z.number().min(-180).max(180) }),
   }),
 });
+/** Forms send null or "" for fields a dialog doesn't have: treat them as not provided. */
+const blankToUndefined = (v: unknown) => (v === null || (typeof v === 'string' && v.trim() === '') ? undefined : v);
+const isoDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(v => {
+  const d = new Date(v + 'T00:00:00Z');
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === v;
+}, 'Invalid date');
 const eventInput = z.object({
   action: z.string().min(1).max(40),
-  note: z.string().max(2000).optional(),
+  note: z.preprocess(v => (v === null ? undefined : v), z.string().max(2000).optional()),
   approved: z.unknown().optional(),
-  duplicateOf: z.string().max(40).optional(),
-  jurisdiction: z.string().max(200).optional(),
-  teamId: z.string().max(100).optional(),
-  priority: z.enum(['Low', 'Medium', 'High']).optional(),
-  targetDate: z.string().regex(/^\d{4}-\d{2}-\d{2}/).nullable().optional(),
-  phase: z.string().max(60).optional(),
+  duplicateOf: z.preprocess(blankToUndefined, z.string().max(40).optional()),
+  jurisdiction: z.preprocess(blankToUndefined, z.string().max(200).optional()),
+  teamId: z.preprocess(blankToUndefined, z.string().max(100).optional()),
+  priority: z.preprocess(blankToUndefined, z.enum(['Low', 'Medium', 'High']).optional()),
+  targetDate: z.preprocess(blankToUndefined, isoDate.optional()),
+  phase: z.preprocess(blankToUndefined, z.string().max(60).optional()),
   photos: z.array(photoRef).max(10).optional(),
 });
 
@@ -83,8 +91,10 @@ export function originAllowed(origin: string, allowed: string[]) {
   return !!m && allowed.includes(`${m[1]}:*`);
 }
 
-export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], logger = false, bodyLimit = BODY_LIMIT }: AppOptions) {
-  const app = Fastify({ logger, bodyLimit });
+export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], logger = false, bodyLimit = BODY_LIMIT, trustProxy = false }: AppOptions) {
+  // A hop count becomes Fastify's trust function: trust only the nearest N proxies.
+  const trust = typeof trustProxy === 'number' ? (_address: string, hop: number) => hop < trustProxy : trustProxy;
+  const app = Fastify({ logger, bodyLimit, trustProxy: trust });
 
   // Accept an empty JSON body as {} (Flutter sends Content-Type on every request).
   app.removeContentTypeParser('application/json');
@@ -131,21 +141,39 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
   }
   const attempts = new Map<string, { count: number; until: number }>();
   function throttle(req: FastifyRequest) {
-    const key = `${req.ip}:${req.url}`, now = Date.now();
+    const key = `${req.ip}:${req.routeOptions.url ?? req.url.split('?')[0]}`, now = Date.now();
+    if (attempts.size >= 10_000) {
+      for (const [k, v] of attempts) if (v.until < now) attempts.delete(k);
+      // Still full of live entries: drop the oldest instead of growing without bound.
+      while (attempts.size >= 10_000) attempts.delete(attempts.keys().next().value!);
+    }
     let a = attempts.get(key);
     if (!a || a.until < now) { a = { count: 0, until: now + 60_000 }; attempts.set(key, a); }
     if (++a.count > 20) fail(429, 'Too many attempts. Wait a minute and try again.');
-    if (attempts.size > 10_000) for (const [k, v] of attempts) if (v.until < now) attempts.delete(k);
   }
-  async function notify(s: Store, r: Report, title: string) {
+  /**
+   * Citizen: when their report's status changes. Team: assignment, returned work, resolution.
+   * Admins: new reports and crew progress. Internal admin actions (flag, forward, publication) notify nobody.
+   */
+  async function notify(s: Store, r: Report, title: string, action: string, by: Role) {
+    const last = r.history.at(-1);
+    const statusChanged = action === 'Submitted' || (!!last && last.from !== last.to);
+    const toCitizen = by !== 'citizen' && statusChanged || action === 'Submitted';
+    const toTeam = !!r.teamId && by !== 'maintenance' && ['assign', 'return', 'resolve'].includes(action);
+    const toAdmin = action === 'Submitted' || (by === 'maintenance' && ['start', 'complete'].includes(action));
     await s.addNotifications([
-      { role: 'citizen', userId: r.reporterId, teamId: null, reportId: r.id, title },
-      { role: 'admin', userId: null, teamId: null, reportId: r.id, title },
-      ...(r.teamId ? [{ role: 'maintenance' as const, userId: null, teamId: r.teamId, reportId: r.id, title }] : []),
+      ...(toCitizen ? [{ role: 'citizen' as const, userId: r.reporterId, teamId: null, reportId: r.id, title }] : []),
+      ...(toAdmin ? [{ role: 'admin' as const, userId: null, teamId: null, reportId: r.id, title }] : []),
+      ...(toTeam ? [{ role: 'maintenance' as const, userId: null, teamId: r.teamId, reportId: r.id, title }] : []),
     ]);
   }
-  async function requireUploads(photos: { url: string }[]) {
-    if (!(await store.uploadsExist(photos.map(p => uploadName(p.url))))) fail(400, 'Upload the photo first, then attach it.');
+  /** Photos must be real uploads by this user, unless they are already part of this report's evidence. */
+  async function requireUploads(s: Store, photos: { url: string }[], user: User, report?: Report) {
+    const already = new Set(report ? [
+      ...report.photos, ...report.updates.flatMap(u => u.photos), ...(report.completion?.photos ?? []),
+    ].map(p => p.url) : []);
+    const fresh = photos.map(p => p.url).filter(u => !already.has(u)).map(uploadName);
+    if (!(await s.uploadsOwnedBy(fresh, user.id))) fail(400, 'Upload the photo first, then attach it.');
   }
   function canSee(user: User, r: Report) {
     return user.role === 'admin' || (user.role === 'citizen' ? r.reporterId === user.id : r.teamId === user.teamId);
@@ -231,7 +259,8 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
         store.listTeams(), store.getSettings(), store.notificationsFor(user),
         user.role === 'admin' ? store.listUsers() : Promise.resolve([]),
       ]);
-      return { reports, teams, settings, demo: allowDemo, users: users.map(publicUser), notifications, user: publicUser(user), statuses };
+      const visibleTeams = user.role === 'citizen' ? teams.map(t => ({ ...t, members: [] })) : teams;
+      return { reports, teams: visibleTeams, settings, demo: allowDemo, users: users.map(publicUser), notifications, user: publicUser(user), statuses };
     });
 
     api.patch('/me', async req => {
@@ -240,11 +269,10 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
       const name = typeof b.name === 'string' ? b.name.trim() : '';
       if (!name || name.length > 100 || typeof b.email !== 'string' || !EMAIL.test(b.email.trim())) fail(400, 'Name and valid email are required.');
       if (b.email.trim().toLowerCase() !== user.email.toLowerCase()) fail(400, 'Email changes require verified account recovery.');
-      const address = b.address ? addressFields(b.address) : null;
-      user.name = name;
-      if (address && user.role === 'citizen') user.address = address;
-      await store.updateUser(user);
-      return publicUser(user);
+      const address = b.address && user.role === 'citizen' ? addressFields(b.address) : undefined;
+      const updated = await store.updateProfile(user.id, name, address);
+      if (!updated) fail(401, 'Session expired. Sign in again.');
+      return publicUser(updated!);
     });
 
     api.post('/notifications/read', async req => {
@@ -291,7 +319,7 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
       const parsed = reportInput.safeParse(body(req));
       if (!parsed.success) fail(400, 'Evidence photo, description, road, barangay, city, province, valid coordinates and severity are required.');
       const input = parsed.data!;
-      await requireUploads(input.photos);
+      await requireUploads(store, input.photos, user);
       const [id, settings] = [await store.nextReportId(), await store.getSettings()];
       const at = new Date().toISOString();
       const report: Report = {
@@ -300,12 +328,12 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
         location: { ...input.location, landmark: input.location.landmark ?? '' },
         photos: input.photos.map(p => sanitizePhoto(p, 'before')), reporterId: user.id, jurisdiction: settings.agency,
         createdAt: at, updatedAt: at, teamId: null, assignment: null,
-        history: [{ id: randomUUID(), at, actor: 'citizen', action: 'Submitted', from: null, to: 'Submitted', note: 'Citizen report received; administrative review required.' }],
+        history: [{ id: randomUUID(), at, actor: 'citizen', actorId: user.id, actorName: user.name, action: 'Submitted', from: null, to: 'Submitted', note: 'Citizen report received; administrative review required.' }],
         updates: [], completion: null, feedback: null, flagged: false,
       };
       await store.tx(async tx => {
         await tx.insertReport(report);
-        await notify(tx, report, 'Report submitted for review');
+        await notify(tx, report, 'Report submitted for review', 'Submitted', 'citizen');
       });
       return reply.code(201).send(report);
     });
@@ -323,28 +351,32 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
       const parsed = eventInput.safeParse(body(req));
       if (!parsed.success) fail(400, 'Check the action details and try again.');
       const e = parsed.data!;
+      if (user.role === 'citizen') fail(403, 'Only LGU staff and road crews can change a report.');
       if (['complete', 'before-photos'].includes(e.action) && !e.photos) fail(400, 'Upload real repair photos first.');
-      if (e.photos?.length) await requireUploads(e.photos);
       return store.tx(async tx => {
         const r = await tx.getReport(req.params.id, { forUpdate: true });
         if (!r) fail(404, 'Report not found.');
         if (!canSee(user, r!)) fail(403, 'This report belongs to another account or team.');
-        if (e.action === 'duplicate' && (!e.duplicateOf || e.duplicateOf === r!.id || !(await tx.reportExists(e.duplicateOf)))) fail(400, 'Original report not found.');
+        if (e.photos?.length) await requireUploads(tx, e.photos, user, r!);
+        if (e.action === 'duplicate') {
+          const original = e.duplicateOf && e.duplicateOf !== r!.id ? await tx.getReport(e.duplicateOf) : null;
+          if (!original || hiddenFromPublic.includes(original.status)) fail(400, 'Original report not found.');
+        }
         // complete = after photos, before-photos = before; progress photos default to after.
         const kindOf = (p: z.infer<typeof photoRef>) =>
           e.action === 'complete' ? 'after' : e.action === 'before-photos' ? 'before' : p.kind === 'before' ? 'before' : 'after';
         const photos = e.photos?.map(p => sanitizePhoto(p, kindOf(p)));
         const teams = e.action === 'assign' ? await tx.listTeams() : [];
-        transition(r!, user.role, e.action, { ...e, photos }, teams);
+        transition(r!, user.role, e.action, { ...e, photos }, teams, { id: user.id, name: user.name });
         await tx.saveReport(r!);
-        await notify(tx, r!, eventTitle(r!, e.action, teams));
+        await notify(tx, r!, eventTitle(r!, e.action, teams), e.action, user.role);
         return r;
       });
     });
 
     api.post('/reports/:id/feedback', async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
       const user = await currentUser(req);
-      return store.tx(async tx => {
+      const feedback = await store.tx(async tx => {
         const r = await tx.getReport(req.params.id, { forUpdate: true });
         if (!r) fail(404, 'Report not found.');
         if (user.role !== 'citizen' || r!.reporterId !== user.id) fail(403, 'This report belongs to another account or team.');
@@ -354,8 +386,9 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
         if (!Number.isInteger(b.rating) || b.rating < 1 || b.rating > 5 || !feedbackText || feedbackText.length > 1000) fail(400, 'Choose a rating and add feedback.');
         r!.feedback = { rating: b.rating, text: feedbackText, at: new Date().toISOString() };
         await tx.saveReport(r!);
-        return reply.code(201).send(r!.feedback);
+        return r!.feedback;
       });
+      return reply.code(201).send(feedback);
     });
 
     // ---- admin workspace

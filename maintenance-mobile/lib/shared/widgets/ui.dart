@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../app/theme.dart';
 import '../../core/api.dart';
@@ -780,4 +782,90 @@ class PatagMaintenanceNavigation extends StatelessWidget {
           ),
         ),
       );
+}
+
+/// Shown on the sign-in screens: checks GET /health and explains clearly when
+/// the PATAG server can't be reached, with a Retry button.
+class ServerStatusBanner extends StatefulWidget {
+  const ServerStatusBanner({super.key});
+  @override
+  State<ServerStatusBanner> createState() => _ServerStatusBannerState();
+}
+
+class _ServerStatusBannerState extends State<ServerStatusBanner> {
+  bool slow = false;
+  Timer? slowTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // After the first frame: checking notifies listeners, which must not happen mid-build.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) check();
+    });
+  }
+
+  Future<void> check() async {
+    setState(() => slow = false);
+    slowTimer?.cancel();
+    slowTimer = Timer(const Duration(seconds: 4), () {
+      if (mounted) setState(() => slow = true);
+    });
+    await store.checkServer();
+    slowTimer?.cancel();
+  }
+
+  @override
+  void dispose() {
+    slowTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: store,
+        builder: (context, _) {
+          if (store.checkingServer && slow) {
+            return _panel(context, Icons.hourglass_top_rounded,
+                'Connecting to PATAG… A server that was asleep can take up to a minute.');
+          }
+          final problem = store.serverProblem;
+          if (problem == null || store.checkingServer) {
+            return const SizedBox.shrink();
+          }
+          return _panel(
+              context,
+              Icons.cloud_off_outlined,
+              kDebugMode
+                  ? '$problem\n${PatagMaintenanceStore.baseUrl}'
+                  : problem,
+              retry: true);
+        },
+      );
+
+  Widget _panel(BuildContext context, IconData icon, String text,
+      {bool retry = false}) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: scheme.errorContainer.withValues(alpha: retry ? 1 : .45),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(children: [
+          Icon(icon, color: scheme.onErrorContainer),
+          const SizedBox(width: 10),
+          Expanded(
+              child: Text(text,
+                  style: TextStyle(
+                      color: scheme.onErrorContainer,
+                      fontWeight: FontWeight.w600,
+                      height: 1.35))),
+          if (retry) TextButton(onPressed: check, child: const Text('Retry')),
+        ]),
+      ),
+    );
+  }
 }

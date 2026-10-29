@@ -25,6 +25,8 @@ export interface History {
   id: string;
   at: string;
   actor: string;
+  actorId?: string;
+  actorName?: string;
   action: string;
   from: Status | null;
   to: Status;

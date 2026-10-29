@@ -42,7 +42,7 @@ class _TaskMapScreenState extends State<TaskMapScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh_rounded),
-            onPressed: () => store.refresh(),
+            onPressed: () => store.refresh().catchError((Object _) {}),
           ),
         ],
       ),

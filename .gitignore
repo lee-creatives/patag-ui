@@ -20,3 +20,7 @@ browser-preview/.build/
 
 .playwright-mcp/
 docs/qa-downloads/
+
+# Mobile per-environment API URLs specific to a network or deployment
+*/env/lan.json
+*/env/prod.json

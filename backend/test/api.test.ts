@@ -34,7 +34,7 @@ test('cross-role flow, evidence validation, privacy, ownership, feedback and not
 
     const event = (action: string, payload = {}, token = admin) => call(`/reports/${id}/events`, { action, ...payload }, token);
     assert.equal((await event('assign', { teamId: 'team-1' })).status, 409);
-    assert.equal((await event('verify', {}, citizen)).status, 409);
+    assert.equal((await event('verify', {}, citizen)).status, 403);
     assert.equal((await event('verify')).data.status, 'Verified');
     await event('assign', { teamId: 'team-1', note: 'Inspect the outer lane' });
     assert.ok((await call('/bootstrap', undefined, crew)).data.reports.some((r: any) => r.id === id));

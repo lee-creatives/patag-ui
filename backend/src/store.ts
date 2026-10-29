@@ -72,8 +72,16 @@ export class Store {
     await this.db.query(
       `update users set name = $2, role = $3, active = $4, team_id = $5, address = $6::jsonb, password_hash = $7, updated_at = now() where id = $1`,
       [u.id, u.name, u.role, u.active, u.teamId, json(u.address), u.passwordHash]);
-    // A disabled or re-roled account loses its sessions immediately.
+    // A disabled account loses its sessions immediately (role changes apply on the next request).
     if (!u.active) await this.db.query('delete from sessions where user_id = $1', [u.id]);
+  }
+
+  /** Self-service profile edit: touches only name/address, never role, team, active or password. */
+  async updateProfile(id: string, name: string, address: User['address'] | undefined) {
+    const { rows } = await this.db.query(
+      `update users set name = $2, address = coalesce($3::jsonb, address), updated_at = now() where id = $1 returning ${USER_COLS}`,
+      [id, name, address ? JSON.stringify(address) : null]);
+    return rows[0] ? toUser(rows[0]) : null;
   }
 
   // ---- sessions (only SHA-256 hashes of tokens are stored)
@@ -157,10 +165,12 @@ export class Store {
   async recordUpload(name: string, userId: string, contentType: string, size: number) {
     await this.db.query('insert into uploads (name, uploaded_by, content_type, size_bytes) values ($1, $2, $3, $4)', [name, userId, contentType, size]);
   }
-  async uploadsExist(names: string[]) {
-    if (!names.length) return true;
-    const { rows } = await this.db.query('select count(*)::int as n from uploads where name = any($1::text[])', [[...new Set(names)]]);
-    return rows[0].n === new Set(names).size;
+  /** True when every upload exists and was uploaded by this user. */
+  async uploadsOwnedBy(names: string[], userId: string) {
+    const unique = [...new Set(names)];
+    if (!unique.length) return true;
+    const { rows } = await this.db.query('select count(*)::int as n from uploads where name = any($1::text[]) and uploaded_by = $2', [unique, userId]);
+    return rows[0].n === unique.length;
   }
 
   // ---- notifications

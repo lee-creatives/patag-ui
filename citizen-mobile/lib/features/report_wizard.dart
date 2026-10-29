@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -138,8 +139,17 @@ class _ReportWizardState extends State<ReportWizard> {
     super.dispose();
   }
 
+  static const maxPhotos = 10;
+
   Future<void> pick(bool camera) async {
-    setState(() => busy = true);
+    if (photos.length >= maxPhotos) {
+      setState(() => error = 'You can attach up to $maxPhotos photos.');
+      return;
+    }
+    setState(() {
+      busy = true;
+      error = '';
+    });
     try {
       final picker = ImagePicker();
       final files = camera
@@ -150,9 +160,13 @@ class _ReportWizardState extends State<ReportWizard> {
               ),
             ].whereType<XFile>().toList()
           : await picker.pickMultiImage(imageQuality: 85);
-      for (final file in files) {
+      final room = maxPhotos - photos.length;
+      for (final file in files.take(room)) {
         final photo = await store.upload(file);
         photos.add(photo);
+      }
+      if (files.length > room) {
+        error = 'Only $room more photo(s) could be added (limit $maxPhotos).';
       }
       await save();
     } catch (e) {
@@ -217,7 +231,8 @@ class _ReportWizardState extends State<ReportWizard> {
       final r = await store.call('/reports', body: draft);
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove('patag-draft');
-      await store.refresh();
+      // The report exists now; a failed reload must not look like a failed submit.
+      unawaited(store.refresh().catchError((Object _) {}));
       if (mounted) {
         Navigator.of(context)
             .pushReplacementNamed('/report/success/${r['id']}');
@@ -357,15 +372,18 @@ class _ReportWizardState extends State<ReportWizard> {
                           ),
                         ],
                       ),
-                      field('Road name', road),
-                      field('Barangay', barangay),
-                      field('Municipality / City', city),
-                      field('Province', province),
-                      field('Nearby landmark', landmark, required: false),
+                      field('Road name', road, maxLength: 120),
+                      field('Barangay', barangay, maxLength: 120),
+                      field('Municipality / City', city, maxLength: 120),
+                      field('Province', province, maxLength: 120),
+                      field('Nearby landmark', landmark,
+                          required: false, maxLength: 200),
                     ],
                     if (step == 2) ...[
-                      field('Short report title', title, required: false),
-                      field('Describe the road damage', description, lines: 4),
+                      field('Short report title', title,
+                          required: false, maxLength: 120),
+                      field('Describe the road damage', description,
+                          lines: 4, maxLength: 2000),
                       field('Observed hazards', hazards,
                           lines: 2, required: false),
                       const Text(

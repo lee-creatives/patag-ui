@@ -14,8 +14,8 @@ class Coordinates {
   const Coordinates(this.lat, this.lng);
 
   factory Coordinates.fromJson(Map<String, dynamic> json) => Coordinates(
-        (json['lat'] as num).toDouble(),
-        (json['lng'] as num).toDouble(),
+        (json['lat'] as num?)?.toDouble() ?? 14.85,
+        (json['lng'] as num?)?.toDouble() ?? 120.81,
       );
 
   Map<String, dynamic> toJson() => {'lat': lat, 'lng': lng};
@@ -94,6 +94,7 @@ class ProgressUpdate {
         note: json['note'] as String? ?? '',
         phase: json['phase'] as String? ?? 'Inspection',
         photos: (json['photos'] as List<dynamic>? ?? [])
+            .whereType<Map>()
             .map((p) => Photo.fromJson(Map<String, dynamic>.from(p)))
             .toList(),
       );
@@ -116,6 +117,7 @@ class Completion {
         state: json['state'] as String? ?? 'Awaiting Verification',
         note: json['note'] as String? ?? '',
         photos: (json['photos'] as List<dynamic>? ?? [])
+            .whereType<Map>()
             .map((p) => Photo.fromJson(Map<String, dynamic>.from(p)))
             .toList(),
         at: json['at'] as String? ?? '',
@@ -150,6 +152,7 @@ class PotholeReport {
       );
 
   List<Photo> get photos => (json['photos'] as List<dynamic>? ?? [])
+      .whereType<Map>()
       .map((p) => Photo.fromJson(Map<String, dynamic>.from(p)))
       .toList();
 

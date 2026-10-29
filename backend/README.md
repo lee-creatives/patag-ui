@@ -47,23 +47,66 @@ npm run dev          # from backend/ (restarts on file changes)
 npm run api          # same, from the repo root
 ```
 
-The API listens on `http://127.0.0.1:4100/api`. Migrations are applied automatically at startup.
+The API listens on `http://127.0.0.1:4100/api`. Migrations are applied automatically at startup. Keep this terminal open while you use the apps. If an app says "Connection timed out" or "Can't reach the PATAG server", the backend isn't running.
 
-Clients:
+The mobile apps never talk to Supabase directly: they call this API, which holds the secrets and enforces the workflow. Each app's `env/` folder holds the API address per device ([citizen-mobile/env/README.md](../citizen-mobile/env/README.md)).
+
+## Connect a phone or emulator
+
+Run these from the repo root, then the `flutter` command inside `citizen-mobile/` or `maintenance-mobile/`. Use `C:\flutter\bin\flutter` if `where flutter` still shows `C:\Moble dev\flutter` (that path's space breaks builds).
+
+| Device | Backend | App |
+|---|---|---|
+| Android emulator | `npm run api` | `flutter run --dart-define-from-file=env/emulator.json` |
+| Phone on USB (USB debugging on) | `npm run api` and `npm run mobile:usb` | `flutter run --dart-define-from-file=env/usb.json` |
+| Phone on the same Wi-Fi | `npm run api:lan` (prints the LAN URL) | copy `env/lan.example.json` to `env/lan.json`, put that URL in it, then `flutter run --dart-define-from-file=env/lan.json` |
+
+For Wi-Fi phones, Windows Firewall must allow port 4100 on **private** networks. Run once in an **admin** PowerShell:
 
 ```powershell
-# Flutter (Android emulator)
-cd citizen-mobile
-flutter run --dart-define=API_URL=http://10.0.2.2:4100/api
-
-# Web portals: unchanged, they default to http://127.0.0.1:4100/api
-cd admin-web; npm run dev
-cd maintenance-web; npm run dev
+New-NetFirewallRule -DisplayName "PATAG API (dev)" -Direction Inbound -Protocol TCP -LocalPort 4100 -Profile Private -Action Allow
 ```
 
-To use the "Continue as ..." demo buttons in the web portals or demo citizen login, set `ALLOW_DEMO=true` in `backend/.env` **on your own PC only** and run `npm run seed`.
+Your Wi-Fi must be set to "Private" in Windows settings. Remove the rule later with `Remove-NetFirewallRule -DisplayName "PATAG API (dev)"`. On a network you don't control (school, café), use USB instead.
 
-Physical Android phone over USB: `adb reverse tcp:4100 tcp:4100`, then `--dart-define=API_URL=http://127.0.0.1:4100/api`.
+Web portals are unchanged: they default to `http://127.0.0.1:4100/api` (`cd admin-web; npm run dev`, `cd maintenance-web; npm run dev`).
+
+## Accounts
+
+| Who | How |
+|---|---|
+| Citizens | Register in the citizen app (saved to Supabase immediately). |
+| LGU administrator | `npm run create-admin` (see Setup step 4). |
+| Maintenance crews | The admin creates teams and crew accounts in admin-web. Crews sign in to maintenance-mobile with that email and password. |
+| Seeded demo accounts | Fictional, **no passwords**. They only work through the "demo"/"Continue as…" buttons when `ALLOW_DEMO=true` on a backend running on your own PC. The server refuses `ALLOW_DEMO=true` together with `npm run api:lan` unless you also set `ALLOW_DEMO_ON_LAN=true` (trusted classroom network only). |
+
+The Supabase project in `.env` is the **production** project (`main / PRODUCTION`): everything you create while testing is real data. Consider creating a second Supabase project for testing and pointing a copy of `.env` at it.
+
+## Check the connection
+
+```powershell
+npm run smoke                                   # read-only: /health is "supabase", public reports load
+npm run smoke -- --url https://<host>/api       # against a hosted backend
+npm run smoke -- --write                        # ALSO creates a test citizen + one report (real data, not deleted)
+```
+
+The full walkthrough is in [docs/mobile-supabase-checklist.md](../docs/mobile-supabase-checklist.md).
+
+## Deploy (Render)
+
+Render was chosen because it runs this Dockerfile on a free web service with HTTPS and health checks, has a Singapore region near the Philippines, and reads a [render.yaml](../render.yaml) blueprint from the repo. Railway and Fly.io need a paid plan or card for always-on use.
+
+1. Push this branch to GitHub. In Render: **New → Blueprint**, pick the repo, and it reads `render.yaml`.
+2. Render asks for the values marked `sync: false`:
+   - `SUPABASE_SECRET_KEY` and `SUPABASE_DB_PASSWORD`: same as your `backend/.env`.
+   - `SUPABASE_DB_CA_CERT`: paste the **contents** of the Supabase CA file (Dashboard → Database → Settings → SSL → Download certificate).
+   - `CORS_ORIGINS`: your deployed admin/maintenance web URLs, or leave empty if only the mobile apps use it.
+3. Wait for the deploy, then run `npm run smoke -- --url https://<your-service>.onrender.com/api`.
+4. Put that URL in each app's `env/prod.json` and build: `flutter build apk --release --dart-define-from-file=env/prod.json`. Release builds only allow HTTPS (cleartext is enabled in the **debug** manifest only).
+
+The **free** plan sleeps after about 15 minutes idle; the first request then takes about a minute. The apps show "Connecting to PATAG… A server that was asleep can take up to a minute." while it wakes. For a demo or defense, open the app a minute early, or switch the service to the Starter plan.
+
+`TRUST_PROXY=1` is set in the blueprint so the login rate limit counts each real client behind Render's load balancer. Locally, leave it unset.
 
 ## Tests
 

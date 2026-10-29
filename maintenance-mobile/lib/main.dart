@@ -17,8 +17,6 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   store.showUnread = prefs.getBool('maintenance-notifications') ?? true;
   await themeController.load();
-  store.onSessionExpired = () => navigatorKey.currentState
-      ?.pushNamedAndRemoveUntil('/login', (_) => false);
   runApp(const PatagMaintenanceApp());
 }
 
@@ -27,6 +25,9 @@ class PatagMaintenanceApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // An expired session (401) returns to sign-in from wherever the user is.
+    store.onSessionExpired ??= () => navigatorKey.currentState
+        ?.pushNamedAndRemoveUntil('/login', (_) => false);
     return AnimatedBuilder(
       animation: Listenable.merge([store, themeController]),
       builder: (context, _) => MaterialApp(
@@ -155,7 +156,9 @@ class PatagMaintenanceApp extends StatelessWidget {
         onGenerateRoute: (settings) {
           final route = settings.name ?? '/';
           final parts = route.split('/');
-          Widget screen;
+          // A builder, not a widget: every store change must build a fresh screen
+          // (returning the same instance makes Flutter skip the rebuild).
+          late Widget Function() screen;
 
           final protected = route == '/dashboard' ||
               route.startsWith('/assignments') ||
@@ -166,39 +169,42 @@ class PatagMaintenanceApp extends StatelessWidget {
               route == '/profile';
 
           if (protected && store.token == null) {
-            screen = const MaintenanceLogin();
+            screen = () => MaintenanceLogin();
           } else if (route == '/') {
-            screen = const MaintenanceSplash();
+            screen = () => MaintenanceSplash();
           } else if (route == '/welcome') {
-            screen = const MaintenanceWelcome();
+            screen = () => MaintenanceWelcome();
           } else if (route == '/login') {
-            screen = const MaintenanceLogin();
+            screen = () => MaintenanceLogin();
           } else if (route == '/dashboard') {
-            screen = const MainShell(initialTab: 0);
+            screen = () => MainShell(initialTab: 0);
           } else if (route == '/assignments') {
-            screen = const MainShell(initialTab: 1);
+            screen = () => MainShell(initialTab: 1);
           } else if (route.startsWith('/assignments/')) {
-            screen = TaskDetailsScreen(parts.last);
+            screen = () => TaskDetailsScreen(parts.last);
           } else if (route == '/progress') {
-            screen = const MainShell(initialTab: 2);
+            screen = () => MainShell(initialTab: 2);
           } else if (route == '/map') {
-            screen = const MainShell(initialTab: 3);
+            screen = () => MainShell(initialTab: 3);
           } else if (route.startsWith('/repairs/') &&
               parts.last == 'document') {
-            screen = RepairDocumentationScreen(parts[2]);
+            screen = () => RepairDocumentationScreen(parts[2]);
           } else if (route.startsWith('/repairs/') && parts.last == 'success') {
-            screen = SubmissionSuccessScreen(parts[2]);
+            screen = () => SubmissionSuccessScreen(parts[2]);
           } else if (route == '/notifications') {
-            screen = const NotificationsScreen();
+            screen = () => NotificationsScreen();
           } else if (route == '/profile') {
-            screen = const MainShell(initialTab: 4);
+            screen = () => MainShell(initialTab: 4);
           } else {
-            screen = const MainShell(initialTab: 0);
+            screen = () => MainShell(initialTab: 0);
           }
 
           return MaterialPageRoute<void>(
             settings: settings,
-            builder: (_) => screen,
+            builder: (_) => ListenableBuilder(
+              listenable: store,
+              builder: (_, __) => screen(),
+            ),
           );
         },
       ),

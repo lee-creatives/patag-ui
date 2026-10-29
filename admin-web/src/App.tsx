@@ -122,6 +122,25 @@ const date = (v: string) =>
     day: "numeric",
     year: "numeric",
   });
+// Local YYYY-MM-DD: filters and exports must use the same day the screen shows (UTC+8, not UTC).
+const localDay = (v: string | Date) => new Date(v).toLocaleDateString("en-CA");
+const dateTime = (v: string) =>
+  new Date(v).toLocaleString("en-PH", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+const roleLabels: Record<string, string> = {
+  admin: "LGU administrator",
+  maintenance: "Road crew",
+  citizen: "Citizen",
+};
+const actorLabel = (h: { actor: string; actorName?: string }) => {
+  const role = roleLabels[h.actor] || h.actor;
+  return h.actorName ? `${h.actorName} (${role})` : role;
+};
 function Badge({ value }: { value: string }) {
   return (
     <span className={"badge " + value.toLowerCase().replaceAll(" ", "-")}>
@@ -586,9 +605,14 @@ function Shell() {
                 className="icon-button"
                 aria-label="Sign out"
                 onClick={async () => {
-                  await request("/auth/logout", {});
-                  sessionStorage.removeItem("patag-token");
-                  nav(base + "/login");
+                  try {
+                    await request("/auth/logout", {});
+                  } catch {
+                    // Signing out locally still matters when the server can't be reached.
+                  } finally {
+                    sessionStorage.removeItem("patag-token");
+                    nav(base + "/login");
+                  }
                 }}
               >
                 <LogOut size={17} />
@@ -804,27 +828,16 @@ function Chart({
       : kind === "area"
         ? [...new Set(reports.map((r) => r.location.barangay))]
         : kind === "time"
-          ? [
-              "09",
-              "10",
-              "11",
-              "12",
-              "13",
-              "14",
-              "15",
-              "16",
-              "17",
-              "18",
-              "19",
-              "20",
-              "21",
-            ]
+          ? [...new Set(reports.map((r) => localDay(r.createdAt)))].sort().slice(-14)
           : statuses;
   const series = groups.map((name) => ({
-    name: kind === "time" ? "Oct " + name : name,
+    name:
+      kind === "time"
+        ? new Date(name + "T00:00:00").toLocaleDateString("en-PH", { month: "short", day: "numeric" })
+        : name,
     total: reports.filter((r) =>
       kind === "time"
-        ? r.createdAt.slice(8, 10) === name
+        ? localDay(r.createdAt) === name
         : kind === "area"
           ? r.location.barangay === name
           : kind === "severity"
@@ -1063,8 +1076,8 @@ function ReportList({ mode }: { mode: string }) {
         (severity === "All" || r.severity === severity) &&
         (area === "All" || r.location.barangay === area) &&
         (team === "All" || r.teamId === team) &&
-        (!from || r.createdAt.slice(0, 10) >= from) &&
-        (!to || r.createdAt.slice(0, 10) <= to),
+        (!from || localDay(r.createdAt) >= from) &&
+        (!to || localDay(r.createdAt) <= to),
     )
     .sort((a, b) =>
       sort === "road"
@@ -1227,7 +1240,7 @@ function ReportList({ mode }: { mode: string }) {
                       <td>
                         <Link className="table-identity" to={link(r)}>
                           <img
-                            src={asset(r.photos[0]?.url)}
+                            src={asset(r.photos[0]?.url || "/demo-evidence.svg")}
                             alt="Evidence preview"
                           />
                           <span>
@@ -1339,12 +1352,16 @@ function Details({ mode = "detail" }: { mode?: string }) {
       () => sessionStorage.getItem("repair-notes-" + id) || "",
     ),
     [nearby, setNearby] = useState<{ report: Report; distance: number }[]>([]);
+  const dupKey = r
+    ? [r.id, r.location.road, r.location.coordinates.lat, r.location.coordinates.lng].join("|")
+    : "";
   useEffect(() => {
     if (r)
       void request<{ report: Report; distance: number }[]>("/duplicates", r)
         .then(setNearby)
         .catch(() => setNearby([]));
-  }, [r]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dupKey]);
   if (!r)
     return (
       <Empty
@@ -1359,14 +1376,16 @@ function Details({ mode = "detail" }: { mode?: string }) {
     setError("");
     const f = new FormData(e.currentTarget);
     try {
-      await event(r.id, decision, {
-        note: f.get("note"),
-        teamId: f.get("teamId"),
-        priority: f.get("priority"),
-        targetDate: f.get("targetDate"),
-        duplicateOf: f.get("duplicateOf"),
-        jurisdiction: f.get("jurisdiction"),
-      });
+      const fields = ["note", "teamId", "priority", "targetDate", "duplicateOf", "jurisdiction"];
+      await event(
+        r.id,
+        decision,
+        Object.fromEntries(
+          fields
+            .map((k) => [k, f.get(k)] as const)
+            .filter(([, v]) => typeof v === "string" && v.trim() !== ""),
+        ),
+      );
       setDecision("");
     } catch (e) {
       setError((e as Error).message);
@@ -1638,7 +1657,7 @@ function Details({ mode = "detail" }: { mode?: string }) {
                       </strong>
                       <p>{h.note || h.action}</p>
                       <small>
-                        {date(h.at)} · {h.actor}
+                        {dateTime(h.at)} · {actorLabel(h)}
                       </small>
                     </div>
                   </li>
@@ -1894,7 +1913,7 @@ function Details({ mode = "detail" }: { mode?: string }) {
                   <input
                     type="date"
                     name="targetDate"
-                    min={new Date().toISOString().slice(0, 10)}
+                    min={localDay(new Date())}
                   />
                 </label>
               </>
@@ -2038,21 +2057,25 @@ function Duplicates() {
   const [pairs, setPairs] = useState<
     { a: Report; b: Report; distance: number }[]
   >([]);
+  const pending = data.reports.filter((r) =>
+    ["Submitted", "Under Review"].includes(r.status),
+  );
+  const pendingKey = pending.map((r) => r.id + ":" + r.status).join(",");
   useEffect(() => {
-    void Promise.all(
-      data.reports
-        .filter((r) => ["Submitted", "Under Review"].includes(r.status))
-        .map(async (a) => {
-          const list = await request<{ report: Report; distance: number }[]>(
-            "/duplicates",
-            a,
-          );
-          return list.map((x) => ({ a, b: x.report, distance: x.distance }));
-        }),
-    )
-      .then((x) => setPairs(x.flat()))
-      .catch(() => setPairs([]));
-  }, [data.reports]);
+    // allSettled: one failed check must not blank the whole list.
+    void Promise.allSettled(
+      pending.map(async (a) => {
+        const list = await request<{ report: Report; distance: number }[]>(
+          "/duplicates",
+          a,
+        );
+        return list.map((x) => ({ a, b: x.report, distance: x.distance }));
+      }),
+    ).then((results) =>
+      setPairs(results.flatMap((x) => (x.status === "fulfilled" ? x.value : []))),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingKey]);
   return (
     <>
       <Header
@@ -2430,8 +2453,8 @@ function Exports() {
       (status === "All" || r.status === status) &&
       (severity === "All" || r.severity === severity) &&
       (area === "All" || r.location.barangay === area) &&
-      (!from || r.createdAt.slice(0, 10) >= from) &&
-      (!to || r.createdAt.slice(0, 10) <= to),
+      (!from || localDay(r.createdAt) >= from) &&
+      (!to || localDay(r.createdAt) <= to),
   );
   function value(r: Report, f: string) {
     return (
@@ -2441,7 +2464,7 @@ function Exports() {
         Barangay: r.location.barangay,
         Severity: r.severity,
         Status: r.status,
-        Submitted: r.createdAt.slice(0, 10),
+        Submitted: localDay(r.createdAt),
       }[f] || ""
     );
   }
@@ -2620,7 +2643,7 @@ function Exports() {
   );
 }
 function Notifications() {
-  const { data, refresh } = useData();
+  const { data, refresh, notify } = useData();
   return (
     <>
       <Header
@@ -2629,8 +2652,12 @@ function Notifications() {
         action={
           <button
             onClick={async () => {
-              await request("/notifications/read", { id: "all" });
-              await refresh();
+              try {
+                await request("/notifications/read", { id: "all" });
+                await refresh();
+              } catch (e) {
+                notify((e as Error).message);
+              }
             }}
           >
             Mark all as read
@@ -2649,8 +2676,12 @@ function Notifications() {
               <Link
                 to={base + (admin ? "/reports/" : "/assignments/") + n.reportId}
                 onClick={async () => {
-                  await request("/notifications/read", { id: n.id });
-                  await refresh();
+                  try {
+                    await request("/notifications/read", { id: n.id });
+                    await refresh();
+                  } catch (e) {
+                    notify((e as Error).message);
+                  }
                 }}
               >
                 <strong>{n.title}</strong>
@@ -2677,7 +2708,7 @@ function Activity() {
   const entries = data.reports
     .flatMap((r) => r.history.map((h) => ({ ...h, reportId: r.id })))
     .filter((h) =>
-      (h.reportId + " " + h.actor + " " + h.action + " " + h.note)
+      (h.reportId + " " + actorLabel(h) + " " + h.action + " " + h.note)
         .toLowerCase()
         .includes(q.toLowerCase()),
     )
@@ -2718,14 +2749,14 @@ function Activity() {
                       {h.reportId}
                     </Link>
                   </td>
-                  <td>{h.actor}</td>
+                  <td>{actorLabel(h)}</td>
                   <td>
                     {h.action}
                     <small className="sub-state">{h.note}</small>
                   </td>
                   <td>{h.from || "—"}</td>
                   <td>{h.to}</td>
-                  <td className="numeric">{date(h.at)}</td>
+                  <td className="numeric">{dateTime(h.at)}</td>
                 </tr>
               ))}
             </tbody>

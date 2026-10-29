@@ -8,6 +8,8 @@ import 'features/report_map.dart';
 import 'features/report_wizard.dart';
 import 'shared/widgets/ui.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final preferences = await SharedPreferences.getInstance();
@@ -19,10 +21,15 @@ Future<void> main() async {
 class PatagApp extends StatelessWidget {
   const PatagApp({super.key});
   @override
-  Widget build(BuildContext context) => AnimatedBuilder(
+  Widget build(BuildContext context) {
+    // An expired session (401) returns to sign-in from wherever the user is.
+    store.onSessionExpired ??= () => navigatorKey.currentState
+        ?.pushNamedAndRemoveUntil('/login', (_) => false);
+    return AnimatedBuilder(
       animation: Listenable.merge([store, themeController]),
       builder: (context, _) => MaterialApp(
           title: 'PATAG',
+          navigatorKey: navigatorKey,
           debugShowCheckedModeBanner: false,
           theme: patagTheme(),
           darkTheme: patagTheme(brightness: Brightness.dark),
@@ -32,7 +39,9 @@ class PatagApp extends StatelessWidget {
           onGenerateRoute: (settings) {
             final route = settings.name ?? '/';
             final parts = route.split('/');
-            Widget screen;
+            // A builder, not a widget: every store change must build a fresh screen
+            // (returning the same instance makes Flutter skip the rebuild).
+            late Widget Function() screen;
             final protected = route == '/home' ||
                 route.startsWith('/report/') ||
                 route.startsWith('/reports') ||
@@ -40,52 +49,55 @@ class PatagApp extends StatelessWidget {
                 route == '/notifications' ||
                 route == '/settings';
             if (protected && store.token == null) {
-              screen = const AuthScreen('login');
+              screen = () => AuthScreen('login');
             } else if (route == '/') {
-              screen = const Splash();
+              screen = () => Splash();
             } else if (route == '/onboarding') {
-              screen = const Onboarding();
+              screen = () => Onboarding();
             } else if (route == '/welcome') {
-              screen = const Welcome();
+              screen = () => Welcome();
             } else if (['/login', '/register', '/forgot-password']
                 .contains(route)) {
-              screen = AuthScreen(parts.last);
+              screen = () => AuthScreen(parts.last);
             } else if (route == '/home') {
-              screen = const CitizenHome();
+              screen = () => CitizenHome();
             } else if (route == '/report/new') {
-              screen = ReportWizard(
+              screen = () => ReportWizard(
                   initialPin: settings.arguments as LatLng? ??
                       store.takePendingReportPin());
             } else if (route.startsWith('/report/success/')) {
-              screen = ReportSuccess(parts.last);
+              screen = () => ReportSuccess(parts.last);
             } else if (route == '/reports') {
-              screen = const MyReports();
+              screen = () => MyReports();
             } else if (route.startsWith('/reports/') &&
                 parts.last == 'feedback') {
-              screen = FeedbackScreen(parts[2]);
+              screen = () => FeedbackScreen(parts[2]);
             } else if (route.startsWith('/reports/')) {
-              screen = ReportDetails(parts.last);
+              screen = () => ReportDetails(parts.last);
             } else if (route == '/map') {
-              screen = const PublicMap();
+              screen = () => PublicMap();
             } else if (route.startsWith('/map/reports/')) {
-              screen = ReportDetails(parts.last, public: true);
+              screen = () => ReportDetails(parts.last, public: true);
             } else if (route == '/notifications') {
-              screen = const NotificationsScreen();
+              screen = () => NotificationsScreen();
             } else if (route == '/profile') {
-              screen = const ProfileScreen();
+              screen = () => ProfileScreen();
             } else if (route == '/profile/edit') {
-              screen = const EditProfile();
+              screen = () => EditProfile();
             } else if (route == '/settings') {
-              screen = const SettingsScreen();
+              screen = () => SettingsScreen();
             } else if (route == '/help' || route == '/about') {
-              screen = InfoScreen(about: route == '/about');
+              screen = () => InfoScreen(about: route == '/about');
             } else {
-              screen = const Screen(
+              screen = () => Screen(
                   title: 'PATAG',
                   body: EmptyState(
                       'Page not found', 'Use the navigation to continue.'));
             }
             return MaterialPageRoute<void>(
-                settings: settings, builder: (_) => screen);
+                settings: settings,
+                builder: (_) => ListenableBuilder(
+                    listenable: store, builder: (_, __) => screen()));
           }));
+  }
 }

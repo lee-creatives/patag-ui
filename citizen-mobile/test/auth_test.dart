@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
+import 'package:patag_citizen/core/api.dart';
 import 'package:patag_citizen/app/theme.dart';
 import 'package:patag_citizen/features/screens.dart';
 void main(){
+ // The sign-in screens check GET /health; answer it so no real network is used.
+ setUp(()=>store.client=MockClient((request)async=>http.Response('{"ok":true}',200)));
  testWidgets('registration validates each step and preserves identity when going back',(tester)async{
   await tester.pumpWidget(MaterialApp(theme:patagTheme(),home:const AuthScreen('register')));
   await tester.tap(find.text('Continue'));await tester.pumpAndSettle();
