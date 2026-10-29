@@ -14,15 +14,15 @@ async function call<T>(path: string, body?: unknown, method?: string): Promise<T
       headers: { 'Content-Type': 'application/json', 'X-Patag-Request': '1', ...(body && /\/events$/.test(path) ? { 'Idempotency-Key': crypto.randomUUID() } : {}) },
       body: body ? JSON.stringify(body) : undefined, signal: AbortSignal.timeout(20000),
     });
-  } catch { throw new ApiError(503, 'Supabase backend unavailable. Check the API address and server setup.'); }
+  } catch { throw new ApiError(503, 'PostgreSQL backend unavailable. Check the API address and server setup.'); }
   let data;
-  try { data = await response.json(); } catch { throw new ApiError(503, 'Supabase API is unavailable or incorrectly configured.'); }
+  try { data = await response.json(); } catch { throw new ApiError(503, 'PostgreSQL API is unavailable or incorrectly configured.'); }
   if (!response.ok) throw new ApiError(response.status, data.error || 'Request failed. Please retry.');
   return data;
 }
 export async function request<T>(path: string, body?: unknown, method?: string): Promise<T> {
   backendCheck ??= call<{ backend: string }>('/health').then(data => {
-    if (data.backend !== 'supabase') throw new ApiError(503, 'This admin application requires the PATAG Supabase backend.');
+    if (data.backend !== 'postgresql') throw new ApiError(503, 'This admin application requires the PATAG PostgreSQL backend.');
   }).catch(error => { backendCheck = undefined; throw error; });
   await backendCheck;
   if (path !== '/bootstrap') return call<T>(path, body, method);

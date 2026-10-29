@@ -15,12 +15,12 @@
     "test:visual-system": "node scripts/qa/visual-system.mjs",
     "dev:api": "node --env-file-if-exists=.env.local --env-file-if-exists=backend/.env.local backend/server.mjs",
     "db:migrate": "node --env-file-if-exists=.env.local --env-file-if-exists=backend/.env.local backend/migrate.mjs",
-    "seed:admin": "node --env-file-if-exists=.env.local --env-file-if-exists=backend/.env.local backend/seed-admin.mjs",
-    "test": "node --test backend/tests/*.test.mjs admin-web/tests/*.test.mjs",
+    "test": "node --test --test-concurrency=1 backend/tests/*.test.mjs admin-web/tests/*.test.mjs",
     "build": "npm --prefix admin-web run build",
     "lint": "npm --prefix admin-web run lint",
-    "test:backend": "node --test backend/tests/*.test.mjs",
-    "test:browser": "node admin-web/tests/supabase-browser.mjs"
+    "test:backend": "node --test --test-concurrency=1 backend/tests/*.test.mjs",
+    "test:browser": "node admin-web/tests/supabase-browser.mjs",
+    "admin:set-password": "node --env-file-if-exists=.env.local --env-file-if-exists=backend/.env.local backend/set-admin-password.mjs"
   },
   "dependencies": {
     "pg": "^8.23.1"

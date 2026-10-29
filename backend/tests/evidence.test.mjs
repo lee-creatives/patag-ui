@@ -4,7 +4,7 @@ import { database,fixtures,ids } from './database.mjs';
 import { transaction } from '../db.mjs';
 import { uploadEvidence,evidenceRecord,imageInput,storageClient } from '../evidence.mjs';
 import { reportEvent,getReport } from '../service.mjs';
-const claims=id=>({sub:id,session_id:id,role:'authenticated',aal:'aal1'});
+const claims=id=>({sub:id});
 const image={data:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',name:'test.png',kind:'after'};
 test('private evidence ownership, canonical lifecycle, and upload rollback cleanup',async()=>{
  const pool=await database();const objects=new Map();let removes=0;
@@ -27,7 +27,7 @@ test('private evidence ownership, canonical lifecycle, and upload rollback clean
   await transaction(pool,c=>reportEvent(c,ids.report,{action:'return',note:'Inspect edge'}),claims(ids.admin));
   await transaction(pool,c=>reportEvent(c,ids.report,{action:'complete',note:'Edge corrected',photos:[photo]}),claims(ids.crew));
   const resolved=await transaction(pool,c=>reportEvent(c,ids.report,{action:'resolve'}),claims(ids.admin));assert.equal(resolved.status,'Resolved');
-  await pool.db.query('UPDATE public.patag_profiles SET active=false WHERE id=$1',[ids.crew]);
+  await pool.db.query('UPDATE public.users SET active=false WHERE id=$1',[ids.crew]);
   await assert.rejects(uploadEvidence(pool,claims(ids.crew),image,storage),e=>e.status===403);assert.equal(removes,1);assert.equal(objects.size,2);
   assert.throws(()=>imageInput({...image,data:'data:image/png;base64,ZmFrZSBpbWFnZSBkYXRh'}),e=>e.status===400);
  }finally{await pool.end();}

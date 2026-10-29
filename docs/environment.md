@@ -1,3 +1,5 @@
+> Current runtime: shared PostgreSQL users/sessions with ordinary administrator login and HttpOnly cookies; Supabase Auth/local account-ID selection are not used. Hosted upgrade and initial credentials remain pending. See [setup](supabase-backend.md). Older environment evidence below is historical.
+
 # Environment and reference inspection
 
 Inspected the complete supplied master prompt and existing PATAG folder. The app folders were initially empty. The authoritative PDFs contain 3 academic-specification pages and 7 branding pages; all were rendered and visually reviewed, alongside extracted text. The supplied mobile screenshot and both supplied PNG exports were viewed. Original reference files remain unchanged; approved asset derivatives have separate names.

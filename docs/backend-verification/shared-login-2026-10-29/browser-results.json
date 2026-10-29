@@ -1,0 +1,25 @@
+{
+  "checks": [
+    "shared PostgreSQL email/password login without Supabase Auth",
+    "mobile-created PostgreSQL account visible",
+    "text-ID account detail",
+    "account status saved to shared PostgreSQL",
+    "admin account creation without Auth",
+    "server role filtering",
+    "server account pagination",
+    "real verification modal payload",
+    "real crew assignment modal payload",
+    "administrative resolution modal payload",
+    "bounded duplicate screen",
+    "authorized audited CSV download",
+    "authorized audited PDF download",
+    "notification read update",
+    "polling failure keeps admin usable and recovers without Realtime",
+    "logout revokes shared session and guards workspace"
+  ],
+  "errors": [],
+  "failedApi": [],
+  "demoRequests": [],
+  "backend": "real Node API + isolated PostgreSQL; no Auth schema; private Storage boundary stub",
+  "hosted": false
+}

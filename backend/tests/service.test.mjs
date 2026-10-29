@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { database, fixtures, ids } from './database.mjs';
 import { transaction } from '../db.mjs';
 import { bootstrap, reportEvent, getReport, markNotifications, manageTeam, exportReports } from '../service.mjs';
-const claims=id=>({sub:id,role:'authenticated',aal:'aal1',session_id:id});
+const claims=id=>({sub:id});
 test('API contract, server role checks, transactional workflow, idempotency and jurisdiction', async () => {
   const pool=await database(); const {db}=pool;
   try {

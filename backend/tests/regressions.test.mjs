@@ -6,21 +6,21 @@ import { getReport,reportEvent } from '../service.mjs';
 import { listReports } from '../queries.mjs';
 import { roleValue } from '../accounts.mjs';
 import { migrate } from '../migrate.mjs';
-import { seedAdmin } from '../seed-admin.mjs';
-const claims=id=>({sub:id,session_id:id,role:'authenticated',aal:'aal1'});
+const claims=id=>({sub:id});
 test('idempotency replay rechecks changed scope and role; maintenance must own the assigned team',async()=>{
   const pool=await database();const {db}=pool;
   try {
     await fixtures(db);const key='00000000-0000-4000-8000-000000000099';
     await transaction(pool,c=>reportEvent(c,ids.report,{action:'verify'},key),claims(ids.local));
-    await db.query('UPDATE public.patag_profiles SET municipality=$1 WHERE id=$2',['Baliwag',ids.local]);
+    await db.query("UPDATE public.users SET address=jsonb_set(address,'{city}',to_jsonb($1::text)) WHERE id=$2",['Baliwag',ids.local]);
     await assert.rejects(transaction(pool,c=>reportEvent(c,ids.report,{action:'verify'},key),claims(ids.local)),e=>e.status===404);
-    await db.query('UPDATE public.patag_profiles SET municipality=$1,role=$2,team_id=$3 WHERE id=$4',['Malolos','maintenance',ids.team,ids.local]);
+    await db.query("UPDATE public.users SET address=jsonb_set(address,'{city}',to_jsonb($1::text)),role=$2,team_id=$3 WHERE id=$4",['Malolos','maintenance',ids.team,ids.local]);
     await assert.rejects(transaction(pool,c=>reportEvent(c,ids.report,{action:'verify'},key),claims(ids.local)),e=>e.status===403);
     const otherTeam='00000000-0000-4000-8000-000000000011';
     await db.query('INSERT INTO public.patag_teams(id,name,municipality) VALUES($1,$2,$3)',[otherTeam,'Other Crew','Malolos']);
+    await db.query('INSERT INTO public.teams(id,name) VALUES($1,$2)',[otherTeam,'Other Crew']);
     await transaction(pool,c=>reportEvent(c,ids.report,{action:'assign',teamId:ids.team}),claims(ids.admin));
-    await db.query("UPDATE public.patag_profiles SET role='maintenance',team_id=$1 WHERE id=$2",[otherTeam,ids.citizen]);
+    await db.query("UPDATE public.users SET role='maintenance',team_id=$1 WHERE id=$2",[otherTeam,ids.citizen]);
     assert.equal((await asUser(db,ids.citizen,()=>db.query('SELECT id FROM public.patag_reports'))).rows.length,0);
     await assert.rejects(transaction(pool,c=>reportEvent(c,ids.report,{action:'start'}),claims(ids.citizen)),e=>e.status===404||e.status===403);
   }finally{await pool.end();}
@@ -40,7 +40,7 @@ test('completion evidence is independent of the bounded original-before collecti
 test('raw migration runner applies once, repeats safely, and detects edited applied SQL',async()=>{
   const pool=await database();
   try {
-    assert.deepEqual(await migrate(pool),['202610270001_admin.sql']);assert.deepEqual(await migrate(pool),[]);
+    assert.deepEqual(await migrate(pool),[]);assert.deepEqual(await migrate(pool),[]);
     await pool.db.query("UPDATE patag_private.migrations SET checksum='tampered'");
     await assert.rejects(migrate(pool),/differs from source/);
   }finally{await pool.end();}
@@ -55,17 +55,6 @@ test('allowlists reject inherited keys with validation errors',async()=>{
     }
   }finally{await pool.end();}
 });
-test('failed bootstrap compensates independent Auth creation and never deletes an existing account',async()=>{
-  const pool=await database(),remoteUsers=[];let removed=0;
-  const auth={listUsers:async()=>({users:remoteUsers}),createUser:async body=>{remoteUsers.push({id:ids.admin,email:body.email});return remoteUsers[0];},deleteUser:async()=>{removed++;remoteUsers.splice(0);}};
-  try {
-    await assert.rejects(seedAdmin(pool,auth,{password:'private test seed password'}));
-    assert.equal(remoteUsers.length,0);assert.equal(removed,1);
-    remoteUsers.push({id:ids.admin,email:'admin@patag.test'});
-    await assert.rejects(seedAdmin(pool,auth,{password:'private test seed password'}),/Existing account/);
-    assert.equal(remoteUsers.length,1);assert.equal(removed,1);
-  }finally{await pool.end();}
-});
 test('notification/evidence RLS denies cross-user reads and audit cannot be rewritten',async()=>{
   const pool=await database();const {db}=pool;
   try {
@@ -76,7 +65,7 @@ test('notification/evidence RLS denies cross-user reads and audit cannot be rewr
     await db.query("INSERT INTO public.patag_evidence(report_id,uploaded_by,object_path,name,kind,mime_type,size) VALUES($1,$2,'private','private.png','before','image/png',20)",[ids.report,ids.citizen]);
     assert.equal((await asUser(db,ids.other,()=>db.query('SELECT * FROM public.patag_evidence'))).rows.length,0);
     await assert.rejects(asUser(db,ids.admin,()=>db.query("UPDATE public.patag_audit_events SET action='changed'"),'patag_api'),/permission denied/);
-    await db.query('DELETE FROM auth.sessions WHERE user_id=$1',[ids.admin]);
+    await db.query('UPDATE public.users SET active=false WHERE id=$1',[ids.admin]);
     assert.equal((await asUser(db,ids.admin,()=>db.query('SELECT * FROM public.patag_reports'))).rows.length,0);
   }finally{await pool.end();}
 });

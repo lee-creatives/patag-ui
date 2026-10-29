@@ -1,4 +1,4 @@
-> **Admin backend update — 27 October 2026:** The real admin-web now requires the Supabase-only Node API on port 4101. Use [the current setup guide](docs/supabase-backend.md) and [verification record](docs/backend-verification/README.md). Hosted migration and test-admin creation are complete after explicit authorization; see [live acceptance evidence](docs/backend-verification/hosted-acceptance-2026-10-27.md). Demo/preview instructions below describe separate reference clients; the real admin has no demo login or fallback.
+> **Current account architecture — 29 October 2026:** Admin email/password login now uses shared PostgreSQL public.users and public.sessions, without Supabase Auth. The former account-ID/local bypass is removed. Hosted upgrade and initial credential setup are pending approval. See [setup](docs/supabase-backend.md) and [latest verification](docs/backend-verification/shared-login-2026-10-29/README.md). Separate demo/preview workflows below never provide fallback account storage.
 
 # PATAG
 
@@ -51,7 +51,7 @@ npm install
 npm run dev
 ```
 
-For the real admin, first configure/start `npm run dev:api` using [Supabase setup](docs/supabase-backend.md), then open http://127.0.0.1:5173/admin/login and sign in with the provisioned account. The demo service on 4100 cannot authenticate the real admin.
+For the real admin, configure/start npm run dev:api using [current setup](docs/supabase-backend.md), then open /admin/login. Use a shared active administrator email/password after the approved schema upgrade and private initial-password setup.
 
 Maintenance tab:
 
@@ -70,7 +70,7 @@ cd citizen-mobile
 flutter doctor -v
 flutter pub get
 flutter devices
-flutter run --dart-define=API_URL=http://10.0.2.2:4100/api
+flutter run --dart-define=API_URL=https://<existing-shared-postgresql-mobile-api>/api
 ```
 
 For a USB-connected Android device, run `adb reverse tcp:4100 tcp:4100` and use `flutter run --dart-define=API_URL=http://127.0.0.1:4100/api`. Cleartext HTTP is allowed only by the debug manifest for the local demo; use HTTPS for production. Camera/gallery and GPS require real Android validation. Android emulator localhost is the emulator itself; `10.0.2.2` commonly reaches the host. The API binds 127.0.0.1, so do not assume LAN reachability.

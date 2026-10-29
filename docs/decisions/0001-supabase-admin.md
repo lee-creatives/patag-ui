@@ -1,3 +1,5 @@
+> Historical: identity decisions superseded by [ADR-0002](0002-shared-postgresql-accounts.md). Supabase Auth is no longer used for application accounts.
+
 # ADR-0001: Keep the Supabase admin behind a trusted Node API
 
 Status: accepted for local implementation; hosted acceptance pending.

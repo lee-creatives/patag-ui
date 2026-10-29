@@ -79,7 +79,13 @@ export async function manageTeam(db,input,method) {
     }
     result=await db.query('UPDATE public.patag_teams SET name=$1,active=$2,updated_at=now() WHERE id=$3 RETURNING *',[name,input.active??team.active,id]);
   }
-  const team=result.rows[0];await audit(db,'team.'+method.toLowerCase(),team.id,team.municipality);
+  const team=result.rows[0];
+  if(method==='POST') await db.query('INSERT INTO public.teams(id,name,active) VALUES($1,$2,$3)',[team.id,team.name,team.active]);
+  else {
+    const shared=await db.query('UPDATE public.teams SET name=$1,active=$2 WHERE id=$3 RETURNING id',[team.name,team.active,team.id]);
+    if(!shared.rows.length) fail(409,'Shared maintenance team is missing; reconcile before updating.');
+  }
+  await audit(db,'team.'+method.toLowerCase(),team.id,team.municipality);
   return {id:team.id,name:team.name,active:team.active,members:[]};
 }
 export async function settings(db,input) {

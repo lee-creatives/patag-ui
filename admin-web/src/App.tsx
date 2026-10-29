@@ -40,7 +40,6 @@ import {
   Search,
   Check,
   ChevronRight,
-  LogOut,
   Truck,
   Camera,
   RefreshCw,
@@ -51,6 +50,7 @@ import {
   Copy,
   Eye,
   EyeOff,
+  LogOut,
 } from "lucide-react";
 import {
   MapContainer,
@@ -72,7 +72,6 @@ import type { Bootstrap, Report, Photo, User, Team } from "./types";
 import { statuses } from "./types";
 import { request, asset, upload, ApiError } from "./api";
 import { validCoordinates, mapSettings } from "./map";
-import { ResetPassword } from "./ResetPassword";
 import { reportDates, resolutionDays } from "./analytics";
 import { role } from "./config";
 import "leaflet/dist/leaflet.css";
@@ -260,44 +259,12 @@ function RoleBoundary({ children }: { children: ReactNode }) {
 }
 function Login() {
   const nav = useNavigate();
-  const [error, setError] = useState(""),
-    [loading, setLoading] = useState(false),
-    [recovery, setRecovery] = useState(false),
-    [showPassword, setShowPassword] = useState(false),
-    [message, setMessage] = useState("");
-  const [mfa, setMfa] = useState<{factorId:string;challengeId:string} | null>(null);
+  const [error, setError] = useState(""), [loading, setLoading] = useState(false), [showPassword, setShowPassword] = useState(false);
   const run = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const f = new FormData(e.currentTarget);
-    setError("");
-    setLoading(true);
-    try {
-      if (mfa) {
-        await request("/auth/mfa", {...mfa,code:f.get("code")});
-        nav(base + "/dashboard");
-      } else if (recovery) {
-        const r = await request<{ message: string }>("/auth/recovery", {
-          email: f.get("email"),
-        });
-        setMessage(r.message);
-      } else {
-        const r = await request<{ user: User; mfaRequired?: boolean; factorId?: string }>("/auth/login", {
-          email: f.get("email"),
-          password: f.get("password"),
-          role,
-        });
-        if (r.user.role !== role)
-          throw Error("This account belongs to a different portal.");
-        if (r.mfaRequired && r.factorId) {
-          const challenge = await request<{id:string}>("/auth/mfa", {factorId:r.factorId});
-          setMfa({factorId:r.factorId,challengeId:challenge.id});
-        } else nav(base + "/dashboard");
-      }
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setLoading(false);
-    }
+    e.preventDefault();const form=new FormData(e.currentTarget);setError("");setLoading(true);
+    try {await request("/auth/login",{email:form.get("email"),password:form.get("password")});nav(base+"/dashboard",{replace:true});}
+    catch(error) {setError((error as Error).message);}
+    finally {setLoading(false);}
   };
   return (
     <main className="login">
@@ -334,16 +301,10 @@ function Login() {
           <span className="pill-label">
             {admin ? "LGU administrator" : "Road maintenance"}
           </span>
-          <h2>{mfa ? "Verify your sign-in" : recovery ? "Recover access" : (admin ? "Welcome to LGU Portal" : "Crew Workspace Sign In")}</h2>
-          <p className="login-subtitle">
-            {recovery
-              ? "Request a password reset for your staff account."
-              : (admin
-                  ? "Access your tasks, reports, and teams anytime, anywhere — all in one place."
-                  : "Access assigned road work orders, document repairs, and record evidence.")}
-          </p>
+          <h2>Sign in to PATAG</h2>
+          <p className="login-subtitle">Use your existing PATAG administrator email and password.</p>
           <form onSubmit={run}>
-            {!mfa && <label>
+            <label>
               Email address
               <input
                 name="email"
@@ -352,9 +313,8 @@ function Login() {
                 required
                 placeholder="you@example.test"
               />
-            </label>}
-            {mfa && <label>Authenticator code<input name="code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required autoFocus /></label>}
-            {!recovery && !mfa && (
+            </label>
+            {(
               <label className="password-label">
                 Password
                 <div className="password-wrap">
@@ -383,27 +343,12 @@ function Login() {
                 {error}
               </p>
             )}
-            {message && <p role="status">{message}</p>}
             <button className="primary submit-btn" disabled={loading}>
-              {loading
-                ? "Connecting…"
-                : recovery
-                  ? "Request recovery"
-                  : "Sign in"}
+              {loading ? "Signing in…" : "Sign in"}
               <ArrowRight size={16} />
             </button>
           </form>
-          <button
-            className="text-button forgot-btn"
-            onClick={() => {
-              setMfa(null);
-              setRecovery(!recovery);
-              setMessage("");
-            }}
-          >
-            {recovery ? "Back to sign in" : "Forgot password?"}
-          </button>
-          <p className="login-footnote">Staff accounts are provided by an authorized administrator. Contact your administrator if you need access.</p>
+          <p className="login-footnote">Administrator access is required. Contact your administrator if your password has not been set.</p>
         </section>
       </div>
     </main>
@@ -422,31 +367,24 @@ function Shell() {
     [error, setError] = useState(""),
     [toast, setToast] = useState(""),
     [menu, setMenu] = useState(() => window.innerWidth >= 1024 && localStorage.getItem("patag-sidebar") !== "collapsed");
-  const loc = useLocation(),
-    nav = useNavigate();
+  const loc = useLocation(), nav = useNavigate();
   const refresh = useCallback(async () => {
     try {
       const d = await request<Bootstrap>("/bootstrap");
-      if (d.user.role !== role) {
-        nav(base + "/login");
-        return;
-      }
+      if (d.user.role !== role) throw Error("Configured account cannot open this workspace.");
       setData(d);
       setError("");
     } catch (e) {
       const m = (e as Error).message;
       setError(m);
-      setData(null);
-      if (e instanceof ApiError && (e.status === 401 || e.status === 403)) {
-        nav(base + "/login");
-      }
+      if(e instanceof ApiError&&e.status===401) {setData(null);nav(base+"/login",{replace:true});}
     }
   }, [nav]);
   useEffect(() => {
     void refresh();
     const t = setInterval(() => void refresh(), 5000);
     return () => clearInterval(t);
-  }, [nav, refresh]);
+  }, [refresh]);
   useEffect(() => {
     if (window.innerWidth < 1024) setMenu(false);
     window.scrollTo(0, 0);
@@ -493,12 +431,12 @@ function Shell() {
     return (
       <main className="loading">
         <Logo />
-        <h1>{error ? "Supabase API unavailable" : "Opening your workspace…"}</h1>
+        <h1>{error ? "Workspace setup required" : "Opening your workspace…"}</h1>
         <p>{error || "Loading your reports and assignments."}</p>
         <button onClick={() => void refresh()}>
           <RefreshCw size={16} /> Retry
         </button>
-        <Link to={base + "/login"}>Return to sign in</Link>
+        <Link to={base+"/login"}>Return to sign in</Link>
       </main>
     );
   return (
@@ -543,6 +481,7 @@ function Shell() {
             </Fragment>)}
           </nav>
           <div className="nav-bottom">
+            <button className="button" onClick={async()=>{try{await request("/auth/logout",{});setData(null);nav(base+"/login",{replace:true});}catch(error){setError((error as Error).message);}}}>Sign out <LogOut size={16}/></button>
             <NavLink title="Profile and settings" aria-label="Profile and settings" to={base + (admin ? "/settings" : "/profile")}>
               <Settings size={18} />
               <span className="nav-text">{admin ? "Settings" : "Profile & settings"}</span>
@@ -561,15 +500,6 @@ function Shell() {
                   {admin ? "LGU administrator" : "Maintenance personnel"}
                 </small>
               </div>
-              <button
-                className="icon-button"
-                aria-label="Sign out"
-                onClick={async () => {
-                  try { await request("/auth/logout", {}); } finally { nav(base + "/login"); }
-                }}
-              >
-                <LogOut size={17} />
-              </button>
             </div>
           </div>
         </aside>
@@ -2145,6 +2075,30 @@ function UsersPage() {
     [filter, setFilter] = useState("All"),
     [selected, setSelected] = useState<User | null>(null),
     [error, setError] = useState("");
+  const [users, setUsers] = useState<User[]>([]), [teams, setTeams] = useState<Team[]>([]);
+  const [offset, setOffset] = useState(0), [nextOffset, setNextOffset] = useState<number | null>(null);
+  const [accountStatus, setAccountStatus] = useState("All"), [loading, setLoading] = useState(false);
+  const [revision, setRevision] = useState(0);
+  useEffect(() => {
+    let ignore = false, pending = false;
+    const load = async () => {
+      if(pending) return;
+      pending=true;
+      setLoading(true);
+      try {
+        const query = new URLSearchParams({limit:'25',offset:String(offset)});
+        if(q) query.set('q',q);
+        if(filter!=="All") query.set('role',filter);
+        if(accountStatus!=="All") query.set('active',accountStatus);
+        const result = id ? {users:[await request<User>('/users/'+encodeURIComponent(id))],nextOffset:null} : await request<{users:User[];nextOffset:number|null}>('/users?'+query);
+        const accountTeams = await request<Team[]>('/account-teams');
+        if(!ignore) { setUsers(result.users); setNextOffset(result.nextOffset); setTeams(accountTeams); setError(""); }
+      } catch(e) { if(!ignore) setError((e as Error).message); }
+      finally { pending=false; if(!ignore) setLoading(false); }
+    };
+    void load(); const timer=setInterval(()=>void load(),5000);
+    return () => { ignore=true; clearInterval(timer); };
+  }, [q, filter, accountStatus, offset, id, revision]);
   return (
     <>
       <Header
@@ -2158,14 +2112,14 @@ function UsersPage() {
           <input
             aria-label="Search users"
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={(e) => {setOffset(0);setQ(e.target.value);}}
             placeholder="Search names or email"
           />
         </label>
         <select
           aria-label="Role filter"
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={(e) => {setOffset(0);setFilter(e.target.value);}}
         >
           <option>All</option>
           <option>admin</option>
@@ -2173,7 +2127,10 @@ function UsersPage() {
           <option>maintenance</option>
         </select>
       </div>
-      <Panel title="Workspace accounts">
+      <label>Account status filter<select aria-label="Account status filter" value={accountStatus} onChange={e=>{setOffset(0);setAccountStatus(e.target.value);}}><option value="All">All statuses</option><option value="true">Active</option><option value="false">Inactive</option></select></label>
+      {error && <p role="alert" className="error">{error}</p>}
+      {loading && <p role="status">Loading accounts…</p>}
+      <Panel title="Shared PostgreSQL accounts">
         <div className="table-scroll">
           <table>
             <thead>
@@ -2186,19 +2143,11 @@ function UsersPage() {
               </tr>
             </thead>
             <tbody>
-              {data.users
-                .filter(
-                  (u) =>
-                    (!id || u.id === id) &&
-                    (u.name + u.email)
-                      .toLowerCase()
-                      .includes(q.toLowerCase()) &&
-                    (filter === "All" || u.role === filter),
-                )
+              {users
                 .map((u) => (
                   <tr key={u.id}>
                     <td>
-                      <Link to={base + "/users/" + u.id}>{u.name}</Link>
+                      <Link to={base + "/users/" + encodeURIComponent(u.id)}>{u.name}</Link>
                     </td>
                     <td>{u.email}</td>
                     <td>{u.role}</td>
@@ -2219,6 +2168,8 @@ function UsersPage() {
           </table>
         </div>
       </Panel>
+      {!id && <div className="pagination"><button disabled={offset===0||loading} onClick={()=>setOffset(Math.max(0,offset-25))}>Previous accounts</button><span>Page {Math.floor(offset/25)+1}</span><button disabled={nextOffset===null||loading} onClick={()=>setOffset(nextOffset!)}>Next accounts</button></div>}
+      {!loading && !users.length && <p>No accounts match these filters.</p>}
       {selected && (
         <Modal
           title={selected.id ? "Manage " + selected.name : "Add account"}
@@ -2232,13 +2183,14 @@ function UsersPage() {
                 await request(
                   "/users",
                   {
-                    ...(selected.id ? {id:selected.id} : {name:f.get("name"),email:f.get("email"),password:f.get("password")}),teamId:f.get("teamId"),
+                    ...(selected.id ? {id:selected.id} : {name:f.get("name"),email:f.get("email")}),teamId:f.get("teamId"),
                     role: f.get("role"),
                     active: f.get("active") === "true",
                   },
                   selected.id ? "PATCH" : "POST",
                 );
                 await refresh();
+                setRevision(value=>value+1);
                 setSelected(null);
                 notify("Account updated.");
               } catch (e) {
@@ -2249,10 +2201,9 @@ function UsersPage() {
             {!selected.id && <>
               <label>Full name<input name="name" required autoComplete="name"/></label>
               <label>Email address<input name="email" type="email" required autoComplete="off"/></label>
-              <label>Initial account password<input name="password" type="password" minLength={15} maxLength={128} required autoComplete="new-password"/></label>
-              <p>Provide account details and share the initial password privately.</p>
+              <p>This creates a shared account record without credentials. Mobile credential enrollment remains a separate workflow.</p>
             </>}
-            <label>Maintenance team<select name="teamId" aria-label="Maintenance team" defaultValue={selected.teamId || ""}><option value="">Not assigned (non-maintenance roles)</option>{data.teams.filter(t=>t.active).map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select></label>
+            <label>Maintenance team<select name="teamId" aria-label="Maintenance team" defaultValue={selected.teamId || ""}><option value="">Not assigned (non-maintenance roles)</option>{selected.teamId&&!teams.some(t=>t.id===selected.teamId)&&<option value={selected.teamId}>Current team (unavailable for new assignments)</option>}{teams.filter(t=>t.active).map(t=><option key={t.id} value={t.id}>{t.name}</option>)}</select></label>
             <label>
               Role
               <select name="role" aria-label="Role" defaultValue={selected.role}>
@@ -2694,7 +2645,6 @@ function Activity() {
 }
 
 function SettingsPage() {
-  const navigate = useNavigate();
   const { data, refresh, notify } = useData();
   const [error, setError] = useState(""),
     [enabled, setEnabled] = useState(
@@ -2707,7 +2657,6 @@ function SettingsPage() {
         description="Profile and preferences for your account."
       />
 
-      <button className="button" onClick={async()=>{try{await request('/auth/logout',{});}finally{navigate(base+'/login',{replace:true});}}}>Log out</button>
       <section className="settings-row">
         <div>
           <h2>Your profile</h2>
@@ -2874,7 +2823,6 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path={base + "/login"} element={<Login />} />
-        <Route path={base + "/reset-password"} element={<ResetPassword />} />
         <Route path={base + "/*"} element={<Shell />} />
         <Route
           path="*"

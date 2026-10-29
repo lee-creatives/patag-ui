@@ -10,10 +10,7 @@ export function text(value, label, max = 2000, required = true) {
   if (typeof value !== 'string' || value.trim().length > max || (required && !value.trim())) fail(400, `Invalid ${label}.`);
   return value.trim();
 }
-export function password(value) {
-  if (typeof value !== 'string' || value.length < 15 || value.length > 128 || !value.trim()) fail(400, 'Password must contain 15–128 characters.');
-  return value;
-}
+
 export function email(value) {
   const result = text(value, 'email', 254).toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(result)) fail(400, 'Enter a valid email.');
@@ -23,9 +20,13 @@ export function uuid(value) {
   if (typeof value !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value)) fail(400, 'Invalid record identifier.');
   return value;
 }
+export function accountId(value) {
+  if(typeof value!=='string'||!value.length||value.length>200||!value.trim()||/[\x00-\x20\x7f/?#]/.test(value)) fail(400,'Invalid account identifier.');
+  return value;
+}
 export const statuses = ['Submitted', 'Under Review', 'Verified', 'Assigned', 'In Progress', 'Resolved', 'Rejected', 'Duplicate'];
 export function configuration(env = process.env) {
-  for (const key of ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_PUBLISHABLE_KEY', 'SUPABASE_DB_URL', 'ADMIN_ORIGIN']) {
+  for (const key of ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'SUPABASE_DB_URL', 'ADMIN_ORIGIN']) {
     if (!env[key] || env[key].includes('<')) throw Error(`Setup required: ${key} is missing.`);
   }
   const url = new URL(env.SUPABASE_URL), origin = new URL(env.ADMIN_ORIGIN), db = new URL(env.SUPABASE_DB_URL);
@@ -36,5 +37,5 @@ export function configuration(env = process.env) {
   const ref = url.hostname.split('.')[0];
   if (!(db.hostname === `db.${ref}.supabase.co` || (db.hostname.endsWith('.pooler.supabase.com') && decodeURIComponent(db.username) === `postgres.${ref}`))) throw Error('SUPABASE_DB_URL must identify the configured Supabase project.');
   for (const key of ['sslmode', 'sslcert', 'sslkey', 'sslrootcert']) db.searchParams.delete(key);
-  return { url: url.origin, publicKey: env.SUPABASE_PUBLISHABLE_KEY, serviceKey: env.SUPABASE_SERVICE_ROLE_KEY, dbUrl: db.toString(), origin: origin.origin, secure: origin.protocol === 'https:', port: Number(env.PORT || 4101), recoveryRedirect: `${origin.origin}/admin/reset-password`, trustProxy: env.TRUST_PROXY_CLIENT_IP === 'true', production: env.NODE_ENV === 'production' };
+  return { url: url.origin, serviceKey: env.SUPABASE_SERVICE_ROLE_KEY, dbUrl: db.toString(), origin: origin.origin, secure: origin.protocol === 'https:', port: Number(env.PORT || 4101), trustProxy: env.TRUST_PROXY_CLIENT_IP === 'true', production: env.NODE_ENV === 'production' };
 }

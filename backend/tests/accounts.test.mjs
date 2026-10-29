@@ -4,21 +4,18 @@ import { database,fixtures,ids } from './database.mjs';
 import { transaction } from '../db.mjs';
 import { bootstrap } from '../service.mjs';
 import { provisionUser,updateUser,updateMe } from '../accounts.mjs';
-const claims=id=>({sub:id,session_id:id,role:'authenticated',aal:'aal1'});
+const claims=id=>({sub:id});
 test('account management uses protected roles, team scope and safe response fields',async()=>{
  const pool=await database();
- const created='00000000-0000-4000-8000-000000000040';
- const auth={createUser:async()=>({id:created}),deleteUser:async()=>{}};
  try {
   await fixtures(pool.db);
-  await pool.db.query('INSERT INTO auth.users VALUES($1,$2)',[created,'new@example.test']);
-  await assert.rejects(provisionUser(pool,claims(ids.local),{name:'Test Admin',email:'new@example.test',password:'private staff test password',role:'admin',active:true},auth),e=>e.status===403);
-  const user=await provisionUser(pool,claims(ids.admin),{name:'Test Crew Member',email:'new@example.test',password:'private staff test password',role:'maintenance',teamId:ids.team,active:true},auth);
+  await assert.rejects(provisionUser(pool,claims(ids.local),{name:'Test Admin',email:'new@example.test',role:'admin',active:true}),e=>e.status===403);
+  const user=await provisionUser(pool,claims(ids.admin),{name:'Test Crew Member',email:'new@example.test',role:'maintenance',teamId:ids.team,active:true});
   assert.equal(user.role,'maintenance');assert.equal(user.teamId,ids.team);assert.equal(user.password,undefined);assert.equal(user.hash,undefined);
   await assert.rejects(transaction(pool,c=>updateUser(c,{id:ids.admin,role:'citizen',active:false}),claims(ids.admin)),e=>e.status===409);
   await assert.rejects(transaction(pool,c=>updateUser(c,{id:ids.other,role:'citizen',active:false}),claims(ids.local)),e=>e.status===404);
   await assert.rejects(transaction(pool,c=>updateMe(c,{name:'Test',email:'changed@example.test'}),claims(ids.admin)),e=>e.status===400);
-  const disabled=await transaction(pool,c=>updateUser(c,{id:created,role:'maintenance',teamId:ids.team,active:false}),claims(ids.admin));assert.equal(disabled.active,false);
+  const disabled=await transaction(pool,c=>updateUser(c,{id:user.id,role:'maintenance',teamId:ids.team,active:false}),claims(ids.admin));assert.equal(disabled.active,false);
  }finally{await pool.end();}
 });
 test('bootstrap pagination bounds every collection and supports empty trailing pages',async()=>{

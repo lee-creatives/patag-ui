@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patag_citizen/app/theme.dart';
 import 'package:patag_citizen/features/screens.dart';
+import 'package:patag_citizen/core/api.dart';
 void main(){
+ test('account API fails before networking when no shared backend URL is configured',() async {
+  expect(PatagStore.baseUrl,isEmpty);
+  final client=PatagStore();
+  await expectLater(client.call('/me'),throwsA(isA<Exception>().having((e)=>e.toString(),'message',contains('Configure API_URL'))));
+  client.dispose();
+ });
  testWidgets('registration validates each step and preserves identity when going back',(tester)async{
   await tester.pumpWidget(MaterialApp(theme:patagTheme(),home:const AuthScreen('register')));
   await tester.tap(find.text('Continue'));await tester.pumpAndSettle();

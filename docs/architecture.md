@@ -1,6 +1,6 @@
-# Current admin backend — 27 October 2026
+# Current admin backend — 29 October 2026
 
-The real admin-web uses the Supabase-only Node BFF on 4101, with cookie sessions, protected PostgreSQL profiles, scoped RLS transactions and private evidence Storage. See [setup and boundaries](supabase-backend.md) and [ADR-0001](decisions/0001-supabase-admin.md). The existing admin views still consume their HTTP contract; no source is imported from another checkout. Authorized hosted migration, administrator bootstrap, real sign-in/API/logout and read-only browser routes have passed; see [hosted acceptance](backend-verification/hosted-acceptance-2026-10-27.md). Full hosted workflows remain unverified.
+The real admin-web uses the PostgreSQL Node BFF on4101 and shared public.users/public.sessions for ordinary administrator email/password login. Supabase Auth and the previous local account-ID bypass are removed. Password hashing and opaque session records match both existing mobile-backend branches. HttpOnly cookies, server-side role checks and operation-transaction session revalidation protect admin requests; identity is never inferred from UI selection. Profile compatibility is a view, not an account copy. Hosted migration, distinct legacy admin email and initial password setup remain pending explicit authorization. See [setup](supabase-backend.md) and [ADR-0003](decisions/0003-shared-account-login.md).
 
 The following earlier architecture describes the separate demo, maintenance and citizen clients. Its mock-session/persistence and OSM claims do not describe the real admin's current backend or Mapbox configuration.
 

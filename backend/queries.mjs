@@ -49,7 +49,7 @@ export async function listReports(db,input={}) {
 }
 export async function bootstrap(db,input) {
   const {limit,offset}=page(input),reports=await listReports(db,input);
-  const teams=await db.query(`SELECT t.*,coalesce((SELECT array_agg(p.name ORDER BY p.name) FROM public.patag_profiles p WHERE p.team_id=t.id AND p.active),'{}') AS members FROM public.patag_teams t ORDER BY t.id LIMIT $1 OFFSET $2`,[limit+1,offset]);
+  const teams=await db.query(`SELECT t.*,coalesce((SELECT array_agg(p.name ORDER BY p.name) FROM public.patag_profiles p WHERE p.team_id=t.id::text AND p.active),'{}') AS members FROM public.patag_teams t ORDER BY t.id LIMIT $1 OFFSET $2`,[limit+1,offset]);
   const users=db.actor.role==='administrator'?await db.query('SELECT * FROM public.patag_profiles ORDER BY id LIMIT $1 OFFSET $2',[limit+1,offset]):{rows:[]};
   const notifications=await db.query('SELECT id,report_id AS "reportId",title,read,created_at AS at FROM public.patag_notifications ORDER BY created_at DESC,id LIMIT $1 OFFSET $2',[limit+1,offset]);
   const settings=(await db.query('SELECT agency,city,province FROM public.patag_settings WHERE id')).rows[0];

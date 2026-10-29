@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class PatagStore extends ChangeNotifier {
-  static const baseUrl = String.fromEnvironment('API_URL', defaultValue: 'http://10.0.2.2:4100/api');
+  static const baseUrl = String.fromEnvironment('API_URL');
   String? token;
   Map<String, dynamic>? user;
   List<PotholeReport> reports = [], publicReports = [];
@@ -22,6 +22,7 @@ class PatagStore extends ChangeNotifier {
     Map<String, dynamic>? body, String? method
   }
   ) async {
+    if (baseUrl.isEmpty) throw Exception('Configure API_URL for the shared PostgreSQL mobile API.');
     final uri = Uri.parse('$baseUrl$path');
     final headers = {
       'Content-Type': 'application/json', if (token != null) 'Authorization': 'Bearer $token'
