@@ -76,7 +76,12 @@ class _DancingMascotState extends State<DancingMascot>
       child: SizedBox(
           width: widget.width,
           child: Image.asset('assets/images/patag-mascot.png',
-              width: widget.width, excludeFromSemantics: true)),
+              width: widget.width,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.white
+                  : ink,
+              colorBlendMode: BlendMode.srcIn,
+              excludeFromSemantics: true)),
       builder: (context, child) {
         final moving = widget.dance && !MediaQuery.disableAnimationsOf(context);
         final wave = moving ? math.sin(controller.value * math.pi * 4) : 0.0;

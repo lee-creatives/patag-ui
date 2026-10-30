@@ -17,20 +17,12 @@ function pgliteDb(pg: PGlite): Db {
   return wrap(pg);
 }
 
-<<<<<<< HEAD
-export async function startServer({ allowDemo = true, bodyLimit = undefined as number | undefined, trustProxy = false as boolean | number } = {}) {
-=======
 export async function startServer({ allowDemo = true, bodyLimit = undefined as number | undefined, trustProxy = false as boolean | number, geocode = undefined as ReverseGeocode | undefined, corsOrigins = ["http://127.0.0.1:5173"] } = {}) {
->>>>>>> a23d6dc6104974848c15b05706bbfbe034d63ec1
   const db = pgliteDb(await PGlite.create());
   await migrate(db);
   const store = new Store(db);
   await seedAll(store);
-<<<<<<< HEAD
-  const app = buildApp({ store, blobs: new MemoryBlobStore(), allowDemo, bodyLimit, trustProxy, corsOrigins: ["http://127.0.0.1:5173"] });
-=======
   const app = buildApp({ store, blobs: new MemoryBlobStore(), allowDemo, bodyLimit, trustProxy, geocode, corsOrigins });
->>>>>>> a23d6dc6104974848c15b05706bbfbe034d63ec1
   await app.listen({ port: 0, host: '127.0.0.1' });
   const address = app.server.address() as { port: number };
   const base = `http://127.0.0.1:${address.port}/api`;

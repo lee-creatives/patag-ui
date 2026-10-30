@@ -89,6 +89,10 @@ class _DancingMascotState extends State<DancingMascot>
           child: Image.asset(
             'assets/images/patag-mascot.png',
             width: widget.width,
+            color: Theme.of(context).brightness == Brightness.dark
+                ? Colors.white
+                : ink,
+            colorBlendMode: BlendMode.srcIn,
             excludeFromSemantics: true,
             errorBuilder: (_, __, ___) => SizedBox(
               width: widget.width,

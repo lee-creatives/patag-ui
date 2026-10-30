@@ -54,13 +54,30 @@ export function manageWorkspace(db,user,p,body,method){
   db.settings={agency:body.agency.trim(),city:body.city.trim(),province:body.province.trim()};return db.settings;
  }
  if(p==='/teams'){
-  if(!body.name?.trim())fail('Team name is required.');
-  if(db.teams.some(t=>t.id!==body.id&&t.name.toLowerCase()===body.name.trim().toLowerCase()))fail('A team with that name already exists.',409);
+  const name=typeof body.name==='string'?body.name.trim():'';
+  if(!name||name.length>100)fail('Team name is required.');
+  if(db.teams.some(t=>t.id!==body.id&&t.name.toLowerCase()===name.toLowerCase()))fail('A team with that name already exists.',409);
   const t=method==='POST'?{id:crypto.randomUUID(),members:[],active:true}:db.teams.find(t=>t.id===body.id);
   if(!t)fail('Team not found.',404);
-  if(body.active===false&&(db.reports.some(r=>r.teamId===t.id&&!['Resolved','Rejected','Duplicate'].includes(r.status))||db.users.some(u=>u.teamId===t.id&&u.active)))fail('Move active members and finish assigned tasks before deactivating this team.',409);
-  t.name=body.name.trim();t.active=body.active!==false;
-  if(method==='POST')db.teams.push(t);return t;
+  const ids=body.memberIds,active=body.active!==false;
+  if(ids!==undefined){
+   if(!Array.isArray(ids)||ids.length>1000||ids.some(id=>typeof id!=='string'||!id||id.length>100)||new Set(ids).size!==ids.length)fail('Choose unique member account IDs.');
+   if(ids.some(id=>!db.users.some(u=>u.id===id&&u.active&&u.role==='maintenance')))fail('Choose active road crew accounts only.');
+   if(!active&&ids.length)fail('Members require an active maintenance team.');
+  }
+  const remainingMembers=ids===undefined?db.users.some(u=>u.teamId===t.id&&u.active):ids.length>0;
+  if(!active&&(remainingMembers||db.reports.some(r=>r.teamId===t.id&&!['Resolved','Rejected','Duplicate'].includes(r.status))))fail('Move active members and finish assigned tasks before deactivating this team.',409);
+  t.name=name;t.active=active;
+  if(method==='POST')db.teams.push(t);
+  if(ids!==undefined){
+   const selected=new Set(ids);
+   for(const u of db.users)if(u.active&&u.role==='maintenance'){
+    if(selected.has(u.id))u.teamId=t.id;
+    else if(u.teamId===t.id)u.teamId=null;
+   }
+   for(const team of db.teams)team.members=db.users.filter(u=>u.active&&u.role==='maintenance'&&u.teamId===team.id).map(u=>u.name);
+  }
+  return t;
  }
  if(p==='/users'){
   const u=method==='POST'?{id:crypto.randomUUID(),active:true}:db.users.find(u=>u.id===body.id);
@@ -75,7 +92,7 @@ export function manageWorkspace(db,user,p,body,method){
   const role=body.role||u.role;
   if(!['admin','citizen','maintenance'].includes(role))fail('Choose a valid role.');
   const teamId=body.teamId||u.teamId;
-  if(role==='maintenance'&&!db.teams.some(t=>t.id===teamId&&t.active))fail('Choose an active maintenance team.');
+  if(role==='maintenance'&&!(method==='PATCH'&&u.role==='maintenance'&&!u.teamId&&!teamId)&&!db.teams.some(t=>t.id===teamId&&t.active))fail('Choose an active maintenance team.');
   if(method==='POST'){
    if(!body.name?.trim()||!/^\S+@\S+\.\S+$/.test(body.email||''))fail('Name and valid email are required.');
    const email=body.email.trim().toLowerCase();if(db.users.some(x=>x.email.toLowerCase()===email))fail('Email is already registered.',409);
