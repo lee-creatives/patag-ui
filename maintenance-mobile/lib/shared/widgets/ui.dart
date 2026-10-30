@@ -4,9 +4,11 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../../app/locale.dart';
 import '../../app/theme.dart';
 import '../../core/api.dart';
 import '../../core/models.dart';
+import '../../l10n/l10n.dart';
 
 Widget gap([double size = 16]) => SizedBox(height: size, width: size);
 
@@ -189,15 +191,17 @@ Widget field(
 }) =>
     Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: TextFormField(
-        controller: ctrl,
-        maxLines: lines,
-        keyboardType: keyboard,
-        onChanged: onChanged,
-        decoration: InputDecoration(labelText: label),
-        validator: (s) => required && (s == null || s.trim().isEmpty)
-            ? '$label is required.'
-            : null,
+      child: Builder(
+        builder: (context) => TextFormField(
+          controller: ctrl,
+          maxLines: lines,
+          keyboardType: keyboard,
+          onChanged: onChanged,
+          decoration: InputDecoration(labelText: label),
+          validator: (s) => required && (s == null || s.trim().isEmpty)
+              ? context.l10n.fieldRequired(label)
+              : null,
+        ),
       ),
     );
 
@@ -252,7 +256,7 @@ class StatusBadge extends StatelessWidget {
           ),
           const SizedBox(width: 6),
           Text(
-            status,
+            statusLabel(context.l10n, status),
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
@@ -293,7 +297,7 @@ class SeverityBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        severity.toUpperCase(),
+        severityLabel(context.l10n, severity).toUpperCase(),
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w700,
@@ -315,6 +319,7 @@ class TaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dark = theme.brightness == Brightness.dark;
+    final l = context.l10n;
 
     return Card(
       margin: const EdgeInsets.only(bottom: 14),
@@ -344,14 +349,16 @@ class TaskCard extends StatelessWidget {
                         )
                       : Container(
                           color: dark ? const Color(0xFF22242A) : quiet,
-                          child: const Column(
+                          child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.add_road, size: 28, color: slate),
-                              SizedBox(height: 4),
+                              const Icon(Icons.add_road,
+                                  size: 28, color: slate),
+                              const SizedBox(height: 4),
                               Text(
-                                'Site',
-                                style: TextStyle(fontSize: 10, color: slate),
+                                l.taskCardSite,
+                                style:
+                                    const TextStyle(fontSize: 10, color: slate),
                               ),
                             ],
                           ),
@@ -376,7 +383,7 @@ class TaskCard extends StatelessWidget {
                     Text(
                       report.road.isNotEmpty
                           ? report.road
-                          : 'Road Damage Work Order',
+                          : l.taskCardFallbackTitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
@@ -387,7 +394,7 @@ class TaskCard extends StatelessWidget {
                     ),
                     gap(3),
                     Text(
-                      'Brgy. ${report.barangay}',
+                      l.barangayShort(report.barangay),
                       style: TextStyle(
                         fontSize: 12,
                         color: theme.colorScheme.onSurfaceVariant,
@@ -438,6 +445,15 @@ class PhotoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
+    return Semantics(
+      image: true,
+      label: photo.kind == 'after' ? l.photoAfter : l.photoBefore,
+      child: _image(context),
+    );
+  }
+
+  Widget _image(BuildContext context) {
     final br = borderRadius ?? BorderRadius.circular(14);
     if (photo.url.startsWith('data:image')) {
       final base64Str = photo.url.split(',').last;
@@ -506,13 +522,16 @@ class PhotoWidget extends StatelessWidget {
               ),
             ),
           ),
-          const Positioned(
+          Positioned(
             left: 8,
             top: 8,
-            child: Icon(
-              Icons.photo_camera_outlined,
-              size: 15,
-              color: Color(0xFF5F6870),
+            child: Tooltip(
+              message: context.l10n.photoPlaceholder,
+              child: const Icon(
+                Icons.photo_camera_outlined,
+                size: 15,
+                color: Color(0xFF5F6870),
+              ),
             ),
           ),
         ],
@@ -564,7 +583,9 @@ class ThemeToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return IconButton.filledTonal(
-      tooltip: dark ? 'Switch to light mode' : 'Switch to dark mode',
+      tooltip: dark
+          ? context.l10n.themeSwitchToLight
+          : context.l10n.themeSwitchToDark,
       style: IconButton.styleFrom(
         backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       ),
@@ -626,19 +647,19 @@ class Screen extends StatelessWidget {
           children: [
             if (store.networkError != null)
               MaterialBanner(
-                content: Text(store.networkError!),
+                content: Text(errorText(context.l10n, store.networkError!)),
                 actions: [
                   TextButton(
                     onPressed: () => store.refresh().catchError((Object e) {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text(PatagMaintenanceStore.clean(e)),
+                            content: Text(errorText(context.l10n, e)),
                           ),
                         );
                       }
                     }),
-                    child: const Text('Retry'),
+                    child: Text(context.l10n.retry),
                   ),
                 ],
               ),
@@ -720,7 +741,14 @@ class PatagMaintenanceNavigation extends StatelessWidget {
                         ? ink
                         : const Color(0xFFDCE4EE);
 
-                final labels = ['Home', 'Tasks', 'Repair', 'Map', 'Profile'];
+                final l = context.l10n;
+                final labels = [
+                  l.navHome,
+                  l.navTasks,
+                  l.navRepair,
+                  l.navMap,
+                  l.navProfile,
+                ];
                 final icons = [
                   Icons.home_outlined,
                   Icons.assignment_outlined,
@@ -761,6 +789,8 @@ class PatagMaintenanceNavigation extends StatelessWidget {
                                 const SizedBox(height: 2),
                                 Text(
                                   labels[i],
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontSize: 10,
                                     fontWeight: active || isCenter
@@ -825,20 +855,18 @@ class _ServerStatusBannerState extends State<ServerStatusBanner> {
   Widget build(BuildContext context) => ListenableBuilder(
         listenable: store,
         builder: (context, _) {
+          final l = context.l10n;
           if (store.checkingServer && slow) {
-            return _panel(context, Icons.hourglass_top_rounded,
-                'Connecting to PATAG… A server that was asleep can take up to a minute.');
+            return _panel(
+                context, Icons.hourglass_top_rounded, l.serverConnecting);
           }
           final problem = store.serverProblem;
           if (problem == null || store.checkingServer) {
             return const SizedBox.shrink();
           }
-          return _panel(
-              context,
-              Icons.cloud_off_outlined,
-              kDebugMode
-                  ? '$problem\n${PatagMaintenanceStore.baseUrl}'
-                  : problem,
+          final text = problem.message(l);
+          return _panel(context, Icons.cloud_off_outlined,
+              kDebugMode ? '$text\n${PatagMaintenanceStore.baseUrl}' : text,
               retry: true);
         },
       );
@@ -863,8 +891,104 @@ class _ServerStatusBannerState extends State<ServerStatusBanner> {
                       color: scheme.onErrorContainer,
                       fontWeight: FontWeight.w600,
                       height: 1.35))),
-          if (retry) TextButton(onPressed: check, child: const Text('Retry')),
+          if (retry)
+            TextButton(onPressed: check, child: Text(context.l10n.retry)),
         ]),
+      ),
+    );
+  }
+}
+
+/// Tagalog / English choice. Changes the app language immediately and
+/// remembers it. [compact] is the small pill used on the sign-in screen.
+class LanguageSwitcher extends StatelessWidget {
+  final bool compact;
+  const LanguageSwitcher({super.key, this.compact = false});
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: localeController,
+        builder: (context, _) =>
+            compact ? _compact(context) : _segmented(context),
+      );
+
+  Widget _segmented(BuildContext context) {
+    final l = context.l10n;
+    return SizedBox(
+      width: double.infinity,
+      child: SegmentedButton<String>(
+        showSelectedIcon: false,
+        segments: [
+          ButtonSegment(
+            value: LocaleController.tagalog.languageCode,
+            label: Text(l.languageTagalog),
+          ),
+          ButtonSegment(
+            value: LocaleController.english.languageCode,
+            label: Text(l.languageEnglish),
+          ),
+        ],
+        selected: {localeController.locale.languageCode},
+        onSelectionChanged: (value) =>
+            localeController.setLocale(Locale(value.first)),
+      ),
+    );
+  }
+
+  Widget _compact(BuildContext context) {
+    final l = context.l10n;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    Widget option(Locale locale, String label) {
+      final selected =
+          localeController.locale.languageCode == locale.languageCode;
+      return Semantics(
+        button: true,
+        selected: selected,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(999),
+          onTap: () => localeController.setLocale(locale),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
+            decoration: BoxDecoration(
+              color: selected ? orange : Colors.transparent,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                color: selected
+                    ? Colors.white
+                    : dark
+                        ? Colors.white70
+                        : const Color(0xFF334155),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Tooltip(
+      message: l.languageSettingTitle,
+      child: Container(
+        padding: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          color: dark ? const Color(0xFF1E222B) : const Color(0xFFF1F5F9),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.only(left: 6, right: 2),
+              child: Icon(Icons.translate_rounded, size: 14, color: slate),
+            ),
+            option(LocaleController.tagalog, l.languageTagalog),
+            option(LocaleController.english, l.languageEnglish),
+          ],
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import { PGlite, type Transaction } from '@electric-sql/pglite';
 import { buildApp } from '../src/app.ts';
 import { MemoryBlobStore } from '../src/blobs.ts';
+import type { ReverseGeocode } from '../src/geocode.ts';
 import { migrate, type Db } from '../src/db.ts';
 import { seedAll } from '../src/seed.ts';
 import { Store } from '../src/store.ts';
@@ -16,12 +17,12 @@ function pgliteDb(pg: PGlite): Db {
   return wrap(pg);
 }
 
-export async function startServer({ allowDemo = true, bodyLimit = undefined as number | undefined, trustProxy = false as boolean | number } = {}) {
+export async function startServer({ allowDemo = true, bodyLimit = undefined as number | undefined, trustProxy = false as boolean | number, geocode = undefined as ReverseGeocode | undefined } = {}) {
   const db = pgliteDb(await PGlite.create());
   await migrate(db);
   const store = new Store(db);
   await seedAll(store);
-  const app = buildApp({ store, blobs: new MemoryBlobStore(), allowDemo, bodyLimit, trustProxy, corsOrigins: ["http://127.0.0.1:5173"] });
+  const app = buildApp({ store, blobs: new MemoryBlobStore(), allowDemo, bodyLimit, trustProxy, geocode, corsOrigins: ["http://127.0.0.1:5173"] });
   await app.listen({ port: 0, host: '127.0.0.1' });
   const address = app.server.address() as { port: number };
   const base = `http://127.0.0.1:${address.port}/api`;

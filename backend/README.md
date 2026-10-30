@@ -82,6 +82,10 @@ Web portals are unchanged: they default to `http://127.0.0.1:4100/api` (`cd admi
 
 The Supabase project in `.env` is the **production** project (`main / PRODUCTION`): everything you create while testing is real data. Consider creating a second Supabase project for testing and pointing a copy of `.env` at it.
 
+## Address autofill (optional)
+
+The citizen app fills road, barangay, city and province when the reporter drops the map pin. It asks `GET /api/geocode/reverse`, and the backend asks Mapbox. Create a token at https://account.mapbox.com/access-tokens/ and set `MAPBOX_TOKEN=` in `backend/.env` (never in the apps). Without a token, autofill is simply off and citizens type the address as before. Pin coordinates are sent to Mapbox only for this lookup.
+
 ## Check the connection
 
 ```powershell

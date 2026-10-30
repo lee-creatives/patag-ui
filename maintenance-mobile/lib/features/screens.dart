@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import '../app/theme.dart';
 import '../core/api.dart';
 import '../core/models.dart';
+import '../l10n/l10n.dart';
 import '../shared/widgets/ui.dart';
 import 'task_map.dart';
 
@@ -56,9 +57,9 @@ class _MaintenanceSplashState extends State<MaintenanceSplash> {
                 child: logo(width: 190),
               ),
               gap(14),
-              const Text(
-                'Road Maintenance Operations',
-                style: TextStyle(
+              Text(
+                context.l10n.splashTagline,
+                style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -66,9 +67,9 @@ class _MaintenanceSplashState extends State<MaintenanceSplash> {
                 ),
               ),
               gap(6),
-              const Text(
-                'Bawat lubak, may agarang aksyon.',
-                style: TextStyle(
+              Text(
+                context.l10n.brandEveryPothole,
+                style: const TextStyle(
                   color: Colors.white54,
                   fontSize: 12,
                 ),
@@ -93,7 +94,7 @@ class MaintenanceWelcome extends StatelessWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(PatagMaintenanceStore.clean(e))),
+          SnackBar(content: Text(errorText(context.l10n, e))),
         );
       }
     }
@@ -102,6 +103,7 @@ class MaintenanceWelcome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l = context.l10n;
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -112,7 +114,7 @@ class MaintenanceWelcome extends StatelessWidget {
             mascot(width: 200),
             gap(24),
             Text(
-              'Mabilis na kumpuni, ligtas na biyahe.',
+              l.brandFastRepair,
               style: theme.textTheme.headlineLarge?.copyWith(
                 fontSize: 28,
                 letterSpacing: -0.8,
@@ -120,7 +122,7 @@ class MaintenanceWelcome extends StatelessWidget {
             ),
             gap(10),
             Text(
-              'Access assigned work orders, document road repairs on site, and upload evidence directly to the LGU portal.',
+              l.welcomeBody,
               style: TextStyle(
                 color: theme.colorScheme.onSurfaceVariant,
                 fontSize: 15,
@@ -128,24 +130,24 @@ class MaintenanceWelcome extends StatelessWidget {
               ),
             ),
             gap(32),
-            action('Sign in to Workspace', () {
+            action(l.welcomeSignIn, () {
               Navigator.of(context).pushNamed('/login');
             }),
             gap(12),
             OutlinedButton(
               onPressed: () => _demoLogin(context),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.play_arrow_rounded, color: orange, size: 20),
-                  SizedBox(width: 6),
-                  Text('Continue as Road Crew Alpha'),
+                  const Icon(Icons.play_arrow_rounded, color: orange, size: 20),
+                  const SizedBox(width: 6),
+                  Flexible(child: Text(l.welcomeContinueAs('Road Crew Alpha'))),
                 ],
               ),
             ),
             gap(28),
             Text(
-              'Academic demonstration · IT 305\nCity of Malolos Road Maintenance Operations.',
+              l.welcomeFooter,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 11,
@@ -173,7 +175,9 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
   bool _obscure = true;
   bool _loading = false;
   bool _showDemoDetails = false;
-  String? _error;
+
+  /// Kept as the error itself so its text follows the chosen language.
+  Object? _error;
 
   @override
   void dispose() {
@@ -194,7 +198,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
       );
       if (mounted) Navigator.of(context).pushReplacementNamed('/dashboard');
     } catch (e) {
-      if (mounted) setState(() => _error = PatagMaintenanceStore.clean(e));
+      if (mounted) setState(() => _error = e);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -209,7 +213,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
       await store.demoLogin();
       if (mounted) Navigator.of(context).pushReplacementNamed('/dashboard');
     } catch (e) {
-      if (mounted) setState(() => _error = PatagMaintenanceStore.clean(e));
+      if (mounted) setState(() => _error = e);
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -219,6 +223,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dark = theme.brightness == Brightness.dark;
+    final l = context.l10n;
 
     return Scaffold(
       backgroundColor: dark ? const Color(0xFF0B0D11) : const Color(0xFFF1F3F7),
@@ -257,9 +262,9 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                     children: [
                       logo(width: 104, forceWhite: true),
                       const SizedBox(height: 18),
-                      const Text(
-                        'Safer roads start here.',
-                        style: TextStyle(
+                      Text(
+                        l.loginHeroTitle,
+                        style: const TextStyle(
                           fontFamily: 'Montserrat',
                           fontSize: 25,
                           fontWeight: FontWeight.w700,
@@ -270,7 +275,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Report clearly. Track progress. See the repair through.',
+                        l.loginHeroSubtitle,
                         style: TextStyle(
                           fontSize: 12.5,
                           color: Colors.white.withOpacity(0.88),
@@ -308,7 +313,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                                 ),
                               ),
                               child: Text(
-                                'MAINTENANCE ACCOUNT',
+                                l.loginBadge,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -322,6 +327,9 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                               ),
                             ),
                           ),
+                          const SizedBox(width: 8),
+                          const LanguageSwitcher(compact: true),
+                          const SizedBox(width: 8),
                           InkWell(
                             borderRadius: BorderRadius.circular(999),
                             onTap: () =>
@@ -350,7 +358,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Welcome back',
+                        l.loginWelcome,
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
@@ -360,7 +368,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        'Sign in to view assignments and update road repairs.',
+                        l.loginIntro,
                         style: TextStyle(
                           fontSize: 13,
                           color: dark ? const Color(0xFF94A3B8) : slate,
@@ -369,7 +377,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                       ),
                       const SizedBox(height: 20),
                       Text(
-                        'Log in',
+                        l.loginHeading,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -378,7 +386,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                       ),
                       const SizedBox(height: 14),
                       Text(
-                        'Email address',
+                        l.loginEmail,
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -431,7 +439,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                       ),
                       const SizedBox(height: 14),
                       Text(
-                        'Password',
+                        l.loginPassword,
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -481,8 +489,9 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                             ),
                           ),
                           suffixIcon: IconButton(
-                            tooltip:
-                                _obscure ? 'Show password' : 'Hide password',
+                            tooltip: _obscure
+                                ? l.loginShowPassword
+                                : l.loginHidePassword,
                             icon: Icon(
                               _obscure
                                   ? Icons.visibility_outlined
@@ -516,7 +525,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                             ),
                           ),
                           child: Text(
-                            _error!,
+                            errorText(l, _error!),
                             style: TextStyle(
                               color: dark
                                   ? const Color(0xFFFFAA91)
@@ -544,7 +553,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                           ),
                           onPressed: _loading ? null : _submit,
                           child: Text(
-                            _loading ? 'Signing in…' : 'Log in',
+                            _loading ? l.loginSigningIn : l.loginHeading,
                             style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
@@ -560,7 +569,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                         runSpacing: 8,
                         children: [
                           Text(
-                            'Account assigned by LGU Admin',
+                            l.loginAccountAssigned,
                             style: TextStyle(
                               fontSize: 11.5,
                               color: dark ? const Color(0xFF94A3B8) : slate,
@@ -569,15 +578,13 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                           InkWell(
                             onTap: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Maintenance accounts are assigned and managed by the LGU Admin. Contact your supervisor to reset credentials.',
-                                  ),
+                                SnackBar(
+                                  content: Text(l.loginForgotPasswordHelp),
                                 ),
                               );
                             },
                             child: Text(
-                              'Forgot password?',
+                              l.loginForgotPassword,
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -617,7 +624,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                                 children: [
                                   Expanded(
                                     child: Text(
-                                      'Explore fictional demo data',
+                                      l.loginDemoTitle,
                                       style: TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
@@ -639,7 +646,7 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                             if (_showDemoDetails) ...[
                               const SizedBox(height: 8),
                               Text(
-                                'Separate test access for the seeded crew account.',
+                                l.loginDemoBody,
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: dark ? const Color(0xFF94A3B8) : slate,
@@ -666,8 +673,8 @@ class _MaintenanceLoginState extends State<MaintenanceLogin> {
                                   onPressed: _loading ? null : _demoLogin,
                                   child: Text(
                                     _loading
-                                        ? 'Opening…'
-                                        : 'Open maintenance demo',
+                                        ? l.loginDemoOpening
+                                        : l.loginDemoButton,
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w600,
@@ -752,6 +759,7 @@ class DashboardTab extends StatelessWidget {
     final crewTeam = store.team;
     final inProgress = store.activeWork;
     final completed = store.completedHistory;
+    final l = context.l10n;
 
     return Scaffold(
       appBar: AppBar(
@@ -760,18 +768,22 @@ class DashboardTab extends StatelessWidget {
           children: [
             logo(width: 96),
             const SizedBox(width: 10),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: orange.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                crewTeam?.name ?? 'Road Crew Alpha',
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  color: orange,
+            Flexible(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: orange.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  crewTeam?.name ?? 'Road Crew Alpha',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: orange,
+                  ),
                 ),
               ),
             ),
@@ -779,7 +791,7 @@ class DashboardTab extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            tooltip: 'Notifications',
+            tooltip: l.notificationsTooltip,
             icon: Icon(
               store.showUnread && store.notifications.any((n) => n.read != true)
                   ? Icons.notifications_active_outlined
@@ -804,7 +816,10 @@ class DashboardTab extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Hello, ${crewUser?.name.split(' ').first ?? 'Crew'}.',
+                        l.dashboardGreeting(
+                          crewUser?.name.split(' ').first ??
+                              l.greetingFallbackName,
+                        ),
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w700,
@@ -824,7 +839,7 @@ class DashboardTab extends StatelessWidget {
                   ),
                 ),
                 IconButton.filledTonal(
-                  tooltip: 'Your profile',
+                  tooltip: l.profileTooltip,
                   onPressed: () => Navigator.of(context).pushNamed('/profile'),
                   icon: Text(
                     crewUser?.name.isNotEmpty == true
@@ -860,9 +875,9 @@ class DashboardTab extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Handa na ang mga work order.',
-                              style: TextStyle(
+                            Text(
+                              l.brandWorkOrdersReady,
+                              style: const TextStyle(
                                 color: Color(0xFF20180F),
                                 fontSize: 17,
                                 fontWeight: FontWeight.w800,
@@ -871,7 +886,10 @@ class DashboardTab extends StatelessWidget {
                             ),
                             gap(4),
                             Text(
-                              '${store.newAssignments.length + store.activeWork.length} work orders ready for action.',
+                              l.dashboardReadyCount(
+                                store.newAssignments.length +
+                                    store.activeWork.length,
+                              ),
                               style: const TextStyle(
                                 color: Color(0xFF38271D),
                                 fontSize: 12,
@@ -885,7 +903,7 @@ class DashboardTab extends StatelessWidget {
                   ),
                   gap(16),
                   action(
-                    'Review next work order',
+                    l.dashboardReviewNext,
                     [...store.newAssignments, ...store.activeWork].isEmpty
                         ? null
                         : () => Navigator.of(context).pushNamed(
@@ -909,12 +927,13 @@ class DashboardTab extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  _metricBox(context, 'Assigned',
+                  _metricBox(context, statusLabel(l, 'Assigned'),
                       '${store.newAssignments.length}', crewAmber),
-                  _metricBox(
-                      context, 'In Progress', '${inProgress.length}', orange),
-                  _metricBox(
-                      context, 'Resolved', '${completed.length}', crewGreen),
+                  _metricBox(context, statusLabel(l, 'In Progress'),
+                      '${inProgress.length}', orange),
+                  _metricBox(context, statusLabel(l, 'Resolved'),
+                      '${completed.length}', crewGreen,
+                      last: true),
                 ],
               ),
             ),
@@ -923,7 +942,9 @@ class DashboardTab extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                heading(context, 'Active Work Orders'),
+                Flexible(
+                  child: heading(context, l.dashboardActiveWorkOrders),
+                ),
                 TextButton(
                   onPressed: () {
                     if (onNavigateToTab != null) {
@@ -933,16 +954,13 @@ class DashboardTab extends StatelessWidget {
                           .pushReplacementNamed('/assignments');
                     }
                   },
-                  child: const Text('View all'),
+                  child: Text(l.viewAll),
                 ),
               ],
             ),
             gap(12),
             if (inProgress.isEmpty && store.newAssignments.isEmpty)
-              const EmptyState(
-                'All clear for now',
-                'No pending road repairs assigned to your team.',
-              )
+              EmptyState(l.dashboardEmptyTitle, l.dashboardEmptyBody)
             else ...[
               ...inProgress.map(
                 (r) => TaskCard(
@@ -987,16 +1005,16 @@ class DashboardTab extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Safety Protocol On Site',
-                          style: TextStyle(
+                        Text(
+                          l.safetyTitle,
+                          style: const TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 14,
                           ),
                         ),
                         gap(4),
                         Text(
-                          'Deploy safety cones 15m ahead, wear high-vis vests, and log before & after photos.',
+                          l.safetyBody,
                           style: TextStyle(
                             fontSize: 12,
                             color: theme.colorScheme.onSurfaceVariant,
@@ -1019,14 +1037,15 @@ class DashboardTab extends StatelessWidget {
     BuildContext context,
     String label,
     String value,
-    Color accent,
-  ) {
+    Color accent, {
+    bool last = false,
+  }) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 6),
         decoration: BoxDecoration(
           border: Border(
-            right: label == 'Resolved'
+            right: last
                 ? BorderSide.none
                 : const BorderSide(color: Color(0xFF343740)),
           ),
@@ -1045,10 +1064,13 @@ class DashboardTab extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               label,
-              style: TextStyle(
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: const Color(0xFFD5DEE9),
+                color: Color(0xFFD5DEE9),
               ),
             ),
           ],
@@ -1089,8 +1111,9 @@ class _AssignmentsTabState extends State<AssignmentsTab> {
       return true;
     }).toList();
 
+    final l = context.l10n;
     return Screen(
-      title: 'My Assignments',
+      title: l.assignmentsTitle,
       selected: 1,
       onTabSelected: widget.onNavigateToTab,
       body: Column(
@@ -1098,9 +1121,9 @@ class _AssignmentsTabState extends State<AssignmentsTab> {
           Padding(
             padding: const EdgeInsets.fromLTRB(18, 12, 18, 8),
             child: TextField(
-              decoration: const InputDecoration(
-                hintText: 'Search road, barangay, or ID…',
-                prefixIcon: Icon(Icons.search_rounded),
+              decoration: InputDecoration(
+                hintText: l.assignmentsSearchHint,
+                prefixIcon: const Icon(Icons.search_rounded),
               ),
               onChanged: (v) => setState(() => _search = v.trim()),
             ),
@@ -1114,7 +1137,7 @@ class _AssignmentsTabState extends State<AssignmentsTab> {
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: FilterChip(
-                    label: Text(f),
+                    label: Text(f == 'All' ? l.filterAll : statusLabel(l, f)),
                     selected: isSelected,
                     onSelected: (val) => setState(() => _filter = f),
                     selectedColor: orange,
@@ -1132,10 +1155,7 @@ class _AssignmentsTabState extends State<AssignmentsTab> {
             child: RefreshIndicator(
               onRefresh: () => store.refresh().catchError((Object _) {}),
               child: list.isEmpty
-                  ? const EmptyState(
-                      'No matching work orders',
-                      'Try another filter or check for newly assigned tasks.',
-                    )
+                  ? EmptyState(l.assignmentsEmptyTitle, l.assignmentsEmptyBody)
                   : ListView.builder(
                       padding: const EdgeInsets.all(18),
                       itemCount: list.length,
@@ -1160,17 +1180,18 @@ class InProgressTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final inProgress = store.activeWork;
+    final l = context.l10n;
 
     return Screen(
-      title: 'Repairs In Progress',
+      title: l.inProgressTitle,
       selected: 2,
       onTabSelected: onNavigateToTab,
       body: RefreshIndicator(
         onRefresh: () => store.refresh().catchError((Object _) {}),
         child: inProgress.isEmpty
-            ? const EmptyState(
-                'No repairs in progress',
-                'Select an assigned task from Work Orders and tap "Start inspection / repair" to begin work.',
+            ? EmptyState(
+                l.inProgressEmptyTitle,
+                l.inProgressEmptyBody(l.startRepair),
               )
             : ListView.builder(
                 padding: const EdgeInsets.all(18),
@@ -1204,9 +1225,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         'note': 'Crew started on-site road surface repair.',
       });
       if (mounted) {
+        final l = context.l10n;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Repair started! Task is now In Progress.'),
+          SnackBar(
+            content: Text(l.repairStarted(statusLabel(l, 'In Progress'))),
           ),
         );
       }
@@ -1214,7 +1236,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${PatagMaintenanceStore.clean(e)}'),
+            content:
+                Text(context.l10n.errorWithMessage(errorText(context.l10n, e))),
           ),
         );
       }
@@ -1237,14 +1260,15 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Before-repair photo uploaded.')),
+          SnackBar(content: Text(context.l10n.beforePhotoUploaded)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Upload failed: ${PatagMaintenanceStore.clean(e)}'),
+            content:
+                Text(context.l10n.uploadFailed(errorText(context.l10n, e))),
           ),
         );
       }
@@ -1269,14 +1293,15 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('After-repair photo uploaded.')),
+          SnackBar(content: Text(context.l10n.afterPhotoUploaded)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Upload failed: ${PatagMaintenanceStore.clean(e)}'),
+            content:
+                Text(context.l10n.uploadFailed(errorText(context.l10n, e))),
           ),
         );
       }
@@ -1290,11 +1315,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     final report = store.getReportById(widget.reportId);
     final theme = Theme.of(context);
     final dark = theme.brightness == Brightness.dark;
+    final l = context.l10n;
 
     if (report == null) {
-      return const Screen(
-        title: 'Task Details',
-        body: EmptyState('Task not found', 'This task could not be loaded.'),
+      return Screen(
+        title: l.taskDetailsTitle,
+        body: EmptyState(l.taskNotFoundTitle, l.taskNotFoundBody),
       );
     }
 
@@ -1323,12 +1349,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           ),
           gap(14),
           Text(
-            report.road.isNotEmpty ? report.road : 'Road Work Order',
+            report.road.isNotEmpty ? report.road : l.taskFallbackTitle,
             style: theme.textTheme.headlineMedium,
           ),
           gap(6),
           Text(
-            'Brgy. ${report.barangay}, ${report.city}, ${report.province}',
+            l.taskLocation(report.barangay, report.city, report.province),
             style: TextStyle(
               color: theme.colorScheme.onSurfaceVariant,
               fontSize: 14,
@@ -1336,9 +1362,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           ),
           gap(18),
           if (beforePhotos.isNotEmpty) ...[
-            const Text(
-              'Before-Repair Inspection Photos',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+            Text(
+              l.beforePhotosHeading,
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
             gap(10),
             SizedBox(
@@ -1357,9 +1383,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             gap(16),
           ],
           if (afterPhotos.isNotEmpty) ...[
-            const Text(
-              'After-Repair Completion Photos',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+            Text(
+              l.afterPhotosHeading,
+              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
             ),
             gap(10),
             SizedBox(
@@ -1387,21 +1413,23 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Assignment Details',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                Text(
+                  l.assignmentDetails,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.w700, fontSize: 14),
                 ),
                 gap(8),
                 if (report.assignment?.note != null &&
                     report.assignment!.note.isNotEmpty)
                   Text(
-                    'LGU Note: ${report.assignment!.note}',
+                    l.lguNote(report.assignment!.note),
                     style: const TextStyle(fontSize: 13),
                   ),
                 if (report.assignment?.targetDate != null) ...[
                   gap(6),
                   Text(
-                    'Target Completion: ${report.assignment!.targetDate}',
+                    l.targetCompletion(
+                        formatDate(l, report.assignment!.targetDate!)),
                     style: const TextStyle(
                       fontSize: 13,
                       color: orange,
@@ -1411,7 +1439,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 ],
                 gap(8),
                 Text(
-                  'Coordinates: ${report.coordinates.lat.toStringAsFixed(4)}, ${report.coordinates.lng.toStringAsFixed(4)}',
+                  l.coordinatesLine(
+                    report.coordinates.lat.toStringAsFixed(4),
+                    report.coordinates.lng.toStringAsFixed(4),
+                  ),
                   style: const TextStyle(fontSize: 12, color: slate),
                 ),
               ],
@@ -1438,16 +1469,18 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                       const Icon(Icons.photo_camera_outlined,
                           size: 18, color: orange),
                       const SizedBox(width: 8),
-                      const Text(
-                        'Before-Repair Inspection',
-                        style: TextStyle(
-                            fontSize: 13.5, fontWeight: FontWeight.w700),
+                      Expanded(
+                        child: Text(
+                          l.beforeInspectionTitle,
+                          style: const TextStyle(
+                              fontSize: 13.5, fontWeight: FontWeight.w700),
+                        ),
                       ),
                     ],
                   ),
                   gap(6),
                   Text(
-                    'Record a photo of the damaged road before repair work starts.',
+                    l.beforeInspectionBody,
                     style: TextStyle(
                       fontSize: 12,
                       color: dark ? const Color(0xFF94A3B8) : slate,
@@ -1459,7 +1492,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.camera_alt_outlined, size: 17),
-                      label: const Text('Add Before Photo'),
+                      label: Text(l.addBeforePhoto),
                       onPressed:
                           _loading ? null : () => _uploadBeforePhoto(report),
                     ),
@@ -1469,24 +1502,23 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             ),
             gap(16),
             action(
-              _loading ? 'Updating…' : 'Start Inspection / Repair',
+              _loading ? l.updating : l.startRepair,
               _loading ? null : () => _startRepair(report),
               icon: Icons.play_arrow_rounded,
             ),
           ] else if (report.status == 'In Progress' &&
               awaitingVerification) ...[
-            const InfoPanel(
+            InfoPanel(
               icon: Icons.hourglass_top_rounded,
-              text:
-                  'Repair submitted. Waiting for the LGU to verify your evidence before the task is resolved.',
+              text: l.awaitingVerificationInfo,
             ),
           ] else if (report.status == 'In Progress') ...[
             if (returnNote != null) ...[
               InfoPanel(
                 icon: Icons.assignment_return_outlined,
                 text: returnNote.isEmpty
-                    ? 'The LGU requested more work on this repair.'
-                    : 'More work requested by the LGU: $returnNote',
+                    ? l.moreWorkRequested
+                    : l.moreWorkRequestedNote(returnNote),
               ),
               gap(16),
             ],
@@ -1508,16 +1540,18 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                       const Icon(Icons.add_a_photo_outlined,
                           size: 18, color: orange),
                       const SizedBox(width: 8),
-                      const Text(
-                        'After-Repair Completion Evidence',
-                        style: TextStyle(
-                            fontSize: 13.5, fontWeight: FontWeight.w700),
+                      Expanded(
+                        child: Text(
+                          l.afterEvidenceTitle,
+                          style: const TextStyle(
+                              fontSize: 13.5, fontWeight: FontWeight.w700),
+                        ),
                       ),
                     ],
                   ),
                   gap(6),
                   Text(
-                    'Add photos of the patched road surface before submitting the completion report.',
+                    l.afterEvidenceBody,
                     style: TextStyle(
                       fontSize: 12,
                       color: dark ? const Color(0xFF94A3B8) : slate,
@@ -1529,7 +1563,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       icon: const Icon(Icons.add_a_photo_outlined, size: 17),
-                      label: const Text('Add After Photo'),
+                      label: Text(l.addAfterPhoto),
                       onPressed:
                           _loading ? null : () => _uploadAfterPhoto(report),
                     ),
@@ -1539,7 +1573,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             ),
             gap(16),
             action(
-              'Document & Submit Completion',
+              l.documentAndSubmit,
               _loading
                   ? null
                   : () {
@@ -1555,14 +1589,15 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 color: const Color(0xFFD1FAE5),
                 borderRadius: BorderRadius.circular(16),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.check_circle_rounded, color: Color(0xFF047857)),
-                  SizedBox(width: 10),
+                  const Icon(Icons.check_circle_rounded,
+                      color: Color(0xFF047857)),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Repair verified and resolved by LGU.',
-                      style: TextStyle(
+                      l.resolvedInfo,
+                      style: const TextStyle(
                         color: Color(0xFF047857),
                         fontWeight: FontWeight.w600,
                       ),
@@ -1586,6 +1621,7 @@ class TaskProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final l = context.l10n;
     final int step;
     final double progress;
     final String stepName;
@@ -1594,27 +1630,27 @@ class TaskProgressBar extends StatelessWidget {
       case 'Assigned':
         step = 1;
         progress = 0.33;
-        stepName = 'Assigned to Crew';
+        stepName = l.progressAssignedToCrew;
         break;
       case 'In Progress':
         step = 2;
         progress = completionState == 'Awaiting Verification' ? 0.85 : 0.66;
         stepName = completionState == 'Awaiting Verification'
-            ? 'Awaiting LGU Verification'
+            ? l.progressAwaitingVerification
             : completionState == 'Additional Work Requested'
-                ? 'More Work Requested'
-                : 'Repair In Progress';
+                ? l.progressMoreWork
+                : l.progressRepairInProgress;
         break;
       case 'Resolved':
       case 'Completed':
         step = 3;
         progress = 1.0;
-        stepName = 'Completed & Verified';
+        stepName = l.progressCompleted;
         break;
       default:
         step = 1;
         progress = 0.20;
-        stepName = status;
+        stepName = statusLabel(l, status);
     }
 
     return Container(
@@ -1637,7 +1673,7 @@ class TaskProgressBar extends StatelessWidget {
                   const Icon(Icons.flash_on_rounded, size: 16, color: orange),
                   const SizedBox(width: 6),
                   Text(
-                    'TASK PROGRESS',
+                    l.progressTitle,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w700,
@@ -1649,12 +1685,16 @@ class TaskProgressBar extends StatelessWidget {
                   ),
                 ],
               ),
-              Text(
-                '${(progress * 100).toInt()}% · $stepName',
-                style: const TextStyle(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
-                  color: orange,
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  l.progressSummary((progress * 100).toInt(), stepName),
+                  textAlign: TextAlign.end,
+                  style: const TextStyle(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: orange,
+                  ),
                 ),
               ),
             ],
@@ -1673,32 +1713,25 @@ class TaskProgressBar extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '1. Assigned',
-                style: TextStyle(
-                  fontSize: 10.5,
-                  fontWeight: step >= 1 ? FontWeight.w700 : FontWeight.w500,
-                  color: step >= 1 ? (dark ? Colors.white : ink) : slate,
+              for (final (i, value)
+                  in const ['Assigned', 'In Progress', 'Resolved'].indexed)
+                Expanded(
+                  child: Text(
+                    l.progressStep(i + 1, statusLabel(l, value)),
+                    textAlign: const [
+                      TextAlign.start,
+                      TextAlign.center,
+                      TextAlign.end,
+                    ][i],
+                    style: TextStyle(
+                      fontSize: 10.5,
+                      fontWeight: step > i ? FontWeight.w700 : FontWeight.w500,
+                      color: step > i ? (dark ? Colors.white : ink) : slate,
+                    ),
+                  ),
                 ),
-              ),
-              Text(
-                '2. In Progress',
-                style: TextStyle(
-                  fontSize: 10.5,
-                  fontWeight: step >= 2 ? FontWeight.w700 : FontWeight.w500,
-                  color: step >= 2 ? (dark ? Colors.white : ink) : slate,
-                ),
-              ),
-              Text(
-                '3. Resolved',
-                style: TextStyle(
-                  fontSize: 10.5,
-                  fontWeight: step >= 3 ? FontWeight.w700 : FontWeight.w500,
-                  color: step >= 3 ? (dark ? Colors.white : ink) : slate,
-                ),
-              ),
             ],
           ),
         ],
@@ -1717,12 +1750,22 @@ class RepairDocumentationScreen extends StatefulWidget {
 }
 
 class _RepairDocumentationScreenState extends State<RepairDocumentationScreen> {
-  final _notesController = TextEditingController(
-    text:
-        'Base compacted, crack seal applied, and hot asphalt patched to grade.',
-  );
+  final _notesController = TextEditingController();
   final List<Photo> _afterPhotos = [];
   bool _loading = false;
+
+  /// The suggested note follows the language until the crew edits it.
+  String? _suggestedNote;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final suggestion = context.l10n.defaultWorkNote;
+    if (_suggestedNote == null || _notesController.text == _suggestedNote) {
+      _notesController.text = suggestion;
+    }
+    _suggestedNote = suggestion;
+  }
 
   @override
   void initState() {
@@ -1753,8 +1796,8 @@ class _RepairDocumentationScreenState extends State<RepairDocumentationScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content:
-                Text('Photo upload failed: ${PatagMaintenanceStore.clean(e)}'),
+            content: Text(
+                context.l10n.photoUploadFailed(errorText(context.l10n, e))),
           ),
         );
       }
@@ -1766,9 +1809,7 @@ class _RepairDocumentationScreenState extends State<RepairDocumentationScreen> {
   Future<void> _submitCompletion() async {
     if (_notesController.text.trim().isEmpty || _afterPhotos.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Add at least one after photo and describe the work.'),
-        ),
+        SnackBar(content: Text(context.l10n.completionRequirements)),
       );
       return;
     }
@@ -1787,7 +1828,7 @@ class _RepairDocumentationScreenState extends State<RepairDocumentationScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content:
-                Text('Submission failed: ${PatagMaintenanceStore.clean(e)}'),
+                Text(context.l10n.submissionFailed(errorText(context.l10n, e))),
           ),
         );
       }
@@ -1798,19 +1839,20 @@ class _RepairDocumentationScreenState extends State<RepairDocumentationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Screen(
-      title: 'Document Repair',
+      title: l.documentRepairTitle,
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
-          const Text(
-            'Upload After-Repair Evidence',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          Text(
+            l.uploadAfterEvidence,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
           ),
           gap(6),
-          const Text(
-            'Provide clear photos of the patched and compacted road surface.',
-            style: TextStyle(fontSize: 13, color: slate),
+          Text(
+            l.uploadAfterEvidenceBody,
+            style: const TextStyle(fontSize: 13, color: slate),
           ),
           gap(16),
           if (_afterPhotos.isNotEmpty) ...[
@@ -1831,25 +1873,23 @@ class _RepairDocumentationScreenState extends State<RepairDocumentationScreen> {
           ],
           OutlinedButton.icon(
             icon: const Icon(Icons.add_a_photo_outlined),
-            label: const Text('Take / Select After Photo'),
+            label: Text(l.takeAfterPhoto),
             onPressed: _loading ? null : _takeAfterPhoto,
           ),
           gap(24),
-          const Text(
-            'Work Performed / Progress Notes',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+          Text(
+            l.workNotesHeading,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
           ),
           gap(10),
           TextField(
             controller: _notesController,
             maxLines: 4,
-            decoration: const InputDecoration(
-              hintText: 'Describe materials used, compaction, curing time…',
-            ),
+            decoration: InputDecoration(hintText: l.workNotesHint),
           ),
           gap(28),
           action(
-            _loading ? 'Submitting…' : 'Submit for Verification',
+            _loading ? l.submitting : l.submitForVerification,
             _loading ? null : _submitCompletion,
             icon: Icons.check_circle_outline,
           ),
@@ -1865,6 +1905,7 @@ class SubmissionSuccessScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = context.l10n;
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -1875,12 +1916,15 @@ class SubmissionSuccessScreen extends StatelessWidget {
               children: [
                 mascot(width: 130, dance: true),
                 gap(20),
-                const StatusBadge('Awaiting Verification'),
+                const FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: StatusBadge('Awaiting Verification'),
+                ),
                 gap(16),
-                const Text(
-                  'Work submitted.\nOne step closer to patag.',
+                Text(
+                  l.successTitle,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                     height: 1.2,
@@ -1888,13 +1932,13 @@ class SubmissionSuccessScreen extends StatelessWidget {
                 ),
                 gap(10),
                 Text(
-                  '$reportId · The LGU engineering office will review your evidence before closing the task.',
+                  l.successBody(reportId),
                   textAlign: TextAlign.center,
                   style: const TextStyle(fontSize: 13, color: slate),
                 ),
                 gap(28),
                 action(
-                  'Return to Overview',
+                  l.returnToOverview,
                   () {
                     Navigator.of(context).pushReplacementNamed('/dashboard');
                   },
@@ -1918,7 +1962,7 @@ class NotificationsScreen extends StatelessWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(PatagMaintenanceStore.clean(e))),
+          SnackBar(content: Text(errorText(context.l10n, e))),
         );
       }
     }
@@ -1933,20 +1977,18 @@ class NotificationsScreen extends StatelessWidget {
   }
 
   Widget _build(BuildContext context, List<Notice> list) {
+    final l = context.l10n;
     return Screen(
-      title: 'Notifications',
+      title: l.notificationsTitle,
       actions: [
         if (list.any((n) => !n.read))
           TextButton(
             onPressed: () => _markRead(context, 'all'),
-            child: const Text('Mark all read'),
+            child: Text(l.markAllRead),
           ),
       ],
       body: list.isEmpty
-          ? const EmptyState(
-              'All caught up',
-              'No new notifications for your crew.',
-            )
+          ? EmptyState(l.notificationsEmptyTitle, l.notificationsEmptyBody)
           : ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: list.length,
@@ -1966,7 +2008,14 @@ class NotificationsScreen extends StatelessWidget {
                     item.title,
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
-                  subtitle: Text(item.reportId),
+                  subtitle: Text(
+                    item.at.isEmpty
+                        ? item.reportId
+                        : l.notificationSubtitle(
+                            item.reportId,
+                            formatDate(l, item.at, withTime: true),
+                          ),
+                  ),
                   onTap: () async {
                     await _markRead(context, item.id);
                     if (context.mounted &&
@@ -1992,9 +2041,10 @@ class ProfileTab extends StatelessWidget {
     final dark = theme.brightness == Brightness.dark;
     final user = store.user;
     final team = store.team;
+    final l = context.l10n;
 
     return Screen(
-      title: 'Profile & Settings',
+      title: l.profileTitle,
       selected: 4,
       onTabSelected: onNavigateToTab,
       body: ListView(
@@ -2022,7 +2072,7 @@ class ProfileTab extends StatelessWidget {
                 ),
                 gap(12),
                 Text(
-                  user?.name ?? 'Maintenance Personnel',
+                  user?.name ?? l.profileFallbackName,
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
@@ -2044,9 +2094,9 @@ class ProfileTab extends StatelessWidget {
             tileColor: dark ? const Color(0xFF22242A) : quiet,
             leading:
                 Icon(dark ? Icons.light_mode : Icons.dark_mode, color: orange),
-            title: const Text('Theme Mode'),
+            title: Text(l.themeMode),
             trailing: Text(
-              dark ? 'Dark' : 'Light',
+              dark ? l.themeDark : l.themeLight,
               style: const TextStyle(fontWeight: FontWeight.w600),
             ),
             onTap: () => themeController.toggle(theme.brightness),
@@ -2061,11 +2111,50 @@ class ProfileTab extends StatelessWidget {
               Icons.notifications_active_outlined,
               color: orange,
             ),
-            title: const Text('Unread Indicators'),
+            title: Text(l.unreadIndicators),
             value: store.showUnread,
             onChanged: (val) {
               store.setUnreadPreference(val);
             },
+          ),
+          gap(12),
+          Container(
+            key: const ValueKey('language-setting'),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+            decoration: BoxDecoration(
+              color: dark ? const Color(0xFF22242A) : quiet,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.translate_rounded, color: orange),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l.languageSettingTitle,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          Text(
+                            l.languageSettingSubtitle,
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                gap(12),
+                const LanguageSwitcher(),
+              ],
+            ),
           ),
           gap(12),
           ListTile(
@@ -2074,8 +2163,8 @@ class ProfileTab extends StatelessWidget {
             ),
             tileColor: dark ? const Color(0xFF22242A) : quiet,
             leading: const Icon(Icons.info_outline_rounded, color: orange),
-            title: const Text('About PATAG Maintenance'),
-            subtitle: const Text('IT 305 · Bulacan State University'),
+            title: Text(l.aboutTitle),
+            subtitle: Text(l.aboutSubtitle),
           ),
           gap(28),
           OutlinedButton.icon(
@@ -2085,7 +2174,7 @@ class ProfileTab extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 14),
             ),
             icon: const Icon(Icons.logout_rounded),
-            label: const Text('Sign out of Workspace'),
+            label: Text(l.signOut),
             onPressed: () async {
               await store.logout();
               if (context.mounted) {

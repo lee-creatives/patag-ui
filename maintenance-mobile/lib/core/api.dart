@@ -4,7 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'errors.dart';
 import 'models.dart';
+
+export 'errors.dart';
 
 /// Talks to the shared PATAG API (see docs/api-contract.md). The server is the
 /// source of truth: local state only changes after a successful response.
@@ -32,11 +35,13 @@ class PatagMaintenanceStore extends ChangeNotifier {
   List<PotholeReport> reports = [];
   List<Notice> notifications = [];
   Timer? timer;
-  String? networkError;
+
+  /// Last failed refresh; shown (translated) by the screen banner.
+  Object? networkError;
   bool showUnread = true;
 
   /// Result of the last GET /health; null while reachable or not yet checked.
-  String? serverProblem;
+  PatagException? serverProblem;
   bool checkingServer = false;
   int _serverCheck = 0;
 
@@ -60,7 +65,7 @@ class PatagMaintenanceStore extends ChangeNotifier {
     if (check == _serverCheck) {
       checkingServer = false;
       serverProblem =
-          ok ? null : "Can't reach the PATAG server. Is the backend running?";
+          ok ? null : const PatagException(PatagErrorKind.serverDown);
       notifyListeners();
     }
     return ok;
@@ -136,10 +141,9 @@ class PatagMaintenanceStore extends ChangeNotifier {
             .timeout(timeout);
       }
     } on TimeoutException {
-      throw Exception('Connection timed out. Please retry.');
+      throw const PatagException(PatagErrorKind.timeout);
     } catch (_) {
-      throw Exception(
-          'Cannot reach the PATAG server. Check your connection and try again.');
+      throw const PatagException(PatagErrorKind.unreachable);
     }
 
     dynamic data;
@@ -147,9 +151,12 @@ class PatagMaintenanceStore extends ChangeNotifier {
       data = jsonDecode(response.body);
     } catch (_) {
       // e.g. an HTML 502 page while a hosted server is starting.
-      throw Exception(response.statusCode >= 500
-          ? 'The PATAG server is unavailable (${response.statusCode}). Please retry in a moment.'
-          : 'Unexpected response from the PATAG server (${response.statusCode}).');
+      throw PatagException(
+        response.statusCode >= 500
+            ? PatagErrorKind.serverUnavailable
+            : PatagErrorKind.unexpectedResponse,
+        statusCode: response.statusCode,
+      );
     }
     if (response.statusCode >= 400) {
       // Only expire the session this request was made with (not a newer login).
@@ -157,8 +164,12 @@ class PatagMaintenanceStore extends ChangeNotifier {
         _clearSession();
         onSessionExpired?.call();
       }
-      throw Exception(
-          (data is Map ? data['error'] : null) ?? 'Request failed.');
+      final error = data is Map ? data['error'] : null;
+      throw error is String && error.trim().isNotEmpty
+          ? PatagException(PatagErrorKind.server,
+              statusCode: response.statusCode, serverMessage: error)
+          : PatagException(PatagErrorKind.requestFailed,
+              statusCode: response.statusCode);
     }
     return data;
   }
@@ -180,7 +191,7 @@ class PatagMaintenanceStore extends ChangeNotifier {
 
   Future<void> _startSession(dynamic data) async {
     if (data['user']?['role'] != 'maintenance') {
-      throw Exception('This account does not belong to road maintenance.');
+      throw const PatagException(PatagErrorKind.notMaintenance);
     }
     token = data['token'] as String;
     user = User.fromJson(Map<String, dynamic>.from(data['user']));
@@ -221,7 +232,7 @@ class PatagMaintenanceStore extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       if (token == sessionToken) {
-        networkError = clean(e);
+        networkError = e;
         notifyListeners();
       }
       rethrow;
@@ -254,7 +265,7 @@ class PatagMaintenanceStore extends ChangeNotifier {
       {String kind = 'after'}) async {
     final bytes = await file.readAsBytes();
     if (bytes.length > 8 * 1024 * 1024) {
-      throw Exception('Choose a photo under 8 MB.');
+      throw const PatagException(PatagErrorKind.photoTooLarge);
     }
     final name = file.name.toLowerCase();
     final type = name.endsWith('.png')
@@ -265,7 +276,7 @@ class PatagMaintenanceStore extends ChangeNotifier {
                 ? 'jpeg'
                 : null;
     if (type == null) {
-      throw Exception('Choose a JPEG, PNG or WebP photo.');
+      throw const PatagException(PatagErrorKind.photoType);
     }
     final res = await call('/uploads', body: {
       'data': 'data:image/$type;base64,${base64Encode(bytes)}',

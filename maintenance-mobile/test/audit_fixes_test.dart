@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:patag_maintenance/app/locale.dart';
 import 'package:patag_maintenance/core/api.dart';
 import 'package:patag_maintenance/core/models.dart';
 import 'package:patag_maintenance/features/screens.dart';
@@ -29,8 +30,10 @@ Map<String, dynamic> photo(String url,
     {'id': url, 'url': url, 'name': 'p', 'kind': kind, 'demo': demo};
 
 void main() {
-  setUp(() {
+  setUp(() async {
     SharedPreferences.setMockInitialValues({});
+    // These checks were written against the English UI (the default is Tagalog).
+    await localeController.setLocale(LocaleController.english);
     store.client = MockClient((_) async => http.Response('{"ok":true}', 200));
   });
   tearDown(() {

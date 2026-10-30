@@ -3,9 +3,11 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../../app/locale.dart';
 import '../../app/theme.dart';
 import '../../core/api.dart';
 import '../../core/models.dart';
+import '../../l10n/l10n.dart';
 
 void go(BuildContext context, String route) =>
     Navigator.of(context).pushNamed(route);
@@ -15,6 +17,7 @@ void home(BuildContext context) {
   // Continue a report started from the map before signing in.
   if (store.pendingReportPin != null) navigator.pushNamed('/report/new');
 }
+
 void message(BuildContext context, String text) =>
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
 Widget logo({double width = 135}) => Builder(
@@ -133,16 +136,17 @@ Widget field(String label, TextEditingController ctrl,
         ValueChanged<String>? onChanged}) =>
     Padding(
         padding: const EdgeInsets.only(bottom: 16),
-        child: TextFormField(
-            controller: ctrl,
-            maxLines: lines,
-            maxLength: maxLength,
-            keyboardType: keyboard,
-            onChanged: onChanged,
-            decoration: InputDecoration(labelText: label),
-            validator: (s) => required && (s == null || s.trim().isEmpty)
-                ? '$label is required.'
-                : null));
+        child: Builder(
+            builder: (context) => TextFormField(
+                controller: ctrl,
+                maxLines: lines,
+                maxLength: maxLength,
+                keyboardType: keyboard,
+                onChanged: onChanged,
+                decoration: InputDecoration(labelText: label),
+                validator: (s) => required && (s == null || s.trim().isEmpty)
+                    ? l10n(context).fieldRequired(label)
+                    : null)));
 
 class StatusChip extends StatelessWidget {
   final String value;
@@ -159,7 +163,7 @@ class StatusChip extends StatelessWidget {
                     ? const Color(0xFFFEE8DD)
                     : const Color(0xFFEDF0F5),
             borderRadius: BorderRadius.circular(999)),
-        child: Text(value,
+        child: Text(apiValueLabel(l10n(context), value),
             style: TextStyle(
                 fontSize: 12,
                 color: success ? const Color(0xFF21633F) : ink,
@@ -178,22 +182,20 @@ class Evidence extends StatelessWidget {
               height: 170,
               width: double.infinity,
               color: const Color(0xFFE5E8EA),
-              child: const Column(
+              child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.add_road, size: 46, color: ink),
-                    Text('Illustrated demo evidence',
-                        style: TextStyle(color: ink))
+                    const Icon(Icons.add_road, size: 46, color: ink),
+                    Text(l10n(context).demoEvidence,
+                        style: const TextStyle(color: ink))
                   ]))
           : Image.network(store.photoUrl(photo['url']),
               height: 190,
               width: double.infinity,
               fit: BoxFit.cover,
-              errorBuilder: (_, error, stack) => const SizedBox(
+              errorBuilder: (_, error, stack) => SizedBox(
                   height: 130,
-                  child: Center(
-                      child:
-                          Text('Photo unavailable. Check your connection.')))));
+                  child: Center(child: Text(l10n(context).photoUnavailable)))));
 }
 
 class ReportCard extends StatelessWidget {
@@ -238,7 +240,7 @@ class ReportCard extends StatelessWidget {
                           style: const TextStyle(
                               fontSize: 15, fontWeight: FontWeight.w600)),
                       gap(4),
-                      Text('Brgy. ${report.barangay}',
+                      Text(l10n(context).brgy(report.barangay),
                           style: TextStyle(
                               fontSize: 12,
                               color: Theme.of(context)
@@ -311,15 +313,18 @@ class Screen extends StatelessWidget {
       body: SafeArea(
           child: Column(children: [
         if (store.networkError != null)
-          MaterialBanner(content: Text(store.networkError!), actions: [
-            TextButton(
-                onPressed: () => store.refresh().catchError((Object e) {
-                      if (context.mounted) {
-                        message(context, PatagStore.clean(e));
-                      }
-                    }),
-                child: const Text('Retry'))
-          ]),
+          MaterialBanner(
+              content: Text(errorText(
+                  context, store.networkErrorCause ?? store.networkError!)),
+              actions: [
+                TextButton(
+                    onPressed: () => store.refresh().catchError((Object e) {
+                          if (context.mounted) {
+                            message(context, errorText(context, e));
+                          }
+                        }),
+                    child: Text(l10n(context).retry))
+              ]),
         Expanded(child: body)
       ])),
       bottomNavigationBar:
@@ -332,7 +337,7 @@ class ThemeToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return IconButton.filledTonal(
-      tooltip: dark ? 'Switch to light mode' : 'Switch to dark mode',
+      tooltip: dark ? l10n(context).switchToLight : l10n(context).switchToDark,
       style: IconButton.styleFrom(
           backgroundColor:
               Theme.of(context).colorScheme.surfaceContainerHighest),
@@ -347,104 +352,108 @@ class PatagNavigation extends StatelessWidget {
   final int selected;
   const PatagNavigation({required this.selected, super.key});
   @override
-  Widget build(BuildContext context) => SafeArea(
-      top: false,
-      child: Padding(
-          padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
-          child: Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                  gradient: PatagTokens.darkGradient,
-                  borderRadius: BorderRadius.circular(28)),
-              child: Row(
-                  children: List.generate(5, (i) {
-                final active = selected == i;
-                final isCenter = i == 2;
-                final color = isCenter
-                    ? orange
-                    : active
-                        ? Colors.white
-                        : Colors.transparent;
-                final foreground = isCenter
-                    ? Colors.black
-                    : active
-                        ? ink
-                        : const Color(0xFFDCE4EE);
-                return Expanded(
-                    child: Semantics(
-                        selected: active,
-                        button: true,
-                        label: [
-                          'Home',
-                          'Map',
-                          'Report a pothole',
-                          'My reports',
-                          'Profile'
-                        ][i],
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 3,
-                            vertical: 2,
-                          ),
-                          child: Material(
-                            color: color,
-                            borderRadius: BorderRadius.circular(18),
-                            child: InkWell(
-                                borderRadius: BorderRadius.circular(18),
-                                onTap: () {
-                                  final route = [
-                                    '/home',
-                                    '/map',
-                                    '/report/new',
-                                    '/reports',
-                                    '/profile'
-                                  ][i];
-                                  if (i == 2) {
-                                    go(context, route);
-                                  } else if (!active) {
-                                    Navigator.of(context)
-                                        .pushReplacementNamed(route);
-                                  }
-                                },
-                                child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 6),
-                                    child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                              [
-                                                Icons.home_outlined,
-                                                Icons.map_outlined,
-                                                Icons.add,
-                                                Icons.assignment_outlined,
-                                                Icons.person_outline
-                                              ][i],
-                                              color: foreground,
-                                              size: 20),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                              [
-                                                'Home',
-                                                'Map',
-                                                'Report',
-                                                'My reports',
-                                                'Profile'
-                                              ][i],
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: TextStyle(
-                                                  color: foreground,
-                                                  fontSize: 10,
-                                                  fontWeight: active || isCenter
-                                                      ? FontWeight.w700
-                                                      : FontWeight.normal))
-                                        ]))),
-                          ),
-                        )));
-              })))));
+  Widget build(BuildContext context) {
+    final l = l10n(context);
+    return SafeArea(
+        top: false,
+        child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 8, 14, 12),
+            child: Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                    gradient: PatagTokens.darkGradient,
+                    borderRadius: BorderRadius.circular(28)),
+                child: Row(
+                    children: List.generate(5, (i) {
+                  final active = selected == i;
+                  final isCenter = i == 2;
+                  final color = isCenter
+                      ? orange
+                      : active
+                          ? Colors.white
+                          : Colors.transparent;
+                  final foreground = isCenter
+                      ? Colors.black
+                      : active
+                          ? ink
+                          : const Color(0xFFDCE4EE);
+                  return Expanded(
+                      child: Semantics(
+                          selected: active,
+                          button: true,
+                          label: [
+                            l.navHome,
+                            l.navMap,
+                            l.reportAPothole,
+                            l.navMyReports,
+                            l.navProfile
+                          ][i],
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 3,
+                              vertical: 2,
+                            ),
+                            child: Material(
+                              color: color,
+                              borderRadius: BorderRadius.circular(18),
+                              child: InkWell(
+                                  borderRadius: BorderRadius.circular(18),
+                                  onTap: () {
+                                    final route = [
+                                      '/home',
+                                      '/map',
+                                      '/report/new',
+                                      '/reports',
+                                      '/profile'
+                                    ][i];
+                                    if (i == 2) {
+                                      go(context, route);
+                                    } else if (!active) {
+                                      Navigator.of(context)
+                                          .pushReplacementNamed(route);
+                                    }
+                                  },
+                                  child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 6),
+                                      child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                                [
+                                                  Icons.home_outlined,
+                                                  Icons.map_outlined,
+                                                  Icons.add,
+                                                  Icons.assignment_outlined,
+                                                  Icons.person_outline
+                                                ][i],
+                                                color: foreground,
+                                                size: 20),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                                [
+                                                  l.navHome,
+                                                  l.navMap,
+                                                  l.navReport,
+                                                  l.navMyReports,
+                                                  l.navProfile
+                                                ][i],
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: TextStyle(
+                                                    color: foreground,
+                                                    fontSize: 10,
+                                                    fontWeight: active ||
+                                                            isCenter
+                                                        ? FontWeight.w700
+                                                        : FontWeight.normal))
+                                          ]))),
+                            ),
+                          )));
+                })))));
+  }
 }
 
 class ReportProgress extends StatelessWidget {
@@ -462,24 +471,25 @@ class ReportProgress extends StatelessWidget {
     ].indexOf(report.status);
     final awaiting =
         report.json['completion']?['state'] == 'Awaiting Verification';
+    final l = l10n(context);
     return Container(
         padding: const EdgeInsets.all(22),
         decoration:
             BoxDecoration(color: ink, borderRadius: BorderRadius.circular(24)),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            const Expanded(
-                child: Text('Report progress',
-                    style: TextStyle(color: Colors.white, fontSize: 13))),
+            Expanded(
+                child: Text(l.progressTitle,
+                    style: const TextStyle(color: Colors.white, fontSize: 13))),
             StatusChip(report.status)
           ]),
           gap(16),
           Text(
               report.status == 'Resolved'
-                  ? 'Repair verified. A better road ahead.'
+                  ? l.progressResolved
                   : awaiting
-                      ? 'Repair submitted. Awaiting LGU verification.'
-                      : 'Follow your tag, from report to repair.',
+                      ? l.progressAwaiting
+                      : l.progressFollow,
               style: const TextStyle(color: Color(0xFFDDE5EF), fontSize: 13)),
           gap(22),
           Row(
@@ -509,10 +519,10 @@ class ReportProgress extends StatelessWidget {
                             gap(10),
                             Text(
                                 [
-                                  'Reported',
-                                  'Verified',
-                                  'Repair',
-                                  'Resolved'
+                                  l.progressStepReported,
+                                  l.progressStepVerified,
+                                  l.progressStepRepair,
+                                  l.progressStepResolved
                                 ][i],
                                 style: const TextStyle(
                                     color: Color(0xFFDDE5EF), fontSize: 11))
@@ -542,7 +552,13 @@ class WizardSteps extends StatelessWidget {
                                     color: i <= current ? orange : line,
                                     borderRadius: BorderRadius.circular(10))),
                             gap(10),
-                            Text(['Photo', 'Location', 'Details', 'Review'][i],
+                            Text(
+                                [
+                                  l10n(context).stepPhoto,
+                                  l10n(context).stepLocation,
+                                  l10n(context).stepDetails,
+                                  l10n(context).stepReview
+                                ][i],
                                 style: TextStyle(
                                     fontSize: 12,
                                     color: i == current
@@ -601,15 +617,13 @@ class _ServerStatusBannerState extends State<ServerStatusBanner> {
         builder: (context, _) {
           if (store.checkingServer && slow) {
             return _panel(context, Icons.hourglass_top_rounded,
-                'Connecting to PATAG… A server that was asleep can take up to a minute.');
+                l10n(context).serverWaking);
           }
-          final problem = store.serverProblem;
-          if (problem == null || store.checkingServer) {
+          if (store.serverProblem == null || store.checkingServer) {
             return const SizedBox.shrink();
           }
-          return _panel(
-              context,
-              Icons.cloud_off_outlined,
+          final problem = l10n(context).serverUnreachable;
+          return _panel(context, Icons.cloud_off_outlined,
               kDebugMode ? '$problem\n${PatagStore.baseUrl}' : problem,
               retry: true);
         },
@@ -636,8 +650,37 @@ class _ServerStatusBannerState extends State<ServerStatusBanner> {
                       fontWeight: FontWeight.w600,
                       height: 1.35))),
           if (retry)
-            TextButton(onPressed: check, child: const Text('Retry')),
+            TextButton(onPressed: check, child: Text(l10n(context).retry)),
         ]),
+      ),
+    );
+  }
+}
+
+/// Compact English / Tagalog switch for screens shown before signing in.
+class LanguageToggle extends StatelessWidget {
+  const LanguageToggle({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final l = l10n(context);
+    return ListenableBuilder(
+      listenable: localeController,
+      builder: (context, _) => PopupMenuButton<Locale>(
+        tooltip: l.languageTitle,
+        icon: const Icon(Icons.translate, size: 21),
+        initialValue: localeController.locale,
+        onSelected: localeController.setLocale,
+        itemBuilder: (_) => [
+          for (final (locale, label) in [
+            (LocaleController.english, l.languageEnglish),
+            (LocaleController.tagalog, l.languageTagalog),
+          ])
+            CheckedPopupMenuItem<Locale>(
+              value: locale,
+              checked: localeController.locale == locale,
+              child: Text(label),
+            ),
+        ],
       ),
     );
   }

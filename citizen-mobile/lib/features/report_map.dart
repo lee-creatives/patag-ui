@@ -4,12 +4,14 @@ import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import '../app/theme.dart';
 import '../core/api.dart';
+import '../core/errors.dart';
 import '../core/models.dart';
+import '../l10n/l10n.dart';
 import '../shared/widgets/ui.dart';
 
 Future<LatLng> locate() async {
   if (!await Geolocator.isLocationServiceEnabled()) {
-    throw Exception('GPS is off. Turn it on or tap the map to pin manually.');
+    throw const PatagException(PatagErrorKind.gpsOff);
   }
   var permission = await Geolocator.checkPermission();
   if (permission == LocationPermission.denied) {
@@ -17,8 +19,7 @@ Future<LatLng> locate() async {
   }
   if (permission == LocationPermission.denied ||
       permission == LocationPermission.deniedForever) {
-    throw Exception(
-        'Location permission denied. Tap the map to choose a location, or enable location in Android settings.');
+    throw const PatagException(PatagErrorKind.locationDenied);
   }
   final position = await Geolocator.getCurrentPosition(
     locationSettings: const LocationSettings(
@@ -78,7 +79,9 @@ class _RoadMapState extends State<RoadMap> {
     final picked = await Navigator.of(context).push<LatLng>(MaterialPageRoute(
         fullscreenDialog: true,
         builder: (_) => FullMapScreen(
-            reports: widget.reports, initialPin: widget.pin, picking: picking)));
+            reports: widget.reports,
+            initialPin: widget.pin,
+            picking: picking)));
     if (picked != null && picking) widget.onPin!(picked);
   }
 
@@ -94,11 +97,11 @@ class _RoadMapState extends State<RoadMap> {
             children: [
               heading(sheetContext, report.road),
               gap(10),
-              Text('Brgy. ${report.barangay}'),
+              Text(l10n(sheetContext).brgy(report.barangay)),
               gap(12),
               StatusChip(report.status),
               gap(16),
-              action('View public report', () {
+              action(l10n(sheetContext).viewPublicReport, () {
                 Navigator.pop(sheetContext);
                 go(context, '/map/reports/${report.id}');
               }),
@@ -109,6 +112,7 @@ class _RoadMapState extends State<RoadMap> {
 
   @override
   Widget build(BuildContext context) {
+    final l = l10n(context);
     return ClipRRect(
         borderRadius: BorderRadius.circular(widget.height == null ? 0 : 18),
         child: SizedBox(
@@ -176,7 +180,8 @@ class _RoadMapState extends State<RoadMap> {
                         width: 44,
                         height: 44,
                         child: IconButton(
-                            tooltip: '${report.road}: ${report.status}',
+                            tooltip: l.mapPinTooltip(
+                                report.road, apiValueLabel(l, report.status)),
                             icon: Icon(Icons.location_pin,
                                 color: report.status == 'Resolved'
                                     ? const Color(0xFF247B50)
@@ -197,28 +202,28 @@ class _RoadMapState extends State<RoadMap> {
                   if (widget.expandable) ...[
                     FloatingActionButton.small(
                         heroTag: null,
-                        tooltip: 'Full screen map',
+                        tooltip: l.mapFullScreen,
                         onPressed: expand,
                         child: const Icon(Icons.fullscreen)),
                     gap(4),
                   ],
                   FloatingActionButton.small(
                       heroTag: null,
-                      tooltip: 'Zoom in',
+                      tooltip: l.mapZoomIn,
                       onPressed: () => controller.move(
                           controller.camera.center, controller.camera.zoom + 1),
                       child: const Icon(Icons.add)),
                   gap(4),
                   FloatingActionButton.small(
                       heroTag: null,
-                      tooltip: 'Zoom out',
+                      tooltip: l.mapZoomOut,
                       onPressed: () => controller.move(
                           controller.camera.center, controller.camera.zoom - 1),
                       child: const Icon(Icons.remove)),
                   gap(4),
                   FloatingActionButton.small(
                       heroTag: null,
-                      tooltip: 'Recenter map',
+                      tooltip: l.mapRecenter,
                       onPressed: () => controller.move(
                           widget.pin ?? const LatLng(14.855, 120.815), 14),
                       child: const Icon(Icons.my_location)),
@@ -230,11 +235,10 @@ class _RoadMapState extends State<RoadMap> {
                   right: 8,
                   child: ColoredBox(
                       color: Theme.of(context).colorScheme.surface,
-                      child: const Padding(
-                          padding: EdgeInsets.all(6),
-                          child: Text(
-                              'Map tiles unavailable. Enter coordinates or use the report list.',
-                              style: TextStyle(fontSize: 11))))),
+                      child: Padding(
+                          padding: const EdgeInsets.all(6),
+                          child: Text(l.mapTilesUnavailable,
+                              style: const TextStyle(fontSize: 11))))),
           ]),
         ));
   }
@@ -272,7 +276,7 @@ class _FullMapScreenState extends State<FullMapScreen> {
       final point = await locate();
       if (mounted) setState(() => pin = point);
     } catch (e) {
-      if (mounted) message(context, PatagStore.clean(e));
+      if (mounted) message(context, errorText(context, e));
     }
     if (mounted) setState(() => locating = false);
   }
@@ -282,7 +286,7 @@ class _FullMapScreenState extends State<FullMapScreen> {
     if (store.token == null) {
       // Kept until sign-in finishes, then the report form opens with it.
       store.pendingReportPin = point;
-      message(context, 'Sign in to report this pothole.');
+      message(context, l10n(context).mapSignInToReport);
       Navigator.of(context).pushNamed('/login').then((_) {
         // Backed out without signing in: don't open a report form later.
         if (store.token == null) store.pendingReportPin = null;
@@ -295,9 +299,8 @@ class _FullMapScreenState extends State<FullMapScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final hint = widget.picking
-        ? 'Tap the map to place the pothole pin.'
-        : 'Tap a pin for details, or tap the road to report a pothole there.';
+    final l = l10n(context);
+    final hint = widget.picking ? l.mapHintPicking : l.mapHintBrowsing;
     return Scaffold(
       body: SizedBox.expand(
           child: Stack(children: [
@@ -314,25 +317,26 @@ class _FullMapScreenState extends State<FullMapScreen> {
             right: 0,
             child: SafeArea(
                 child: Padding(
-          padding: const EdgeInsets.fromLTRB(12, 10, 64, 0),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            FloatingActionButton.small(
-                heroTag: null,
-                tooltip: 'Close full screen map',
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Icon(Icons.close)),
-            const SizedBox(width: 8),
-            Flexible(
-                child: Material(
-              color: theme.colorScheme.surface.withValues(alpha: .94),
-              borderRadius: BorderRadius.circular(14),
-              child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                  child: Text(hint, style: const TextStyle(fontSize: 13))),
-            )),
-          ]),
-        ))),
+              padding: const EdgeInsets.fromLTRB(12, 10, 64, 0),
+              child:
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                FloatingActionButton.small(
+                    heroTag: null,
+                    tooltip: l.mapClose,
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Icon(Icons.close)),
+                const SizedBox(width: 8),
+                Flexible(
+                    child: Material(
+                  color: theme.colorScheme.surface.withValues(alpha: .94),
+                  borderRadius: BorderRadius.circular(14),
+                  child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 10),
+                      child: Text(hint, style: const TextStyle(fontSize: 13))),
+                )),
+              ]),
+            ))),
         Positioned(
             left: 0,
             right: 0,
@@ -351,7 +355,9 @@ class _FullMapScreenState extends State<FullMapScreen> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10),
                         child: Text(
-                            'Pin: ${pin!.latitude.toStringAsFixed(5)}, ${pin!.longitude.toStringAsFixed(5)}',
+                            l.mapPinCoordinates(
+                                pin!.latitude.toStringAsFixed(5),
+                                pin!.longitude.toStringAsFixed(5)),
                             style: TextStyle(
                                 fontSize: 12,
                                 color: theme.colorScheme.onSurfaceVariant)),
@@ -361,7 +367,7 @@ class _FullMapScreenState extends State<FullMapScreen> {
                           child: OutlinedButton.icon(
                               onPressed: locating ? null : useGps,
                               icon: const Icon(Icons.my_location),
-                              label: Text(locating ? 'Locating…' : 'My GPS'))),
+                              label: Text(locating ? l.locating : l.myGps))),
                       const SizedBox(width: 10),
                       Expanded(
                           flex: 2,
@@ -375,8 +381,8 @@ class _FullMapScreenState extends State<FullMapScreen> {
                                   ? Icons.check
                                   : Icons.add_location_alt_outlined),
                               label: Text(widget.picking
-                                  ? 'Use this location'
-                                  : 'Report a pothole here'))),
+                                  ? l.useThisLocation
+                                  : l.reportPotholeHere))),
                     ]),
                   ]),
                 ),
@@ -410,13 +416,14 @@ class _PublicMapState extends State<PublicMap> {
             (severity == 'All' || severity == report.severity) &&
             (status == 'All' || status == report.status))
         .toList();
+    final l = l10n(context);
     return Screen(
-      title: 'Community pothole map',
+      title: l.publicMapTitle,
       selected: 1,
       body: ListView(padding: const EdgeInsets.all(20), children: [
-        heading(context, 'Know the road ahead.'),
+        heading(context, l.publicMapHeading),
         gap(8),
-        Text('Fictional demonstration reports · Malolos, Bulacan',
+        Text(l.publicMapDemoNote,
             style: TextStyle(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 12)),
@@ -426,18 +433,22 @@ class _PublicMapState extends State<PublicMap> {
               value: severity,
               items: ['All', 'High', 'Medium', 'Low']
                   .map((s) => DropdownMenuItem(
-                      value: s, child: Text(s == 'All' ? 'All severities' : s)))
+                      value: s,
+                      child: Text(
+                          s == 'All' ? l.allSeverities : apiValueLabel(l, s))))
                   .toList(),
               onChanged: (s) => setState(() => severity = s!)),
           DropdownButton<String>(
               value: status,
               items: ['All', ...reportStatuses]
                   .map((s) => DropdownMenuItem(
-                      value: s, child: Text(s == 'All' ? 'All statuses' : s)))
+                      value: s,
+                      child: Text(
+                          s == 'All' ? l.allStatuses : apiValueLabel(l, s))))
                   .toList(),
               onChanged: (s) => setState(() => status = s!)),
           IconButton(
-              tooltip: list ? 'Show map' : 'Show list',
+              tooltip: list ? l.showMap : l.showList,
               onPressed: () => setState(() => list = !list),
               icon: Icon(list ? Icons.map_outlined : Icons.list)),
         ]),
@@ -445,31 +456,33 @@ class _PublicMapState extends State<PublicMap> {
         if (!list)
           RoadMap(key: ValueKey(gps), reports: reports, pin: gps, height: 420),
         gap(16),
-        const Text('Community reports',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+        Text(l.communityReports,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
         gap(12),
         Wrap(spacing: 8, runSpacing: 8, children: [
           for (final s in ['All', ...reportStatuses])
             ChoiceChip(
-                label: Text(s),
+                label: Text(s == 'All' ? l.filterAll : apiValueLabel(l, s)),
                 selected: status == s,
                 onSelected: (_) => setState(() => status = s)),
         ]),
         gap(16),
         if (reports.isEmpty)
-          const EmptyState('No reports nearby', 'Try a different filter.'),
+          EmptyState(l.noReportsNearby, l.tryDifferentFilter),
         if (list) ...reports.map((report) => ReportCard(report, public: true)),
-        if (!list) Text('${reports.length} reports · Tap a pin for details.'),
+        if (!list) Text(l.reportsCountTapPin(reports.length)),
         gap(),
         OutlinedButton.icon(
             icon: const Icon(Icons.my_location),
-            label: const Text('Use current GPS location'),
+            label: Text(l.useCurrentGps),
             onPressed: () async {
               try {
                 final point = await locate();
                 if (mounted) setState(() => gps = point);
               } catch (error) {
-                if (context.mounted) message(context, PatagStore.clean(error));
+                if (context.mounted) {
+                  message(context, errorText(context, error));
+                }
               }
             }),
       ]),

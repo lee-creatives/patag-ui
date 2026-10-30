@@ -11,6 +11,7 @@ import {
   type Photo, type Report, type Role, type User,
 } from './domain.ts';
 import { hashPassword, newToken, sha256, verifyPassword } from './passwords.ts';
+import type { ReverseGeocode } from './geocode.ts';
 import type { Store } from './store.ts';
 
 export interface AppOptions {
@@ -22,6 +23,8 @@ export interface AppOptions {
   bodyLimit?: number;
   /** Fastify trustProxy: false locally; hop count or proxy IPs behind a hosting load balancer. */
   trustProxy?: boolean | number | string[];
+  /** Reverse geocoder for the report form's map pin; when absent the endpoint returns empty fields. */
+  geocode?: ReverseGeocode;
 }
 
 const SESSION_MS = 8 * 60 * 60 * 1000;
@@ -91,7 +94,7 @@ export function originAllowed(origin: string, allowed: string[]) {
   return !!m && allowed.includes(`${m[1]}:*`);
 }
 
-export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], logger = false, bodyLimit = BODY_LIMIT, trustProxy = false }: AppOptions) {
+export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], logger = false, bodyLimit = BODY_LIMIT, trustProxy = false, geocode }: AppOptions) {
   // A hop count becomes Fastify's trust function: trust only the nearest N proxies.
   const trust = typeof trustProxy === 'number' ? (_address: string, hop: number) => hop < trustProxy : trustProxy;
   const app = Fastify({ logger, bodyLimit, trustProxy: trust });
@@ -301,6 +304,22 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
       await store.recordUpload(name, user.id, contentType, bytes.length);
       const display = typeof b.name === 'string' && b.name.trim() ? b.name.trim().slice(0, 200) : name;
       return reply.code(201).send({ id: randomUUID(), url: `/uploads/${name}`, name: display, kind: b.kind === 'after' ? 'after' : 'before' });
+    });
+
+    // Address suggestion for a map pin. A convenience only: failures return empty fields, never an error.
+    const geoUse = new Map<string, { count: number; until: number }>();
+    api.get('/geocode/reverse', async (req: FastifyRequest<{ Querystring: Record<string, string | undefined> }>) => {
+      const user = await currentUser(req);
+      const lat = Number(req.query.lat), lng = Number(req.query.lng);
+      if (!validCoordinates({ lat, lng }) || req.query.lat === undefined || req.query.lng === undefined) fail(400, 'Valid coordinates are required.');
+      const lang = req.query.lang === 'fil' ? 'fil' : 'en';
+      const now = Date.now();
+      let u = geoUse.get(user.id);
+      if (!u || u.until < now) { u = { count: 0, until: now + 60_000 }; geoUse.set(user.id, u); }
+      if (++u.count > 30) fail(429, 'Too many address lookups. Wait a minute and try again.');
+      if (geoUse.size > 10_000) for (const [k, v] of geoUse) if (v.until < now) geoUse.delete(k);
+      const empty = { road: '', barangay: '', city: '', province: '', source: 'none' as const };
+      return geocode ? geocode(lat, lng, lang) : empty;
     });
 
     api.post('/duplicates', async req => {

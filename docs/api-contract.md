@@ -40,6 +40,7 @@ Base: web `VITE_API_URL=http://127.0.0.1:4100/api`; Android emulator `--dart-def
 | POST /uploads | authenticated | data (base64 PNG/JPEG/WebP <=8 MB), name, kind -> ReportPhoto |
 | POST /reports | citizen | report fields below; service sets owner, Submitted status and history |
 | POST /duplicates | authenticated | id (optional), location -> possible matching public reports with distance |
+| GET /geocode/reverse?lat&lng&lang | authenticated | lang `en` or `fil` -> `{road, barangay, city, province, source}`; `source` is `mapbox` or `none` (empty fields, never an error); 30 lookups/min per user |
 | POST /reports/:id/events | authorized operational role | action + fields below -> updated report, event and notifications |
 | POST /reports/:id/feedback | owning citizen | rating, text -> feedback |
 | POST /notifications/read | recipient | id or id=all |

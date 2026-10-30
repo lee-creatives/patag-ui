@@ -1,10 +1,13 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'app/locale.dart';
 import 'app/theme.dart';
 import 'core/api.dart';
 import 'features/screens.dart';
+import 'l10n/l10n.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -17,6 +20,7 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   store.showUnread = prefs.getBool('maintenance-notifications') ?? true;
   await themeController.load();
+  await localeController.load();
   runApp(const PatagMaintenanceApp());
 }
 
@@ -29,9 +33,18 @@ class PatagMaintenanceApp extends StatelessWidget {
     store.onSessionExpired ??= () => navigatorKey.currentState
         ?.pushNamedAndRemoveUntil('/login', (_) => false);
     return AnimatedBuilder(
-      animation: Listenable.merge([store, themeController]),
+      animation: Listenable.merge([store, themeController, localeController]),
       builder: (context, _) => MaterialApp(
-        title: 'PATAG Maintenance',
+        onGenerateTitle: (context) => context.l10n.appTitle,
+        // The crew's choice (Tagalog by default), never the phone's language.
+        locale: localeController.locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: const [
+          AppLocalizations.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         navigatorKey: navigatorKey,
         debugShowCheckedModeBanner: false,
         theme: patagMaintenanceTheme(),
@@ -73,7 +86,7 @@ class PatagMaintenanceApp extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'PATAG Crew Mobile · Portrait Phone View',
+                        context.l10n.devicePreviewLabel,
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,

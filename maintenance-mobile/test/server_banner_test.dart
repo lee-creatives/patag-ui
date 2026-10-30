@@ -5,6 +5,8 @@ import 'package:http/testing.dart';
 import 'package:patag_maintenance/core/api.dart';
 import 'package:patag_maintenance/shared/widgets/ui.dart';
 
+import 'test_app.dart';
+
 void main() {
   var serverUp = false;
   setUp(() {
@@ -16,8 +18,7 @@ void main() {
     });
   });
 
-  Widget screen() =>
-      const MaterialApp(home: Scaffold(body: ServerStatusBanner()));
+  Widget screen() => testApp(const Scaffold(body: ServerStatusBanner()));
 
   testWidgets('explains an unreachable server and recovers on Retry',
       (tester) async {

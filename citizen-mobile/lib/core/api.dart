@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
+import 'errors.dart';
 import 'models.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,6 +17,9 @@ class PatagStore extends ChangeNotifier {
   List<dynamic> notifications = [];
   Timer? timer;
   String? networkError;
+
+  /// The error behind [networkError], so it can be shown in the app language.
+  Object? networkErrorCause;
   bool showUnread = true;
 
   /// Replaceable in tests.
@@ -48,8 +52,8 @@ class PatagStore extends ChangeNotifier {
     }
     if (check == _serverCheck) {
       checkingServer = false;
-      serverProblem =
-          ok ? null : "Can't reach the PATAG server. Is the backend running?";
+      // English for logs and tests; the banner shows it in the app language.
+      serverProblem = ok ? null : englishL10n.serverUnreachable;
       notifyListeners();
     }
     return ok;
@@ -86,19 +90,20 @@ class PatagStore extends ChangeNotifier {
                   : client.post(uri, headers: headers, body: jsonEncode(body)))
           .timeout(const Duration(seconds: 20));
     } on TimeoutException {
-      throw Exception('Connection timed out. Your draft is saved. Please retry.');
+      throw const PatagException(PatagErrorKind.timeout);
     } catch (_) {
-      throw Exception(
-          'Cannot reach PATAG. Check the local API and your connection. Your draft is saved.');
+      throw const PatagException(PatagErrorKind.unreachable);
     }
     dynamic data;
     try {
       data = jsonDecode(response.body);
     } catch (_) {
       // e.g. an HTML 502 page while a hosted server is starting.
-      throw Exception(response.statusCode >= 500
-          ? 'The PATAG server is unavailable (${response.statusCode}). Please retry in a moment.'
-          : 'Unexpected response from the PATAG server (${response.statusCode}).');
+      throw PatagException(
+          response.statusCode >= 500
+              ? PatagErrorKind.serverDown
+              : PatagErrorKind.unexpectedResponse,
+          status: response.statusCode);
     }
     if (response.statusCode >= 400) {
       // Only expire the session this request was made with (not a newer login).
@@ -106,8 +111,9 @@ class PatagStore extends ChangeNotifier {
         await _clearSession();
         onSessionExpired?.call();
       }
-      throw Exception(
-          (data is Map ? data['error'] : null) ?? 'Please try again.');
+      final serverMessage = data is Map ? data['error'] : null;
+      throw PatagException(PatagErrorKind.server,
+          serverMessage: serverMessage is String ? serverMessage : null);
     }
     return data;
   }
@@ -115,7 +121,7 @@ class PatagStore extends ChangeNotifier {
   Future<void> authenticate(String path, Map<String, dynamic> body) async {
     final data = await call(path, body: body);
     if (data['user']['role'] != 'citizen') {
-      throw Exception('Use a citizen account in this app.');
+      throw const PatagException(PatagErrorKind.citizenOnly);
     }
     token = data['token'];
     user = Map<String, dynamic>.from(data['user']);
@@ -152,10 +158,12 @@ class PatagStore extends ChangeNotifier {
       }
       publicReports = public;
       networkError = null;
+      networkErrorCause = null;
       notifyListeners();
     } catch (e) {
       if (token == sessionToken) {
         networkError = clean(e);
+        networkErrorCause = e;
         notifyListeners();
       }
       rethrow;
@@ -167,7 +175,7 @@ class PatagStore extends ChangeNotifier {
   Future<Map<String, dynamic>> upload(XFile file) async {
     final bytes = await file.readAsBytes();
     if (bytes.length > 8 * 1024 * 1024) {
-      throw Exception('Choose a photo under 8 MB.');
+      throw const PatagException(PatagErrorKind.photoTooLarge);
     }
     final name = file.name.toLowerCase();
     final type = name.endsWith('.png')
@@ -178,13 +186,36 @@ class PatagStore extends ChangeNotifier {
                 ? 'jpeg'
                 : null;
     if (type == null) {
-      throw Exception('Choose a JPEG, PNG or WebP photo.');
+      throw const PatagException(PatagErrorKind.photoType);
     }
     return Map<String, dynamic>.from(await call('/uploads', body: {
       'data': 'data:image/$type;base64,${base64Encode(bytes)}',
       'name': file.name,
       'kind': 'before'
     }));
+  }
+
+  /// Road, barangay, city and province for a map pin, looked up by the PATAG
+  /// server (which asks Mapbox). Unknown parts are empty strings; any failure
+  /// returns all parts empty.
+  Future<Map<String, String>> reverseGeocode(
+      double lat, double lng, String lang) async {
+    const parts = ['road', 'barangay', 'city', 'province'];
+    final empty = {for (final part in parts) part: ''};
+    try {
+      final query = Uri(queryParameters: {
+        'lat': lat.toStringAsFixed(6),
+        'lng': lng.toStringAsFixed(6),
+        'lang': lang == 'fil' ? 'fil' : 'en',
+      }).query;
+      final data = await call('/geocode/reverse?$query');
+      if (data is! Map) return empty;
+      return {
+        for (final part in parts) part: (data[part] ?? '').toString().trim()
+      };
+    } catch (_) {
+      return empty;
+    }
   }
 
   String photoUrl(String path) =>

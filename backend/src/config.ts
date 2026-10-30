@@ -32,6 +32,7 @@ export const config = {
     .split(',').map(s => s.trim()).filter(Boolean),
   supabaseUrl: env.SUPABASE_URL || '',
   supabaseSecretKey: env.SUPABASE_SECRET_KEY || '',
+  mapboxToken: env.MAPBOX_TOKEN || '',
   bucket: env.STORAGE_BUCKET || 'report-photos',
 };
 

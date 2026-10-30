@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 import '../app/theme.dart';
 import '../core/api.dart';
 import '../core/models.dart';
+import '../l10n/l10n.dart';
 import '../shared/widgets/ui.dart';
 
 class TaskMapScreen extends StatefulWidget {
@@ -23,6 +24,7 @@ class _TaskMapScreenState extends State<TaskMapScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final dark = theme.brightness == Brightness.dark;
+    final l = context.l10n;
     final allReports = store.myAssignments;
 
     final filtered = allReports.where((r) {
@@ -38,9 +40,10 @@ class _TaskMapScreenState extends State<TaskMapScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Assigned Task Map'),
+        title: Text(l.mapTitle),
         actions: [
           IconButton(
+            tooltip: l.refresh,
             icon: const Icon(Icons.refresh_rounded),
             onPressed: () => store.refresh().catchError((Object _) {}),
           ),
@@ -116,7 +119,11 @@ class _TaskMapScreenState extends State<TaskMapScreen> {
                   return Padding(
                     padding: const EdgeInsets.only(right: 8),
                     child: ChoiceChip(
-                      label: Text(f),
+                      label: Text(switch (f) {
+                        'All' => l.filterAll,
+                        'High' => severityLabel(l, f),
+                        _ => statusLabel(l, f),
+                      }),
                       selected: isSelected,
                       onSelected: (selected) {
                         if (selected) setState(() => _filter = f);
@@ -141,6 +148,7 @@ class _TaskMapScreenState extends State<TaskMapScreen> {
             bottom: 24,
             child: FloatingActionButton(
               mini: true,
+              tooltip: l.mapRecenter,
               backgroundColor: dark ? const Color(0xFF22242A) : Colors.white,
               foregroundColor: orange,
               onPressed: () {
@@ -160,53 +168,58 @@ class _TaskMapScreenState extends State<TaskMapScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(22),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                StatusBadge(report.status),
-                SeverityBadge(report.severity),
-              ],
-            ),
-            gap(12),
-            Text(
-              report.road.isNotEmpty ? report.road : 'Road Work Order',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-            ),
-            gap(4),
-            Text(
-              'Brgy. ${report.barangay}, ${report.city} · ${report.id}',
-              style: const TextStyle(fontSize: 13, color: slate),
-            ),
-            if (report.description.isNotEmpty) ...[
-              gap(8),
+      builder: (ctx) {
+        final l = ctx.l10n;
+        return Padding(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  StatusBadge(report.status),
+                  SeverityBadge(report.severity),
+                ],
+              ),
+              gap(12),
               Text(
-                report.description,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 13),
+                report.road.isNotEmpty ? report.road : l.taskFallbackTitle,
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              ),
+              gap(4),
+              Text(
+                l.mapTaskLocation(report.barangay, report.city, report.id),
+                style: const TextStyle(fontSize: 13, color: slate),
+              ),
+              if (report.description.isNotEmpty) ...[
+                gap(8),
+                Text(
+                  report.description,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 13),
+                ),
+              ],
+              gap(18),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.open_in_new_rounded, size: 18),
+                  label: Text(l.openTaskDetails),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    Navigator.of(context)
+                        .pushNamed('/assignments/${report.id}');
+                  },
+                ),
               ),
             ],
-            gap(18),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                icon: const Icon(Icons.open_in_new_rounded, size: 18),
-                label: const Text('Open Task Details'),
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  Navigator.of(context).pushNamed('/assignments/${report.id}');
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:patag_maintenance/app/theme.dart';
 import 'package:patag_maintenance/features/screens.dart';
+
+import 'test_app.dart';
 
 void main() {
   testWidgets('Maintenance login screen renders and has demo login button',
       (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        theme: patagMaintenanceTheme(),
-        home: const MaintenanceLogin(),
-      ),
+      testApp(const MaintenanceLogin()),
     );
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -23,11 +21,8 @@ void main() {
   testWidgets('Maintenance splash screen displays title and logo',
       (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        theme: patagMaintenanceTheme(),
-        routes: {'/login': (_) => const Scaffold()},
-        home: const MaintenanceSplash(),
-      ),
+      testApp(const MaintenanceSplash(),
+          routes: {'/login': (_) => const Scaffold()}),
     );
     expect(find.text('Road Maintenance Operations'), findsOneWidget);
     await tester.pump(const Duration(milliseconds: 500));
@@ -42,10 +37,7 @@ void main() {
       addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(
-        MaterialApp(
-          theme: patagMaintenanceTheme(),
-          home: const MaintenanceLogin(),
-        ),
+        testApp(const MaintenanceLogin()),
       );
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.text('Welcome back'), findsOneWidget);

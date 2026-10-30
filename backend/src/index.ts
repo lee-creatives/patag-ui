@@ -2,6 +2,7 @@ import { buildApp } from './app.ts';
 import { SupabaseBlobStore } from './blobs.ts';
 import { config, createPool, demoExposureError, lanUrls, requireEnv } from './config.ts';
 import { migrate, pgDb } from './db.ts';
+import { createGeocoder } from './geocode.ts';
 import { Store } from './store.ts';
 
 const exposure = demoExposureError(config.host, config.allowDemo, config.allowDemoOnLan);
@@ -16,6 +17,7 @@ const store = new Store(db);
 const blobs = new SupabaseBlobStore(config.supabaseUrl, config.supabaseSecretKey, config.bucket);
 const app = buildApp({
   store, blobs, allowDemo: config.allowDemo, corsOrigins: config.corsOrigins, trustProxy: config.trustProxy, logger: true,
+  geocode: createGeocoder({ token: config.mapboxToken, log: m => console.warn(m) }),
 });
 
 const purge = setInterval(() => store.purgeExpiredSessions().catch(() => {}), 60 * 60 * 1000);

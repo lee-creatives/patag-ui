@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:patag_maintenance/app/theme.dart';
 import 'package:patag_maintenance/core/api.dart';
 import 'package:patag_maintenance/core/models.dart';
 import 'package:patag_maintenance/features/screens.dart';
+
+import 'test_app.dart';
 
 void main() {
   setUp(() {
@@ -75,10 +76,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
 
     await tester.pumpWidget(
-      MaterialApp(
-        theme: patagMaintenanceTheme(),
-        home: const DashboardTab(),
-      ),
+      testApp(const DashboardTab()),
     );
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -96,10 +94,7 @@ void main() {
   testWidgets('AssignmentsTab renders search and list of tasks',
       (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        theme: patagMaintenanceTheme(),
-        home: const AssignmentsTab(),
-      ),
+      testApp(const AssignmentsTab()),
     );
     await tester.pump(const Duration(milliseconds: 300));
 
@@ -110,10 +105,7 @@ void main() {
   testWidgets('TaskDetailsScreen renders work order info and action buttons',
       (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        theme: patagMaintenanceTheme(),
-        home: const TaskDetailsScreen('PTG-2026-0104'),
-      ),
+      testApp(const TaskDetailsScreen('PTG-2026-0104')),
     );
     await tester.pumpAndSettle();
 
@@ -129,10 +121,7 @@ void main() {
       'TaskDetailsScreen for In Progress task shows Add After Photo and submit',
       (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        theme: patagMaintenanceTheme(),
-        home: const TaskDetailsScreen('PTG-2026-0106'),
-      ),
+      testApp(const TaskDetailsScreen('PTG-2026-0106')),
     );
     await tester.pumpAndSettle();
 
@@ -156,10 +145,7 @@ void main() {
       },
     });
     await tester.pumpWidget(
-      MaterialApp(
-        theme: patagMaintenanceTheme(),
-        home: const TaskDetailsScreen('PTG-2026-0106'),
-      ),
+      testApp(const TaskDetailsScreen('PTG-2026-0106')),
     );
     await tester.pumpAndSettle();
 
@@ -172,10 +158,7 @@ void main() {
   testWidgets('SubmissionSuccessScreen displays celebration and return CTA',
       (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        theme: patagMaintenanceTheme(),
-        home: const SubmissionSuccessScreen('PTG-2026-0106'),
-      ),
+      testApp(const SubmissionSuccessScreen('PTG-2026-0106')),
     );
     await tester.pump(const Duration(milliseconds: 300));
 
