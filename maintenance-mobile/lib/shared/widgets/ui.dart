@@ -86,40 +86,19 @@ class _DancingMascotState extends State<DancingMascot>
         animation: controller,
         child: SizedBox(
           width: widget.width,
-          child: Stack(
-            children: [
-              for (final offset in [
-                const Offset(-1, 0),
-                const Offset(1, 0),
-                const Offset(0, -1),
-                const Offset(0, 1),
-              ])
-                Transform.translate(
-                  offset: offset,
-                  child: Image.asset(
-                    'assets/images/patag-mascot.png',
-                    width: widget.width,
-                    color: const Color(0xFFFFF4E6),
-                    colorBlendMode: BlendMode.srcIn,
-                    excludeFromSemantics: true,
-                    errorBuilder: (_, __, ___) => const SizedBox(),
-                  ),
-                ),
-              Image.asset(
-                'assets/images/patag-mascot.png',
-                width: widget.width,
-                excludeFromSemantics: true,
-                errorBuilder: (_, __, ___) => SizedBox(
-                  width: widget.width,
-                  height: widget.width,
-                  child: const Icon(
-                    Icons.handyman_rounded,
-                    color: orange,
-                    size: 40,
-                  ),
-                ),
+          child: Image.asset(
+            'assets/images/patag-mascot.png',
+            width: widget.width,
+            excludeFromSemantics: true,
+            errorBuilder: (_, __, ___) => SizedBox(
+              width: widget.width,
+              height: widget.width,
+              child: const Icon(
+                Icons.handyman_rounded,
+                color: orange,
+                size: 40,
               ),
-            ],
+            ),
           ),
         ),
         builder: (context, child) {

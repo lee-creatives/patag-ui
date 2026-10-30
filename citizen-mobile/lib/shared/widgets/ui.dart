@@ -75,23 +75,8 @@ class _DancingMascotState extends State<DancingMascot>
       animation: controller,
       child: SizedBox(
           width: widget.width,
-          child: Stack(children: [
-            for (final offset in [
-              const Offset(-1, 0),
-              const Offset(1, 0),
-              const Offset(0, -1),
-              const Offset(0, 1)
-            ])
-              Transform.translate(
-                  offset: offset,
-                  child: Image.asset('assets/images/patag-mascot.png',
-                      width: widget.width,
-                      color: const Color(0xFFFFF4E6),
-                      colorBlendMode: BlendMode.srcIn,
-                      excludeFromSemantics: true)),
-            Image.asset('assets/images/patag-mascot.png',
-                width: widget.width, excludeFromSemantics: true),
-          ])),
+          child: Image.asset('assets/images/patag-mascot.png',
+              width: widget.width, excludeFromSemantics: true)),
       builder: (context, child) {
         final moving = widget.dance && !MediaQuery.disableAnimationsOf(context);
         final wave = moving ? math.sin(controller.value * math.pi * 4) : 0.0;
