@@ -176,7 +176,7 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
     if (!(await s.uploadsOwnedBy(fresh, user.id))) fail(400, 'Upload the photo first, then attach it.');
   }
   function canSee(user: User, r: Report) {
-    return user.role === 'admin' || (user.role === 'citizen' ? r.reporterId === user.id : r.teamId === user.teamId);
+    return user.role === 'admin' || (user.role === 'citizen' ? r.reporterId === user.id : !!user.teamId && r.teamId === user.teamId);
   }
 
   // ---- public
@@ -412,21 +412,37 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
       const b = body(req);
       const name = typeof b.name === 'string' ? b.name.trim() : '';
       if (!name || name.length > 100) fail(400, 'Team name is required.');
-      const existing = create ? null : await store.teamById(String(b.id ?? ''));
-      if (!create && !existing) fail(404, 'Team not found.');
-      if (await store.teamNameTaken(name, existing?.id ?? null)) fail(409, 'A team with that name already exists.');
-      const active = b.active !== false;
-      if (!create && !active && (await store.teamHasOpenWorkOrMembers(existing!.id))) fail(409, 'Move active members and finish assigned tasks before deactivating this team.');
-      const team = create ? await store.insertTeam({ name, active }) : await store.updateTeam({ id: existing!.id, name, active });
-      if (!team) fail(409, 'A team with that name already exists.');
-      return team;
+      if (b.memberIds !== undefined && (!Array.isArray(b.memberIds) || b.memberIds.length > 1000 ||
+          b.memberIds.some((id: unknown) => typeof id !== 'string' || !id || id.length > 100) ||
+          new Set(b.memberIds).size !== b.memberIds.length)) fail(400, 'Choose unique member account IDs.');
+      const memberIds = b.memberIds as string[] | undefined;
+      return store.tx(async tx => {
+        // Serialize team edits and transfers, then validate locked account rows before changing any links.
+        await tx.db.query('select id from teams order by id for update');
+        const existing = create ? null : await tx.teamById(String(b.id ?? ''));
+        if (!create && !existing) fail(404, 'Team not found.');
+        if (await tx.teamNameTaken(name, existing?.id ?? null)) fail(409, 'A team with that name already exists.');
+        const active = b.active !== false;
+        if (memberIds !== undefined) {
+          await tx.db.query('select id from users where id = any($1::text[]) or team_id = $2 order by id for update', [memberIds, existing?.id ?? null]);
+          const users = await tx.listUsers();
+          if (memberIds.some(id => !users.some(u => u.id === id && u.active && u.role === 'maintenance')))
+            fail(400, 'Choose active road crew accounts only.');
+          if (!active && memberIds.length) fail(400, 'Members require an active maintenance team.');
+        }
+        const team = create ? await tx.insertTeam({ name, active }) : await tx.updateTeam({ id: existing!.id, name, active });
+        if (!team) fail(409, 'A team with that name already exists.');
+        if (memberIds !== undefined) await tx.replaceTeamMembers(team!.id, memberIds);
+        if (!active && await tx.teamHasOpenWorkOrMembers(team!.id)) fail(409, 'Move active members and finish assigned tasks before deactivating this team.');
+        return tx.teamById(team!.id);
+      });
     }
     api.post('/teams', async (req, reply) => reply.code(201).send(await saveTeam(req, true)));
     api.patch('/teams', async req => saveTeam(req, false));
 
-    async function teamCheck(role: string, teamId: string | null | undefined) {
-      if (role !== 'maintenance') return null;
-      const team = teamId ? await store.teamById(teamId) : null;
+    async function teamCheck(tx: Store, role: string, teamId: string | null | undefined, allowUnassigned = false) {
+      if (role !== 'maintenance' || (allowUnassigned && !teamId)) return null;
+      const team = teamId ? await tx.teamById(teamId) : null;
       if (!team?.active) fail(400, 'Choose an active maintenance team.');
       return team!.id;
     }
@@ -434,46 +450,54 @@ export function buildApp({ store, blobs, allowDemo = false, corsOrigins = [], lo
     api.post('/users', async (req, reply) => {
       await admin(req);
       const b = body(req);
-      const f = registrationFields(b);
-      const role = b.role ?? 'citizen';
-      if (!roles.includes(role)) fail(400, 'Choose a valid role.');
-      const teamId = await teamCheck(role, b.teamId);
-      const user = await store.insertUser({
-        name: f.name, email: f.email, role, active: b.active !== false, teamId,
-        address: role === 'citizen' && b.address ? f.address : null, emailVerified: false, passwordHash: await hashPassword(f.password),
+      const saved = await store.tx(async tx => {
+        await tx.db.query('select id from teams order by id for update');
+        const f = registrationFields(b);
+        const role = b.role ?? 'citizen';
+        if (!roles.includes(role)) fail(400, 'Choose a valid role.');
+        const teamId = await teamCheck(tx, role, b.teamId);
+        const user = await tx.insertUser({
+          name: f.name, email: f.email, role, active: b.active !== false, teamId,
+          address: role === 'citizen' && b.address ? f.address : null, emailVerified: false, passwordHash: await hashPassword(f.password),
+        });
+        if (!user) fail(409, 'Email is already registered.');
+        return publicUser(user!);
       });
-      if (!user) fail(409, 'Email is already registered.');
-      return reply.code(201).send(publicUser(user!));
+      return reply.code(201).send(saved);
     });
 
     api.patch('/users', async req => {
       const me = await admin(req);
       const b = body(req);
-      const user = await store.userById(String(b.id ?? ''));
-      if (!user) fail(404, 'Account not found.');
-      if (user!.id === me.id) fail(400, 'Manage your own profile in Settings.');
-      if (typeof b.name === 'string' && b.name.trim()) {
-        const name = b.name.trim();
-        if (name.length > 100) fail(400, 'Enter your name (up to 100 characters).');
-        user!.name = name;
-      }
-      if (typeof b.email === 'string' && b.email.trim()) {
-        const email = b.email.trim().toLowerCase();
-        if (email.length > 254 || !EMAIL.test(email)) fail(400, 'Enter a valid email address.');
-        if (await store.emailTaken(email, user!.id)) fail(409, 'Email is already registered.');
-        user!.email = email;
-      }
-      if (typeof b.password === 'string' && b.password.length > 0) {
-        const pw = validatePassword(b.password);
-        user!.passwordHash = await hashPassword(pw);
-      }
-      const role = b.role ?? user!.role;
-      if (!roles.includes(role)) fail(400, 'Choose a valid role.');
-      user!.role = role;
-      user!.teamId = await teamCheck(role, b.teamId ?? user!.teamId);
-      if (typeof b.active === 'boolean') user!.active = b.active;
-      await store.updateUser(user!);
-      return publicUser(user!);
+      return store.tx(async tx => {
+        await tx.db.query('select id from teams order by id for update');
+        await tx.db.query('select id from users where id = $1 for update', [String(b.id ?? '')]);
+        const user = await tx.userById(String(b.id ?? ''));
+        if (!user) fail(404, 'Account not found.');
+        if (user!.id === me.id) fail(400, 'Manage your own profile in Settings.');
+        if (typeof b.name === 'string' && b.name.trim()) {
+          const name = b.name.trim();
+          if (name.length > 100) fail(400, 'Enter your name (up to 100 characters).');
+          user!.name = name;
+        }
+        if (typeof b.email === 'string' && b.email.trim()) {
+          const email = b.email.trim().toLowerCase();
+          if (email.length > 254 || !EMAIL.test(email)) fail(400, 'Enter a valid email address.');
+          if (await tx.emailTaken(email, user!.id)) fail(409, 'Email is already registered.');
+          user!.email = email;
+        }
+        if (typeof b.password === 'string' && b.password.length > 0) {
+          const pw = validatePassword(b.password);
+          user!.passwordHash = await hashPassword(pw);
+        }
+        const role = b.role ?? user!.role;
+        if (!roles.includes(role)) fail(400, 'Choose a valid role.');
+        user!.teamId = await teamCheck(tx, role, b.teamId ?? user!.teamId, user!.role === 'maintenance' && !user!.teamId);
+        user!.role = role;
+        if (typeof b.active === 'boolean') user!.active = b.active;
+        await tx.updateUser(user!);
+        return publicUser(user!);
+      });
     });
 
     async function removeUser(req: FastifyRequest, targetId: string) {

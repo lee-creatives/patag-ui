@@ -238,16 +238,23 @@
   align-items: center;
 }
 
-.password-wrap input {
+.password-wrap input,
+.login-form .password-wrap input {
   width: 100%;
-  padding-right: 42px;
+  padding-right: 52px;
 }
 
 .password-toggle-btn {
   position: absolute;
   right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
+  inset-block: 0;
+  margin-block: auto;
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  flex: 0 0 36px;
+  z-index: 2;
+  transform: none;
   background: none;
   border: none;
   cursor: pointer;
@@ -258,6 +265,14 @@
   align-items: center;
   justify-content: center;
   transition: color 0.2s;
+}
+
+.password-wrap .password-toggle-btn:active {
+  transform: none;
+}
+
+.password-toggle-btn svg {
+  flex: none;
 }
 
 .password-toggle-btn:hover {
