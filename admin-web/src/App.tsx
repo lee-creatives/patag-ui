@@ -51,10 +51,13 @@ import {
   Copy,
   Eye,
   EyeOff,
+  Maximize,
+  Minimize,
 } from "lucide-react";
 import {
   MapContainer,
   TileLayer,
+  ZoomControl,
   CircleMarker,
   Popup,
   useMap,
@@ -78,6 +81,8 @@ import "./styles/premium.css";
 import "./styles/visual-system.css";
 import "./styles/login-redesign.css";
 import { useTheme } from "./theme";
+import { translate as tr, getLanguage, useLanguage, setLanguage, languages } from "./i18n";
+import type { Language } from "./i18n";
 
 const admin = role === "admin",
   base = admin ? "/admin" : "/maintenance";
@@ -117,7 +122,7 @@ type Ctx = {
 const Context = createContext<Ctx | null>(null);
 const useData = () => useContext(Context)!;
 const date = (v: string) =>
-  new Date(v).toLocaleDateString("en-PH", {
+  new Date(v).toLocaleDateString(getLanguage() === "tl" ? "fil-PH" : "en-PH", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -125,7 +130,7 @@ const date = (v: string) =>
 // Local YYYY-MM-DD: filters and exports must use the same day the screen shows (UTC+8, not UTC).
 const localDay = (v: string | Date) => new Date(v).toLocaleDateString("en-CA");
 const dateTime = (v: string) =>
-  new Date(v).toLocaleString("en-PH", {
+  new Date(v).toLocaleString(getLanguage() === "tl" ? "fil-PH" : "en-PH", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -139,21 +144,21 @@ const roleLabels: Record<string, string> = {
 };
 const actorLabel = (h: { actor: string; actorName?: string }) => {
   const role = roleLabels[h.actor] || h.actor;
-  return h.actorName ? `${h.actorName} (${role})` : role;
+  return h.actorName ? `${h.actorName} (${tr(role)})` : tr(role);
 };
 function Badge({ value }: { value: string }) {
   return (
     <span className={"badge " + value.toLowerCase().replaceAll(" ", "-")}>
-      <span aria-hidden="true" /> {value}
+      <span aria-hidden="true" /> {tr(value)}
     </span>
   );
 }
 function Logo() {
-  return <img className="logo" src="/assets/patag-logo.png" alt="PATAG" />;
+  return <img className="logo" src="/assets/patag-logo.png" alt={tr("PATAG")} />;
 }
 function Empty({
-  title = "No reports here yet",
-  text = "When a report matches this view, it will appear here.",
+  title = tr("No reports here yet"),
+  text = tr("When a report matches this view, it will appear here."),
 }: {
   title?: string;
   text?: string;
@@ -180,8 +185,8 @@ function Header({
     <header className="page-heading">
       <div>
         <p className="scope">
-          {admin ? "LGU operations" : workspace?.teams.find(t=>t.id===workspace.user.teamId)?.name || "Maintenance"}{" "}
-          <ChevronRight size={13} /> {workspace?.settings?.city || "Malolos"}, {workspace?.settings?.province || "Bulacan"}
+          {admin ? tr("LGU operations") : workspace?.teams.find(t=>t.id===workspace.user.teamId)?.name || tr("Maintenance")}{" "}
+          <ChevronRight size={13} /> {workspace?.settings?.city || tr("Malolos")}, {workspace?.settings?.province || tr("Bulacan")}
         </p>
         <h1>{title}</h1>
         {description && <p>{description}</p>}
@@ -237,7 +242,7 @@ function Modal({
         <button
           type="button"
           className="icon-button"
-          aria-label="Close dialog"
+          aria-label={tr("Close dialog")}
           onClick={close}
         >
           <X size={20} />
@@ -267,8 +272,8 @@ function RoleBoundary({ children }: { children: ReactNode }) {
     (admin && ["progress", "repairs", "submissions", "history"].includes(page));
   return forbidden ? (
     <Empty
-      title="This page requires another role"
-      text="Use the navigation for your authorized workspace."
+      title={tr("This page requires another role")}
+      text={tr("Use the navigation for your authorized workspace.")}
     />
   ) : (
     children
@@ -330,19 +335,15 @@ function Login() {
           </div>
           <div className="login-story-body">
             <h1>
-              {admin ? "Better roads." : "Safe roads."}
+              {admin ? tr("Better roads.") : tr("Safe roads.")}
               <br />
-              {admin ? "Built together." : "Repaired fast."}
+              {admin ? tr("Built together.") : tr("Repaired fast.")}
             </h1>
             <p className="login-story-desc">
-              {admin
-                ? "Turn community reports into coordinated municipal action."
-                : "One repair at a time. Make the way safer for everyone."}
+              {admin ? tr("Turn community reports into coordinated municipal action.") : tr("One repair at a time. Make the way safer for everyone.")}
             </p>
           </div>
-          <small className="login-story-footer">
-            IT 305 · Bulacan State University · Academic demonstration
-          </small>
+          <small className="login-story-footer">{tr("IT 305 · Bulacan State University · Academic demonstration")}</small>
         </section>
         <section className="login-form">
           <div className="login-accent-mark" aria-hidden="true">
@@ -354,43 +355,36 @@ function Login() {
             </svg>
           </div>
           <span className="pill-label">
-            {admin ? "LGU administrator" : "Road maintenance"}
+            {admin ? tr("LGU administrator") : tr("Road maintenance")}
           </span>
-          <h2>{recovery ? "Recover access" : (admin ? "Welcome to LGU Portal" : "Crew Workspace Sign In")}</h2>
+          <h2>{recovery ? tr("Recover access") : (admin ? tr("Welcome to LGU Portal") : tr("Crew Workspace Sign In"))}</h2>
           <p className="login-subtitle">
-            {recovery
-              ? "Request a password reset for your staff account."
-              : (admin
-                  ? "Access your tasks, reports, and teams anytime, anywhere — all in one place."
-                  : "Access assigned road work orders, document repairs, and record evidence.")}
+            {recovery ? tr("Request a password reset for your staff account.") : (admin ? tr("Access your tasks, reports, and teams anytime, anywhere — all in one place.") : tr("Access assigned road work orders, document repairs, and record evidence."))}
           </p>
           <form onSubmit={run}>
-            <label>
-              Email address
-              <input
+            <label>{tr("Email address")}<input
                 name="email"
                 type="email"
                 autoComplete="email"
                 required
-                placeholder="you@example.test"
+                placeholder={tr("you@example.test")}
               />
             </label>
             {!recovery && (
-              <label className="password-label">
-                Password
-                <div className="password-wrap">
+              <label className="password-label">{tr("Password")}<div className="password-wrap">
                   <input
                     name="password"
                     type={showPassword ? "text" : "password"}
                     autoComplete="current-password"
                     required
                     minLength={1}
-                    placeholder="Enter your password"
+                    placeholder={tr("Enter your password")}
                   />
                   <button
                     type="button"
                     className="password-toggle-btn"
-                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  onMouseDown={(e) => e.preventDefault()}
+                    aria-label={showPassword ? tr("Hide password") : tr("Show password")}
                     aria-pressed={showPassword}
                     onClick={() => setShowPassword(!showPassword)}
                   >
@@ -401,16 +395,12 @@ function Login() {
             )}
             {error && (
               <p role="alert" className="error">
-                {error}
+                {tr(error)}
               </p>
             )}
-            {message && <p role="status">{message}</p>}
+            {message && <p role="status">{tr(message)}</p>}
             <button className="primary submit-btn" disabled={loading}>
-              {loading
-                ? "Connecting…"
-                : recovery
-                  ? "Request recovery"
-                  : "Sign in"}
+              {loading ? tr("Connecting…") : recovery ? tr("Request recovery") : tr("Sign in")}
               <ArrowRight size={16} />
             </button>
           </form>
@@ -421,24 +411,20 @@ function Login() {
               setMessage("");
             }}
           >
-            {recovery ? "Back to sign in" : "Forgot password?"}
+            {recovery ? tr("Back to sign in") : tr("Forgot password?")}
           </button>
           <div className="login-divider">
-            <span>or continue with</span>
+            <span>{tr("or continue with")}</span>
           </div>
           <details className="demo-access" open>
-            <summary>Explore fictional demo data</summary>
-            <strong>Explore the working demo</strong>
-            <p>
-              Fictional reports, local API, and role-based workflows. No official
-              LGU records.
-            </p>
-            <button onClick={demo} disabled={loading} className="demo-action-btn">
-              Continue as {admin ? "LGU administrator" : "Road Crew Alpha"}
+            <summary>{tr("Explore fictional demo data")}</summary>
+            <strong>{tr("Explore the working demo")}</strong>
+            <p>{tr("Fictional reports, local API, and role-based workflows. No official LGU records.")}</p>
+            <button onClick={demo} disabled={loading} className="demo-action-btn">{tr("Continue as")}{" "}{admin ? tr("LGU administrator") : tr("Road Crew Alpha")}
               <ArrowUpRight size={16} />
             </button>
           </details>
-          <p className="login-footnote">Staff accounts are provided by an authorized administrator. Contact your administrator if you need access.</p>
+          <p className="login-footnote">{tr("Staff accounts are provided by an authorized administrator. Contact your administrator if you need access.")}</p>
         </section>
       </div>
     </main>
@@ -533,35 +519,32 @@ function Shell() {
     return (
       <main className="loading">
         <Logo />
-        <h1>{error ? "Local API unavailable" : "Opening your workspace…"}</h1>
-        <p>{error || "Loading your reports and assignments."}</p>
+        <h1>{error ? tr("Local API unavailable") : tr("Opening your workspace…")}</h1>
+        <p>{error || tr("Loading your reports and assignments.")}</p>
         <button onClick={() => void refresh()}>
-          <RefreshCw size={16} /> Retry
-        </button>
-        <Link to={base + "/login"}>Return to sign in</Link>
+          <RefreshCw size={16} />{" "}{tr("Retry")}</button>
+        <Link to={base + "/login"}>{tr("Return to sign in")}</Link>
       </main>
     );
   return (
     <Context.Provider value={{ data, refresh, notify: setToast, event }}>
-      <a className="skip-link" href="#main">
-        Skip to content
-      </a>
+      <a className="skip-link" href="#main">{tr("Skip to content")}</a>
       <div className={menu ? "shell menu-expanded" : "shell"}>
-        <aside id="workspace-navigation" aria-label="Workspace navigation" className={menu ? "sidebar open" : "sidebar"}>
-          <button className="icon-button drawer-close" aria-label="Close navigation drawer" onClick={() => setMenu(false)}><X size={20} /></button>
-          <Link to={base + "/dashboard"} aria-label="PATAG overview">
+        <aside id="workspace-navigation" aria-label={tr("Workspace navigation")} className={menu ? "sidebar open" : "sidebar"}>
+          <button className="icon-button drawer-close" aria-label={tr("Close navigation drawer")} onClick={() => setMenu(false)}><X size={20} /></button>
+          <Link to={base + "/dashboard"} aria-label={tr("PATAG overview")}>
             <Logo />
           </Link>
           <div className="workspace">
-            <span className="workspace-avatar">{admin ? "LG" : "RC"}</span>
+            <span className="workspace-avatar">{admin ? tr("LG") : tr("RC")}</span>
             <div>
-              <strong>{admin ? data.settings?.agency || "Malolos demo LGU" : data.teams.find(t=>t.id===data.user.teamId)?.name || "Maintenance"}</strong>
+              <strong>{admin ? data.settings?.agency || tr("Malolos demo LGU") : data.teams.find(t=>t.id===data.user.teamId)?.name || tr("Maintenance")}</strong>
               <small>
-                {admin ? "City engineering office" : "Maintenance workspace"}
+                {admin ? tr("City engineering office") : tr("Maintenance workspace")}
               </small>
             </div>
           </div>
-          <nav aria-label="Main navigation">
+          <nav aria-label={tr("Main navigation")}>
             {(admin ? [
               ["Overview", ["dashboard", "analytics"]],
               ["Report management", ["reports", "verification", "duplicates", "map"]],
@@ -573,19 +556,19 @@ function Shell() {
               ["Field operations", ["assignments", "progress", "submissions"]],
               ["Records", ["history"]],
             ]).map(([label, paths]) => <Fragment key={String(label)}>
-              <p className="nav-label">{String(label)}</p>
+              <p className="nav-label">{tr(String(label))}</p>
               {navigation.filter(([path]) => (paths as string[]).includes(String(path))).map(([path, label, Icon]) => (
-                <NavLink key={String(path)} title={String(label)} aria-label={String(label)} to={base + "/" + path}>
-                  <Icon size={18} /><span>{String(label)}</span>
+                <NavLink key={String(path)} title={tr(String(label))} aria-label={tr(String(label))} to={base + "/" + path}>
+                  <Icon size={18} /><span>{tr(String(label))}</span>
                   {path === "verification" && <b>{data.reports.filter(r => ["Submitted", "Under Review"].includes(r.status)).length}</b>}
                 </NavLink>
               ))}
             </Fragment>)}
           </nav>
           <div className="nav-bottom">
-            <NavLink title="Profile and settings" aria-label="Profile and settings" to={base + (admin ? "/settings" : "/profile")}>
+            <NavLink title={tr("Profile and settings")} aria-label={tr("Profile and settings")} to={base + (admin ? "/settings" : "/profile")}>
               <Settings size={18} />
-              <span className="nav-text">{admin ? "Settings" : "Profile & settings"}</span>
+              <span className="nav-text">{admin ? tr("Settings") : tr("Profile & settings")}</span>
             </NavLink>
             <div className="user-row">
               <span className="avatar">
@@ -598,12 +581,12 @@ function Shell() {
               <div>
                 <strong>{data.user.name}</strong>
                 <small>
-                  {admin ? "LGU administrator" : "Maintenance personnel"}
+                  {admin ? tr("LGU administrator") : tr("Maintenance personnel")}
                 </small>
               </div>
               <button
                 className="icon-button"
-                aria-label="Sign out"
+                aria-label={tr("Sign out")}
                 onClick={async () => {
                   try {
                     await request("/auth/logout", {});
@@ -620,27 +603,27 @@ function Shell() {
             </div>
           </div>
         </aside>
-        {menu && <button className="drawer-backdrop" aria-label="Close navigation overlay" onClick={() => setMenu(false)} />}
+        {menu && <button className="drawer-backdrop" aria-label={tr("Close navigation overlay")} onClick={() => setMenu(false)} />}
         <div className="workspace-main">
           <div className="topbar">
             <button
               className="icon-button mobile-menu"
-              aria-label={menu ? "Close navigation" : "Open navigation"}
+              aria-label={menu ? tr("Close navigation") : tr("Open navigation")}
               aria-expanded={menu}
               aria-controls="workspace-navigation"
               onClick={() => { setMenu(!menu); if (window.innerWidth >= 1024) localStorage.setItem("patag-sidebar", menu ? "collapsed" : "expanded"); }}
             >
               {menu ? <X size={22} /> : <Menu size={22} />}
             </button>
-            <Link className="topbar-brand" to={base + '/dashboard'} aria-label="PATAG home"><Logo /></Link>
-            <nav className="topnav" aria-label="Primary workspace">
-              {(admin ? [['dashboard','Overview'],['reports','Reports'],['assignments','Operations'],['users','User management']] : [['dashboard','Overview'],['assignments','My tasks'],['map','Task map'],['history','History']]).map(([path,label])=><NavLink key={path} to={base+'/'+path}>{label}</NavLink>)}
+            <Link className="topbar-brand" to={base + '/dashboard'} aria-label={tr("PATAG home")}><Logo /></Link>
+            <nav className="topnav" aria-label={tr("Primary workspace")}>
+              {(admin ? [['dashboard','Overview'],['reports','Reports'],['assignments','Operations'],['users','User management']] : [['dashboard','Overview'],['assignments','My tasks'],['map','Task map'],['history','History']]).map(([path,label])=><NavLink key={path} to={base + '/' + path}>{tr(label)}</NavLink>)}
             </nav>
-            <span className="workspace-caption">{admin ? (data.settings?.city || 'Malolos') + ' · LGU' : data.teams.find(t=>t.id===data.user.teamId)?.name || 'Maintenance'}</span>
-            <button className="icon-button theme-toggle" onClick={toggleTheme} aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"} title={theme === "dark" ? "Light mode" : "Dark mode"}>
+            <span className="workspace-caption">{admin ? (data.settings?.city || tr('Malolos')) + tr(' · LGU') : data.teams.find(t=>t.id===data.user.teamId)?.name || tr('Maintenance')}</span>
+            <button className="icon-button theme-toggle" onClick={toggleTheme} aria-label={theme === "dark" ? tr("Switch to light mode") : tr("Switch to dark mode")} title={theme === "dark" ? tr("Light mode") : tr("Dark mode")}>
               {theme === "dark" ? <Sun size={19} /> : <Moon size={19} />}
             </button>
-            <Link to={base + "/notifications"} className="notification-link" aria-label={"Notifications" + (data.notifications.some(n => !n.read) ? ", unread updates" : "")}>
+            <Link to={base + "/notifications"} className="notification-link" aria-label={tr("Notifications") + (data.notifications.some(n => !n.read) ? tr(", unread updates") : "")}>
               <Bell size={18} />
               {localStorage.getItem("patag-notification-preference") !== "off" && data.notifications.some(n => !n.read) && <i className="unread-dot" />}
             </Link>
@@ -648,8 +631,8 @@ function Shell() {
           <main id="main">
             {error && (
               <div className="error" role="alert">
-                {error}
-                <button onClick={() => void refresh()}>Reconnect</button>
+                {tr(error)}
+                <button onClick={() => void refresh()}>{tr("Reconnect")}</button>
               </div>
             )}
             <RoleBoundary>
@@ -720,26 +703,25 @@ function Shell() {
                   path="*"
                   element={
                     <Empty
-                      title="Page not found"
-                      text="Use the workspace navigation to continue."
+                      title={tr("Page not found")}
+                      text={tr("Use the workspace navigation to continue.")}
                     />
                   }
                 />
               </Routes>
             </RoleBoundary>
           </main>
-          <footer className="footer">
-            PATAG <span>Community reports. Coordinated action.</span>
-            <small>Fictional demo data · IT 305</small>
+          <footer className="footer">{tr("PATAG")}{" "}<span>{tr("Community reports. Coordinated action.")}</span>
+            <small>{tr("Fictional demo data · IT 305")}</small>
           </footer>
         </div>
       </div>
       {toast && (
         <div className="toast" role="status">
           <CheckCircle2 size={18} />
-          {toast}
+          {tr(toast)}
           <button
-            aria-label="Dismiss notification"
+            aria-label={tr("Dismiss notification")}
             onClick={() => setToast("")}
           >
             <X size={15} />
@@ -791,24 +773,10 @@ function Stats({
     <div className={"stats " + (compact ? "compact" : "")}>
       {groups.map(([label, n], i) => (
         <div key={label}>
-          <span>{label}</span>
+          <span>{tr(String(label))}</span>
           <strong>{String(n)}</strong>
           <small>
-            {admin
-              ? i === 0
-                ? "Current workspace"
-                : i === 1
-                  ? "Needs attention"
-                  : i === 2
-                    ? "Roads under repair"
-                    : "LGU verified repairs"
-              : i === 0
-                ? "Ready to start"
-                : i === 1
-                  ? "Inspection or repair underway"
-                  : i === 2
-                    ? "Awaiting LGU decision"
-                    : "LGU verified repairs"}
+            {admin ? i === 0 ? tr("Current workspace") : i === 1 ? tr("Needs attention") : i === 2 ? tr("Roads under repair") : tr("LGU verified repairs") : i === 0 ? tr("Ready to start") : i === 1 ? tr("Inspection or repair underway") : i === 2 ? tr("Awaiting LGU decision") : tr("LGU verified repairs")}
           </small>
         </div>
       ))}
@@ -833,8 +801,8 @@ function Chart({
   const series = groups.map((name) => ({
     name:
       kind === "time"
-        ? new Date(name + "T00:00:00").toLocaleDateString("en-PH", { month: "short", day: "numeric" })
-        : name,
+        ? new Date(name + "T00:00:00").toLocaleDateString(getLanguage() === "tl" ? "fil-PH" : "en-PH", { month: "short", day: "numeric" })
+        : kind === "area" ? name : tr(name),
     total: reports.filter((r) =>
       kind === "time"
         ? localDay(r.createdAt) === name
@@ -849,7 +817,7 @@ function Chart({
     <div
       className="chart"
       role="img"
-      aria-label={`Reports by ${kind}: ${series.map((x) => x.name + " " + x.total).join(", ")}`}
+      aria-label={`${tr("Reports by")} ${tr(kind)}: ${series.map((x) => x.name + " " + x.total).join(", ")}`}
     >
       <ResponsiveContainer width="100%" height={180}>
         <BarChart
@@ -870,7 +838,7 @@ function Chart({
           <Bar
             isAnimationActive={false}
             dataKey="total"
-            name="Reports"
+            name={tr("Reports")}
             fill="#F26A32"
             maxBarSize={26}
             radius={[3, 3, 0, 0]}
@@ -890,6 +858,7 @@ function Recenter({ reports }: { reports: Report[] }) {
   return (
     <button
       className="map-recenter"
+      type="button"
       onClick={() => {
         if (reports.length)
           m.setView(
@@ -900,7 +869,7 @@ function Recenter({ reports }: { reports: Report[] }) {
             14,
           );
       }}
-      aria-label="Recenter report map"
+      aria-label={tr("Recenter report map")}
     >
       <Navigation size={16} />
     </button>
@@ -913,15 +882,57 @@ function ReportMap({
   reports: Report[];
   height?: number;
 }) {
+  const language = useLanguage();
   const [tileError, setTileError] = useState(false);
+  const wrapper = useRef<HTMLDivElement>(null);
+  const toggle = useRef<HTMLButtonElement>(null);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [fullscreenError, setFullscreenError] = useState("");
+  useEffect(() => {
+    let wasFullscreen = false;
+    const changed = () => {
+      const active = document.fullscreenElement === wrapper.current;
+      setFullscreen(active);
+      if (wasFullscreen && !active) toggle.current?.focus();
+      wasFullscreen = active;
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === "Escape" && document.fullscreenElement === wrapper.current) {
+        void document.exitFullscreen().catch(() => {
+          if (document.fullscreenElement === wrapper.current) setFullscreenError("Fullscreen is unavailable. Try again.");
+        });
+      }
+    };
+    document.addEventListener("fullscreenchange", changed);
+    document.addEventListener("keydown", escape);
+    return () => {
+      document.removeEventListener("fullscreenchange", changed);
+      document.removeEventListener("keydown", escape);
+    };
+  }, []);
   return (
-    <div className="map-wrapper" style={{ height }}>
+    <div ref={wrapper} className="map-wrapper" style={{ height }}>
+      <button ref={toggle} type="button" className="map-fullscreen"
+        aria-label={fullscreen ? tr("Exit fullscreen map") : tr("Enter fullscreen map")}
+        aria-pressed={fullscreen} disabled={!document.fullscreenEnabled}
+        onClick={async () => {
+          setFullscreenError("");
+          try {
+            if (document.fullscreenElement === wrapper.current) await document.exitFullscreen();
+            else await wrapper.current?.requestFullscreen();
+          } catch { setFullscreenError("Fullscreen is unavailable. Try again."); }
+        }}>
+        {fullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
+      </button>
+      {fullscreenError && <span className="tile-error" role="alert">{tr(fullscreenError)}</span>}
       <MapContainer
         center={[14.855, 120.815]}
         zoom={13}
+        zoomControl={false}
         scrollWheelZoom={false}
         style={{ height: "100%", width: "100%" }}
       >
+        <ZoomControl key={language} zoomInTitle={tr("Zoom in")} zoomOutTitle={tr("Zoom out")} />
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -947,12 +958,10 @@ function ReportMap({
             <Popup>
               <strong>{r.location.road}</strong>
               <p>
-                {r.id} · {r.status}
+                {r.id} · {tr(r.status)}
                 <br />
-                {r.severity} severity
-              </p>
-              <Link to={base + (admin ? "/reports/" : "/assignments/") + r.id}>
-                View {admin ? "report" : "task"}
+                {tr(r.severity)}{" "}{tr("severity")}</p>
+              <Link to={base + (admin ? "/reports/" : "/assignments/") + r.id}>{tr("View")}{" "}{admin ? tr("report") : tr("task")}
               </Link>
             </Popup>
           </CircleMarker>
@@ -960,9 +969,7 @@ function ReportMap({
         <Recenter reports={reports} />
       </MapContainer>
       {tileError && (
-        <span className="tile-error">
-          Map tiles unavailable. Coordinates and report list remain available.
-        </span>
+        <span className="tile-error">{tr("Map tiles unavailable. Coordinates and report list remain available.")}</span>
       )}
     </div>
   );
@@ -978,7 +985,7 @@ function SmallReports({ reports }: { reports: Report[] }) {
         >
           <img
             src={asset(r.photos[0]?.url || "/demo-evidence.svg")}
-            alt="Report evidence"
+            alt={tr("Report evidence")}
           />
           <div>
             <strong>{r.location.road}</strong>
@@ -993,8 +1000,8 @@ function SmallReports({ reports }: { reports: Report[] }) {
     </div>
   ) : (
     <Empty
-      title="You're all caught up"
-      text="No reports need action in this queue."
+      title={tr("You're all caught up")}
+      text={tr("No reports need action in this queue.")}
     />
   );
 }
@@ -1009,21 +1016,21 @@ function Dashboard() {
   const working=rs.filter(r=>r.status==='In Progress').length;
   const next=[...pending].sort((a,b)=>Number(b.severity==='High')-Number(a.severity==='High'))[0];
   const metricRows=admin?[['Pending review',pending.length,'verification'],['In progress',working,'reports?status=In%20Progress'],['Resolved',resolved,'reports?status=Resolved']]:[['Assigned',rs.filter(r=>r.status==='Assigned').length,'assignments'],['In progress',working,'progress'],['Awaiting review',awaiting.length,'submissions']];
-  return <div className={'premium-overview '+(admin?'admin-overview':'crew-overview')}>
-    <Header title={admin?'Roads overview':'Your day on the road'} description={admin?pending.length+' reports need your review. Let’s keep Malolos moving.':pending.length+' active tasks. Clear priorities for your next repair.'} action={<Link className="primary" to={base+(admin?'/verification':'/assignments')}>{admin?'Review reports':'View my tasks'}<ArrowUpRight size={17}/></Link>}/>
-    <section className="overview-summary" aria-label="Report summary">
-      <Link className="summary-lead" to={base+(admin?'/reports':'/history')}><span>{admin?'Community reports':'Verified repairs'}</span><div><strong>{admin?rs.length:resolved}</strong><ArrowUpRight size={23}/></div><small>{admin?'Every tag is a road toward change.':'Completed and confirmed by the LGU.'}</small></Link>
-      {metricRows.map(([label,value,route])=><Link className="summary-metric" key={label} to={base+'/'+route}><span>{label}</span><strong>{value}</strong><small>View {String(label).toLowerCase()}<ArrowUpRight size={14}/></small></Link>)}
+  return <div className={'premium-overview ' + (admin ? 'admin-overview' : 'crew-overview')}>
+    <Header title={admin ? tr('Roads overview') : tr('Your day on the road')} description={admin ? pending.length + tr(' reports need your review. Let’s keep Malolos moving.') : pending.length + tr(' active tasks. Clear priorities for your next repair.')} action={<Link className="primary" to={base + (admin ? '/verification' : '/assignments')}>{admin ? tr('Review reports') : tr('View my tasks')}<ArrowUpRight size={17}/></Link>}/>
+    <section className="overview-summary" aria-label={tr("Report summary")}>
+      <Link className="summary-lead" to={base + (admin ? '/reports' : '/history')}><span>{admin ? tr('Community reports') : tr('Verified repairs')}</span><div><strong>{admin ? rs.length : resolved}</strong><ArrowUpRight size={23}/></div><small>{admin ? tr(tr('Every tag is a road toward change.')) : tr('Completed and confirmed by the LGU.')}</small></Link>
+      {metricRows.map(([label,value,route])=><Link className="summary-metric" key={label} to={base + '/' + route}><span>{tr(String(label))}</span><strong>{value}</strong><small>{tr("View")}{" "}{tr(String(label)).toLowerCase()}<ArrowUpRight size={14}/></small></Link>)}
     </section>
     <div className="operations-grid">
-      <Panel title={admin?'The action desk':'Your next task'} aside={<span className="count">{pending.length} active</span>} className={admin?'action-desk':'next-task-panel'}>
-        {admin?<><div className="action-shortcuts"><Link to={base+'/verification'}><span>Verify reports</span><strong>{pending.length}</strong><ArrowRight size={17}/></Link><Link to={base+'/assignments'}><span>Ready for a crew</span><strong>{verified.length}</strong><ArrowRight size={17}/></Link><Link to={base+'/completions'}><span>Approve repairs</span><strong>{awaiting.length}</strong><ArrowRight size={17}/></Link></div><SmallReports reports={pending.slice(0,2)}/></>:next?<div className="next-task"><div className="next-task-heading"><Badge value={next.severity}/><span>{next.id}</span></div><h2>{next.location.road}</h2><p><MapPin size={16}/>Brgy. {next.location.barangay}, {next.location.city}</p><div className="next-task-status"><Badge value={next.status}/><span>Assigned to your crew</span></div><Link className="primary" to={base+'/assignments/'+next.id}>Open task<ArrowUpRight size={17}/></Link></div>:<Empty title="All clear for now" text="Your next assigned repair will appear here."/>}
+      <Panel title={admin ? tr('The action desk') : tr('Your next task')} aside={<span className="count">{pending.length}{" "}{tr("active")}</span>} className={admin ? 'action-desk' : 'next-task-panel'}>
+        {admin ? <><div className="action-shortcuts"><Link to={base + '/verification'}><span>{tr("Verify reports")}</span><strong>{pending.length}</strong><ArrowRight size={17}/></Link><Link to={base + '/assignments'}><span>{tr("Ready for a crew")}</span><strong>{verified.length}</strong><ArrowRight size={17}/></Link><Link to={base + '/completions'}><span>{tr("Approve repairs")}</span><strong>{awaiting.length}</strong><ArrowRight size={17}/></Link></div><SmallReports reports={pending.slice(0,2)}/></> : next ? <div className="next-task"><div className="next-task-heading"><Badge value={next.severity}/><span>{next.id}</span></div><h2>{next.location.road}</h2><p><MapPin size={16}/>{tr("Brgy.")}{" "}{next.location.barangay}, {next.location.city}</p><div className="next-task-status"><Badge value={next.status}/><span>{tr("Assigned to your crew")}</span></div><Link className="primary" to={base + '/assignments/' + next.id}>{tr("Open task")}<ArrowUpRight size={17}/></Link></div> : <Empty title={tr("All clear for now")} text={tr("Your next assigned repair will appear here.")}/>}
       </Panel>
-      <Panel title={admin?'Road conditions':'Your repair locations'} aside={<Link to={base+'/map'}>Open map<ArrowUpRight size={14}/></Link>} className="overview-map"><ReportMap reports={admin?rs:pending} height={235}/><div className="map-legend"><span><i className="navy-dot"/>Reported</span><span><i className="orange-dot"/>High severity</span><span><i className="green-dot"/>Resolved</span></div></Panel>
-      <Panel title="Reports over time" aside={<span className="muted">October 2026 · demo</span>} className="overview-trend"><Chart reports={rs} kind="time"/></Panel>
-      <Panel title={admin?'Priority roads':'Up next'} aside={<Link to={base+(admin?'/reports?severity=High':'/assignments')}>View all<ArrowUpRight size={14}/></Link>} className="overview-priority"><SmallReports reports={(admin?high:pending.filter(r=>r.id!==next?.id)).slice(0,2)}/></Panel>
+      <Panel title={admin ? tr('Road conditions') : tr('Your repair locations')} aside={<Link to={base + '/map'}>{tr("Open map")}<ArrowUpRight size={14}/></Link>} className="overview-map"><ReportMap reports={admin ? rs : pending} height={235}/><div className="map-legend"><span><i className="navy-dot"/>{tr("Reported")}</span><span><i className="orange-dot"/>{tr("High severity")}</span><span><i className="green-dot"/>{tr("Resolved")}</span></div></Panel>
+      <Panel title={tr("Reports over time")} aside={<span className="muted">{tr("October 2026 · demo")}</span>} className="overview-trend"><Chart reports={rs} kind="time"/></Panel>
+      <Panel title={admin ? tr('Priority roads') : tr('Up next')} aside={<Link to={base + (admin ? '/reports?severity=High' : '/assignments')}>{tr("View all")}<ArrowUpRight size={14}/></Link>} className="overview-priority"><SmallReports reports={(admin?high:pending.filter(r=>r.id!==next?.id)).slice(0,2)}/></Panel>
     </div>
-    <section className="road-progress"><div><h2>From a tag to a better road</h2><p>Every stage, accounted for.</p></div><div className="progress-stages">{['Submitted','Under Review','Verified','Assigned','In Progress','Resolved'].map(s=><Link key={s} to={base+(admin?'/reports?status='+encodeURIComponent(s):'/assignments')}><strong>{rs.filter(r=>r.status===s).length}</strong><span>{s}</span></Link>)}</div></section>
+    <section className="road-progress"><div><h2>{tr("From a tag to a better road")}</h2><p>{tr("Every stage, accounted for.")}</p></div><div className="progress-stages">{['Submitted','Under Review','Verified','Assigned','In Progress','Resolved'].map(s=><Link key={s} to={base + (admin ? '/reports?status=' + encodeURIComponent(s) : '/assignments')}><strong>{rs.filter(r=>r.status===s).length}</strong><span>{tr(s)}</span></Link>)}</div></section>
   </div>;
 }
 function ReportList({ mode }: { mode: string }) {
@@ -1105,15 +1112,15 @@ function ReportList({ mode }: { mode: string }) {
   return (
     <>
       <Header
-        title={title[mode] || "Reports"}
-        description={`${source.length} ${admin ? "community reports" : "crew tasks"} · Evidence and progress in one place.`}
+        title={tr(title[mode] || "Reports")}
+        description={`${source.length} ${admin ? tr("community reports") : tr("crew tasks")} · ${tr("Evidence and progress in one place.")}`}
       />
       <div className="filters">
         <label className="search">
           <Search size={16} />
           <input
-            aria-label="Search reports"
-            placeholder="Search road, barangay or reference…"
+            aria-label={tr("Search reports")}
+            placeholder={tr("Search road, barangay or reference…")}
             value={q}
             onChange={(e) => {
               setQ(e.target.value);
@@ -1122,47 +1129,47 @@ function ReportList({ mode }: { mode: string }) {
           />
         </label>
         <select
-          aria-label="Status filter"
+          aria-label={tr("Status filter")}
           value={status}
           onChange={(e) => {
             setStatus(e.target.value);
             setPage(1);
           }}
         >
-          <option value="All">All statuses</option>
+          <option value="All">{tr("All statuses")}</option>
           {statuses.map((s) => (
-            <option key={s}>{s}</option>
+            <option key={s} value={s}>{tr(s)}</option>
           ))}
         </select>
         <select
-          aria-label="Severity filter"
+          aria-label={tr("Severity filter")}
           value={severity}
           onChange={(e) => {
             setSeverity(e.target.value);
             setPage(1);
           }}
         >
-          <option value="All">All severities</option>
+          <option value="All">{tr("All severities")}</option>
           {["High", "Medium", "Low"].map((s) => (
-            <option key={s}>{s}</option>
+            <option key={s} value={s}>{tr(s)}</option>
           ))}
         </select>
         <select
-          aria-label="Barangay filter"
+          aria-label={tr("Barangay filter")}
           value={area}
           onChange={(e) => setArea(e.target.value)}
         >
-          <option value="All">All barangays</option>
+          <option value="All">{tr("All barangays")}</option>
           {[...new Set(source.map((r) => r.location.barangay))].map((s) => (
-            <option key={s}>{s}</option>
+            <option key={s} value={s}>{s}</option>
           ))}
         </select>
         <select
-          aria-label="Team filter"
+          aria-label={tr("Team filter")}
           value={team}
           onChange={(e) => setTeam(e.target.value)}
         >
-          <option value="All">All teams</option>
+          <option value="All">{tr("All teams")}</option>
           {data.teams.map((t) => (
             <option key={t.id} value={t.id}>
               {t.name}
@@ -1170,27 +1177,23 @@ function ReportList({ mode }: { mode: string }) {
           ))}
         </select>
         <select
-          aria-label="Sort reports"
+          aria-label={tr("Sort reports")}
           value={sort}
           onChange={(e) => setSort(e.target.value)}
         >
-          <option value="newest">Newest first</option>
-          <option value="oldest">Oldest first</option>
-          <option value="road">Road A–Z</option>
+          <option value="newest">{tr("Newest first")}</option>
+          <option value="oldest">{tr("Oldest first")}</option>
+          <option value="road">{tr("Road A–Z")}</option>
         </select>
-        <label className="inline-label">
-          From
-          <input
-            aria-label="From date"
+        <label className="inline-label">{tr("From")}<input
+            aria-label={tr("From date")}
             type="date"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
           />
         </label>
-        <label className="inline-label">
-          To
-          <input
-            aria-label="To date"
+        <label className="inline-label">{tr("To")}<input
+            aria-label={tr("To date")}
             type="date"
             value={to}
             onChange={(e) => setTo(e.target.value)}
@@ -1207,30 +1210,27 @@ function ReportList({ mode }: { mode: string }) {
             setFrom("");
             setTo("");
           }}
-        >
-          Reset
-        </button>
+        >{tr("Reset")}</button>
       </div>
       <section className="panel report-table">
         <div className="panel-title">
           <h2>
-            {rows.length} matching {admin ? "reports" : "tasks"}
+            {rows.length}{" "}{tr("matching")}{" "}{admin ? tr("reports") : tr("tasks")}
           </h2>
-          <span className="muted">Live local demo</span>
+          <span className="muted">{tr("Live local demo")}</span>
         </div>
-        {rows.length ? (
-          <>
+        {rows.length ? (<>
             <div className="table-scroll">
               <table>
                 <thead>
                   <tr>
-                    <th>Report & location</th>
-                    <th>Severity</th>
-                    <th>Status</th>
-                    <th>Assigned team</th>
-                    <th className="numeric">Submitted</th>
+                    <th>{tr("Report & location")}</th>
+                    <th>{tr("Severity")}</th>
+                    <th>{tr("Status")}</th>
+                    <th>{tr("Assigned team")}</th>
+                    <th className="numeric">{tr("Submitted")}</th>
                     <th>
-                      <span className="sr-only">Action</span>
+                      <span className="sr-only">{tr("Action")}</span>
                     </th>
                   </tr>
                 </thead>
@@ -1241,12 +1241,12 @@ function ReportList({ mode }: { mode: string }) {
                         <Link className="table-identity" to={link(r)}>
                           <img
                             src={asset(r.photos[0]?.url || "/demo-evidence.svg")}
-                            alt="Evidence preview"
+                            alt={tr("Evidence preview")}
                           />
                           <span>
                             <strong>{r.location.road}</strong>
                             <small>
-                              {r.id} · Brgy. {r.location.barangay}
+                              {r.id}{" "}{tr("· Brgy.")}{" "}{r.location.barangay}
                             </small>
                           </span>
                         </Link>
@@ -1257,23 +1257,16 @@ function ReportList({ mode }: { mode: string }) {
                       <td>
                         <Badge value={r.status} />
                         {r.completion?.state === "Awaiting Verification" && (
-                          <small className="sub-state">
-                            Awaiting verification
-                          </small>
+                          <small className="sub-state">{tr("Awaiting verification")}</small>
                         )}
                       </td>
                       <td>
-                        {data.teams.find((t) => t.id === r.teamId)?.name ||
-                          "Unassigned"}
+                        {data.teams.find((t) => t.id === r.teamId)?.name || tr("Unassigned")}
                       </td>
                       <td className="numeric">{date(r.createdAt)}</td>
                       <td>
                         <Link className="row-action" to={link(r)}>
-                          {mode === "verification"
-                            ? "Review"
-                            : mode === "assignments" && r.status === "Verified"
-                              ? "Assign"
-                              : "View"}
+                          {mode === "verification" ? tr("Review") : mode === "assignments" && r.status === "Verified" ? tr("Assign") : tr("View")}
                           <ArrowUpRight size={15} />
                         </Link>
                       </td>
@@ -1284,34 +1277,30 @@ function ReportList({ mode }: { mode: string }) {
             </div>
             <div className="pagination">
               <span>
-                {(current - 1) * 8 + 1}–{Math.min(current * 8, rows.length)} of{" "}
+                {(current - 1) * 8 + 1}–{Math.min(current * 8, rows.length)}{" "}{tr("of")}{" "}
                 {rows.length}
               </span>
               <button
                 disabled={current === 1}
                 onClick={() => setPage(current - 1)}
-                aria-label="Previous page"
+                aria-label={tr("Previous page")}
               >
                 <ArrowLeft size={15} />
               </button>
-              <span>
-                Page {current} of {pages}
+              <span>{tr("Page")}{" "}{current}{" "}{tr("of")}{" "}{pages}
               </span>
               <button
                 disabled={current === pages}
                 onClick={() => setPage(current + 1)}
-                aria-label="Next page"
+                aria-label={tr("Next page")}
               >
                 <ArrowRight size={15} />
               </button>
             </div>
-          </>
-        ) : (
-          <Empty
-            title="No matching reports"
-            text="Try another search or reset the filters."
-          />
-        )}
+          </>) : (<Empty
+            title={tr("No matching reports")}
+            text={tr("Try another search or reset the filters.")}
+          />)}
       </section>
     </>
   );
@@ -1323,16 +1312,16 @@ function Gallery({ photos, label }: { photos: Photo[]; label: string }) {
         <a key={p.id} href={asset(p.url)} target="_blank" rel="noreferrer">
           <img
             src={asset(p.url)}
-            alt={label + (p.demo ? " — illustrated demo" : "")}
+            alt={label + (p.demo ? tr(" — illustrated demo") : "")}
           />
           <span>
-            {p.demo ? "Illustrated demo" : label}
+            {p.demo ? tr("Illustrated demo") : label}
             <ArrowUpRight size={14} />
           </span>
         </a>
       ))}
       {!photos.length && (
-        <p className="muted">No {label.toLowerCase()} submitted.</p>
+        <p className="muted">{tr("No")}{" "}{label.toLowerCase()}{" "}{tr("submitted.")}</p>
       )}
     </div>
   );
@@ -1365,8 +1354,8 @@ function Details({ mode = "detail" }: { mode?: string }) {
   if (!r)
     return (
       <Empty
-        title="Report not found"
-        text="It may belong to another team or account."
+        title={tr("Report not found")}
+        text={tr("It may belong to another team or account.")}
       />
     );
   const c = r.location.coordinates;
@@ -1420,7 +1409,7 @@ function Details({ mode = "detail" }: { mode?: string }) {
       const evidence: Photo[] = [];
       for (const file of Array.from(files)) evidence.push(await upload(file, "before"));
       await event(r.id, "before-photos", { photos: evidence, note: "Maintenance before-repair evidence added." });
-      notify("Before-repair evidence saved.");
+      notify(tr("Before-repair evidence saved."));
     } catch (error) {
       setError((error as Error).message);
     } finally { setBusy(false); }
@@ -1434,7 +1423,7 @@ function Details({ mode = "detail" }: { mode?: string }) {
       for (const f of Array.from(files)) next.push(await upload(f));
       setPhotos(next);
       sessionStorage.setItem("repair-photos-" + id, JSON.stringify(next));
-      notify("Photo uploaded. Repair draft saved.");
+      notify(tr("Photo uploaded. Repair draft saved."));
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -1447,74 +1436,64 @@ function Details({ mode = "detail" }: { mode?: string }) {
         className="back-link"
         to={base + (admin ? "/reports" : "/assignments")}
       >
-        <ArrowLeft size={15} /> {admin ? "All reports" : "My assignments"}
+        <ArrowLeft size={15} /> {admin ? tr("All reports") : tr("My assignments")}
       </Link>
       <Header
         title={
-          mode === "review"
-            ? "Review the report"
-            : mode === "assign"
-              ? "Assign a maintenance team"
-              : mode === "completion"
-                ? "Verify completed repair"
-                : mode === "document"
-                  ? "Document the repair"
-                  : mode === "submit"
-                    ? "Review completion evidence"
-                    : r.location.road
+          mode === "review" ? tr("Review the report") : mode === "assign" ? tr("Assign a maintenance team") : mode === "completion" ? tr("Verify completed repair") : mode === "document" ? tr("Document the repair") : mode === "submit" ? tr("Review completion evidence") : r.location.road
         }
         description={`${r.id} · Brgy. ${r.location.barangay}, ${r.location.city}`}
         action={<Badge value={r.status} />}
       />
       {error && (
         <div className="error" role="alert">
-          {error}
+          {tr(error)}
         </div>
       )}
       <div className="detail-grid">
         <div>
           <Panel
             title={
-              mode === "completion" ? "Before repair" : "Submitted evidence"
+              mode === "completion" ? tr("Before repair") : tr("Submitted evidence")
             }
             aside={<Badge value={r.severity} />}
           >
-            <Gallery photos={r.photos} label="Before repair" />
+            <Gallery photos={r.photos} label={tr("Before repair")} />
             {admin && <div className="notice" style={{display:"block"}}>
-              <strong>Public photo visibility</strong>
-              <p>Review all before-and-after images for faces, plates and personal details before allowing them on the community map. New evidence requires a new review.</p>
-              <button className="button" disabled={busy} onClick={() => void direct("publication",{approved:!r.publicPhotosApproved,note:r.publicPhotosApproved?"Public photos hidden.":"Photos reviewed and approved for public display."})}>{r.publicPhotosApproved ? "Hide public photos" : "Approve public photos"}</button>
+              <strong>{tr("Public photo visibility")}</strong>
+              <p>{tr("Review all before-and-after images for faces, plates and personal details before allowing them on the community map. New evidence requires a new review.")}</p>
+              <button className="button" disabled={busy} onClick={() => void direct("publication",{approved:!r.publicPhotosApproved,note:r.publicPhotosApproved?"Public photos hidden.":"Photos reviewed and approved for public display."})}>{r.publicPhotosApproved ? tr("Hide public photos") : tr("Approve public photos")}</button>
             </div>}
             {!admin && ["Assigned", "In Progress"].includes(r.status) && r.completion?.state !== "Awaiting Verification" && (
               <label className="upload">
                 <Camera size={20} />
-                <strong>Add before-repair photos</strong>
-                <span>Document the site before work. Original citizen evidence is kept.</span>
-                <input type="file" accept="image/png,image/jpeg,image/webp" multiple disabled={busy} aria-label="Before-repair photos" onChange={(e) => { void pickBefore(e.target.files); e.target.value = ""; }} />
+                <strong>{tr("Add before-repair photos")}</strong>
+                <span>{tr("Document the site before work. Original citizen evidence is kept.")}</span>
+                <input type="file" accept="image/png,image/jpeg,image/webp" multiple disabled={busy} aria-label={tr("Before-repair photos")} onChange={(e) => { void pickBefore(e.target.files); e.target.value = ""; }} />
               </label>
             )}
             <h3>{r.title}</h3>
             <p>{r.description}</p>
             <dl className="detail-list">
               <div>
-                <dt>Observed hazards</dt>
-                <dd>{r.hazards || "None stated"}</dd>
+                <dt>{tr("Observed hazards")}</dt>
+                <dd>{r.hazards || tr("None stated")}</dd>
               </div>
               <div>
-                <dt>Nearby landmark</dt>
-                <dd>{r.location.landmark || "Not specified"}</dd>
+                <dt>{tr("Nearby landmark")}</dt>
+                <dd>{r.location.landmark || tr("Not specified")}</dd>
               </div>
               <div>
-                <dt>Responsible agency</dt>
+                <dt>{tr("Responsible agency")}</dt>
                 <dd>{r.jurisdiction}</dd>
               </div>
               <div>
-                <dt>Submitted</dt>
+                <dt>{tr("Submitted")}</dt>
                 <dd>{date(r.createdAt)}</dd>
               </div>
               {admin && (
                 <div>
-                  <dt>Reporter reference</dt>
+                  <dt>{tr("Reporter reference")}</dt>
                   <dd>{r.reporterId}</dd>
                 </div>
               )}
@@ -1522,27 +1501,22 @@ function Details({ mode = "detail" }: { mode?: string }) {
           </Panel>
           {r.completion && (
             <Panel
-              title="After repair"
+              title={tr("After repair")}
               aside={<Badge value={r.completion.state} />}
             >
-              <Gallery photos={r.completion.photos} label="After repair" />
+              <Gallery photos={r.completion.photos} label={tr("After repair")} />
               <p>{r.completion.note}</p>
-              <small className="muted">Submitted {date(r.completion.at)}</small>
+              <small className="muted">{tr("Submitted")}{" "}{date(r.completion.at)}</small>
             </Panel>
           )}
           {!admin && ["progress", "document", "submit"].includes(mode) && (
             <Panel
               title={
-                mode === "progress" ? "Repair progress" : "Repair documentation"
+                mode === "progress" ? tr("Repair progress") : tr("Repair documentation")
               }
             >
-              <p>
-                Completion remains In Progress until the LGU verifies the
-                repair.
-              </p>
-              <label>
-                Work performed / progress notes
-                <textarea
+              <p>{tr("Completion remains In Progress until the LGU verifies the repair.")}</p>
+              <label>{tr("Work performed / progress notes")}<textarea
                   rows={4}
                   value={notes}
                   onChange={(e) => {
@@ -1552,24 +1526,24 @@ function Details({ mode = "detail" }: { mode?: string }) {
                       e.target.value,
                     );
                   }}
-                  placeholder="Describe the inspection, materials and work completed."
+                  placeholder={tr("Describe the inspection, materials and work completed.")}
                 />
               </label>
               {mode !== "progress" && (
                 <>
                   <label className="upload">
                     <Camera size={22} />
-                    <strong>Add after-repair photos</strong>
-                    <span>PNG, JPEG or WebP · up to 8 MB per photo</span>
+                    <strong>{tr("Add after-repair photos")}</strong>
+                    <span>{tr("PNG, JPEG or WebP · up to 8 MB per photo")}</span>
                     <input
-                      aria-label="After-repair photos"
+                      aria-label={tr("After-repair photos")}
                       type="file"
                       accept="image/png,image/jpeg,image/webp"
                       multiple
                       onChange={(e) => void pick(e.target.files)}
                     />
                   </label>
-                  <Gallery photos={photos} label="Draft after repair" />
+                  <Gallery photos={photos} label={tr("Draft after repair")} />
                   {photos.map((p) => (
                     <button
                       className="text-button"
@@ -1582,64 +1556,43 @@ function Details({ mode = "detail" }: { mode?: string }) {
                           JSON.stringify(next),
                         );
                       }}
-                    >
-                      Remove {p.name}
+                    >{tr("Remove")}{" "}{p.name}
                     </button>
                   ))}
                 </>
               )}
-              {mode === "progress" ? (
-                <button
+              {mode === "progress" ? (<button
                   className="primary"
                   disabled={busy || !notes.trim()}
                   onClick={() =>
                     void direct("progress", { note: notes, phase: "Repair" })
                   }
-                >
-                  Save progress
-                  <Check size={16} />
-                </button>
-              ) : mode === "document" ? (
-                <Link
+                >{tr("Save progress")}<Check size={16} />
+                </button>) : mode === "document" ? (<Link
                   className="primary"
                   to={base + "/repairs/" + r.id + "/submit"}
-                >
-                  Review completion
-                  <ArrowRight size={16} />
-                </Link>
-              ) : (
-                <>
+                >{tr("Review completion")}<ArrowRight size={16} />
+                </Link>) : (<>
                   <p className="notice">
-                    <ShieldCheck size={18} /> Confirm that these photos show
-                    this road after repair. The LGU will review all evidence.
-                  </p>
+                    <ShieldCheck size={18} />{" "}{tr("Confirm that these photos show this road after repair. The LGU will review all evidence.")}</p>
                   <button
                     className="primary"
                     disabled={
-                      busy ||
-                      !notes.trim() ||
-                      !photos.length ||
-                      r.completion?.state === "Awaiting Verification" ||
-                      r.status !== "In Progress"
+                      busy || !notes.trim() || !photos.length || r.completion?.state === "Awaiting Verification" || r.status !== "In Progress"
                     }
                     onClick={() =>
                       void direct("complete", { note: notes, photos })
                     }
-                  >
-                    Submit for administrative verification
-                    <ArrowRight size={16} />
+                  >{tr("Submit for administrative verification")}<ArrowRight size={16} />
                   </button>
                   <Link
                     className="back-link"
                     to={base + "/repairs/" + id + "/document"}
-                  >
-                    Back to edit
-                  </Link>
-                </>
-              )}
+                  >{tr("Back to edit")}</Link>
+                </>)}
             </Panel>
           )}
-          <Panel title="Report timeline">
+          <Panel title={tr("Report timeline")}>
             <ol className="timeline">
               {r.history
                 .slice()
@@ -1649,11 +1602,7 @@ function Details({ mode = "detail" }: { mode?: string }) {
                     <span className="timeline-dot" />
                     <div>
                       <strong>
-                        {h.action === "complete"
-                          ? "Completion submitted for verification"
-                          : h.action === "return"
-                            ? "Additional work requested"
-                            : h.to}
+                        {h.action === "complete" ? tr("Completion submitted for verification") : h.action === "return" ? tr("Additional work requested") : h.to}
                       </strong>
                       <p>{h.note || h.action}</p>
                       <small>
@@ -1665,21 +1614,20 @@ function Details({ mode = "detail" }: { mode?: string }) {
             </ol>
             {r.updates.map((u, i) => (
               <p key={i}>
-                <strong>{u.phase}</strong> · {u.note}{" "}
+                <strong>{tr(u.phase)}</strong> · {u.note}{" "}
                 <small>{date(u.at)}</small>
               </p>
             ))}
           </Panel>
         </div>
         <div>
-          <Panel title="Location">
+          <Panel title={tr("Location")}>
             <ReportMap reports={[r]} height={260} />
             <div className="location-detail">
               <MapPin size={18} />
               <div>
                 <strong>{r.location.road}</strong>
-                <p>
-                  Brgy. {r.location.barangay}, {r.location.city},{" "}
+                <p>{tr("Brgy.")}{" "}{r.location.barangay}, {r.location.city},{" "}
                   {r.location.province}
                 </p>
                 <small>
@@ -1693,87 +1641,57 @@ function Details({ mode = "detail" }: { mode?: string }) {
               target="_blank"
               rel="noreferrer"
             >
-              <Navigation size={16} />
-              Open map navigation
-              <ArrowUpRight size={15} />
+              <Navigation size={16} />{tr("Open map navigation")}<ArrowUpRight size={15} />
             </a>
           </Panel>
-          <Panel title={admin ? "Next action" : "Your task"}>
+          <Panel title={admin ? tr("Next action") : tr("Your task")}>
             <div className="action-stack">
-              {admin ? (
-                <>
+              {admin ? (<>
                   {["Submitted", "Under Review"].includes(r.status) && (
                     <>
-                      <p>
-                        Check the photo, pinned location and reported severity
-                        before deciding.
-                      </p>
+                      <p>{tr("Check the photo, pinned location and reported severity before deciding.")}</p>
                       <button
                         className="primary"
                         onClick={() => setDecision("verify")}
-                      >
-                        Verify report
-                        <ShieldCheck size={16} />
+                      >{tr("Verify report")}<ShieldCheck size={16} />
                       </button>
                       {r.status === "Submitted" && (
-                        <button onClick={() => setDecision("review")}>
-                          Move to Under Review
-                        </button>
+                        <button onClick={() => setDecision("review")}>{tr("Move to Under Review")}</button>
                       )}
-                      <button onClick={() => setDecision("flag")}>
-                        Flag for follow-up
-                      </button>
-                      <button onClick={() => setDecision("duplicate")}>
-                        Confirm duplicate
-                      </button>
+                      <button onClick={() => setDecision("flag")}>{tr("Flag for follow-up")}</button>
+                      <button onClick={() => setDecision("duplicate")}>{tr("Confirm duplicate")}</button>
                       <button
                         className="danger-button"
                         onClick={() => setDecision("reject")}
-                      >
-                        Reject with reason
-                      </button>
+                      >{tr("Reject with reason")}</button>
                     </>
                   )}
                   {r.status === "Verified" && (
                     <button
                       className="primary"
                       onClick={() => setDecision("assign")}
-                    >
-                      Assign maintenance team
-                      <Truck size={16} />
+                    >{tr("Assign maintenance team")}<Truck size={16} />
                     </button>
                   )}
                   {r.completion?.state === "Awaiting Verification" && (
                     <>
-                      <p>
-                        Compare before-and-after evidence and the repair notes.
-                      </p>
+                      <p>{tr("Compare before-and-after evidence and the repair notes.")}</p>
                       <button
                         className="primary"
                         onClick={() => setDecision("resolve")}
-                      >
-                        Confirm resolution
-                        <CheckCircle2 size={16} />
+                      >{tr("Confirm resolution")}<CheckCircle2 size={16} />
                       </button>
-                      <button onClick={() => setDecision("return")}>
-                        Request additional work
-                      </button>
+                      <button onClick={() => setDecision("return")}>{tr("Request additional work")}</button>
                     </>
                   )}
-                  <button onClick={() => setDecision("forward")}>
-                    Forward to responsible agency
-                  </button>
-                </>
-              ) : (
-                <>
+                  <button onClick={() => setDecision("forward")}>{tr("Forward to responsible agency")}</button>
+                </>) : (<>
                   {r.status === "Assigned" && (
                     <button
                       className="primary"
                       disabled={busy}
                       onClick={() => setDecision("start")}
-                    >
-                      Start inspection / repair
-                      <Truck size={16} />
+                    >{tr("Start inspection / repair")}<Truck size={16} />
                     </button>
                   )}
                   {r.status === "In Progress" &&
@@ -1782,51 +1700,38 @@ function Details({ mode = "detail" }: { mode?: string }) {
                         <Link
                           className="primary"
                           to={base + "/progress/" + r.id}
-                        >
-                          Update progress
-                          <ArrowRight size={16} />
+                        >{tr("Update progress")}<ArrowRight size={16} />
                         </Link>
                         <Link
                           className="button"
                           to={base + "/repairs/" + r.id + "/document"}
-                        >
-                          Upload repair evidence
-                          <Camera size={16} />
+                        >{tr("Upload repair evidence")}<Camera size={16} />
                         </Link>
                       </>
                     )}
                   {r.completion?.state === "Awaiting Verification" && (
                     <p className="notice">
-                      <Clock size={18} />
-                      Awaiting LGU verification. Your work is submitted; this
-                      case is not yet resolved.
-                    </p>
+                      <Clock size={18} />{tr("Awaiting LGU verification. Your work is submitted; this case is not yet resolved.")}</p>
                   )}
-                </>
-              )}
+                </>)}
               {r.status === "Resolved" && (
                 <p className="notice">
-                  <CheckCircle2 size={18} />
-                  Repair verified by the LGU. The reporter can now give
-                  feedback.
-                </p>
+                  <CheckCircle2 size={18} />{tr("Repair verified by the LGU. The reporter can now give feedback.")}</p>
               )}
             </div>
           </Panel>
           {r.assignment && (
-            <Panel title="Assigned crew">
+            <Panel title={tr("Assigned crew")}>
               <strong>{data.teams.find((t) => t.id === r.teamId)?.name}</strong>
-              <p>{r.assignment.note || "No additional instructions."}</p>
-              <small className="muted">
-                Target: {r.assignment.targetDate || "Not set"} · Priority:{" "}
+              <p>{r.assignment.note || tr("No additional instructions.")}</p>
+              <small className="muted">{tr("Target:")}{" "}{r.assignment.targetDate || tr("Not set")}{" "}{tr("· Priority:")}{" "}
                 {r.assignment.priority}
               </small>
             </Panel>
           )}
           {admin && (
-            <Panel title="Possible duplicates">
-              {nearby.length ? (
-                nearby.map((x) => (
+            <Panel title={tr("Possible duplicates")}>
+              {nearby.length ? (nearby.map((x) => (
                   <Link
                     className="duplicate-link"
                     key={x.report.id}
@@ -1834,26 +1739,19 @@ function Details({ mode = "detail" }: { mode?: string }) {
                   >
                     <strong>{x.report.id}</strong>
                     <span>
-                      {x.distance} m away · {x.report.location.road}
+                      {x.distance}{" "}{tr("m away ·")}{" "}{x.report.location.road}
                     </span>
                     <ArrowUpRight size={15} />
                   </Link>
-                ))
-              ) : (
-                <p className="muted">
-                  No similar active reports within 150 m on this road.
-                </p>
-              )}
-              <small className="muted">
-                Suggestions require a human decision.
-              </small>
+                ))) : (<p className="muted">{tr("No similar active reports within 150 m on this road.")}</p>)}
+              <small className="muted">{tr("Suggestions require a human decision.")}</small>
             </Panel>
           )}
         </div>
       </div>
       {decision && (
         <Modal
-          title={
+          title={tr(
             {
               verify: "Verify this report?",
               reject: "Reject report",
@@ -1866,21 +1764,17 @@ function Details({ mode = "detail" }: { mode?: string }) {
               forward: "Forward to agency",
               start: "Start inspection / repair?",
             }[decision] || decision
-          }
+          )}
           close={() => setDecision("")}
         >
           <form onSubmit={submit}>
             <p>
-              {decision === "resolve"
-                ? "Confirm that the road repair is complete and evidence is sufficient. This will notify the reporter."
-                : `Report ${r.id} · ${r.location.road}`}
+              {decision === "resolve" ? tr("Confirm that the road repair is complete and evidence is sufficient. This will notify the reporter.") : `${tr("Report")} ${r.id} · ${r.location.road}`}
             </p>
             {decision === "assign" && (
               <>
-                <label>
-                  Maintenance team
-                  <select name="teamId" required>
-                    <option value="">Select a team</option>
+                <label>{tr("Maintenance team")}<select name="teamId" required>
+                    <option value="">{tr("Select a team")}</option>
                     {data.teams
                       .filter((t) => t.active)
                       .map((t) => (
@@ -1894,23 +1788,17 @@ function Details({ mode = "detail" }: { mode?: string }) {
                                   x.status,
                                 ),
                             ).length
-                          }{" "}
-                          open tasks
-                        </option>
+                          }{" "}{tr("open tasks")}</option>
                       ))}
                   </select>
                 </label>
-                <label>
-                  Priority
-                  <select name="priority" defaultValue={r.severity}>
-                    <option>High</option>
-                    <option>Medium</option>
-                    <option>Low</option>
+                <label>{tr("Priority")}<select name="priority" defaultValue={r.severity}>
+                    <option value="High">{tr("High")}</option>
+                    <option value="Medium">{tr("Medium")}</option>
+                    <option value="Low">{tr("Low")}</option>
                   </select>
                 </label>
-                <label>
-                  Target date
-                  <input
+                <label>{tr("Target date")}<input
                     type="date"
                     name="targetDate"
                     min={localDay(new Date())}
@@ -1919,10 +1807,8 @@ function Details({ mode = "detail" }: { mode?: string }) {
               </>
             )}
             {decision === "duplicate" && (
-              <label>
-                Original report
-                <select name="duplicateOf" required>
-                  <option value="">Select the original report</option>
+              <label>{tr("Original report")}<select name="duplicateOf" required>
+                  <option value="">{tr("Select the original report")}</option>
                   {data.reports
                     .filter(
                       (x) =>
@@ -1938,19 +1824,15 @@ function Details({ mode = "detail" }: { mode?: string }) {
               </label>
             )}
             {decision === "forward" && (
-              <label>
-                Responsible agency
-                <input
+              <label>{tr("Responsible agency")}<input
                   name="jurisdiction"
                   required
-                  placeholder="Agency or jurisdiction name"
+                  placeholder={tr("Agency or jurisdiction name")}
                 />
               </label>
             )}
             <label>
-              {["reject", "return", "flag"].includes(decision)
-                ? "Reason / instructions (required)"
-                : "Review / assignment notes"}
+              {["reject", "return", "flag"].includes(decision) ? tr("Reason / instructions (required)") : tr("Review / assignment notes")}
               <textarea
                 name="note"
                 required={["reject", "return", "flag"].includes(decision)}
@@ -1959,18 +1841,13 @@ function Details({ mode = "detail" }: { mode?: string }) {
             </label>
             {error && (
               <p className="error" role="alert">
-                {error}
+                {tr(error)}
               </p>
             )}
             <div className="dialog-actions">
-              <button type="button" onClick={() => setDecision("")}>
-                Cancel
-              </button>
+              <button type="button" onClick={() => setDecision("")}>{tr("Cancel")}</button>
               <button className="primary" disabled={busy}>
-                {busy
-                  ? "Saving…"
-                  : "Confirm " +
-                    (decision === "resolve" ? "resolution" : decision)}
+                {busy ? tr("Saving…") : tr("Confirm ") + (decision === "resolve" ? tr("resolution") : tr(decision))}
               </button>
             </div>
           </form>
@@ -1993,39 +1870,39 @@ function MapPage() {
   return (
     <>
       <Header
-        title={admin ? "Pothole map" : "Assigned task map"}
-        description={`${rs.length} reports on the map · Malolos, Bulacan · fictional demonstration locations`}
+        title={admin ? tr("Pothole map") : tr("Assigned task map")}
+        description={`${rs.length} ${tr("reports on the map")} · Malolos, Bulacan · ${tr("fictional demonstration locations")}`}
       />
       <div className="filters">
         <select
-          aria-label="Severity filter"
+          aria-label={tr("Severity filter")}
           value={severity}
           onChange={(e) => setSeverity(e.target.value)}
         >
-          <option value="All">All severities</option>
+          <option value="All">{tr("All severities")}</option>
           {["High", "Medium", "Low"].map((s) => (
-            <option key={s}>{s}</option>
+            <option key={s} value={s}>{tr(s)}</option>
           ))}
         </select>
         <select
-          aria-label="Status filter"
+          aria-label={tr("Status filter")}
           value={status}
           onChange={(e) => setStatus(e.target.value)}
         >
-          <option value="All">All statuses</option>
+          <option value="All">{tr("All statuses")}</option>
           {statuses.map((s) => (
-            <option key={s}>{s}</option>
+            <option key={s} value={s}>{tr(s)}</option>
           ))}
         </select>
         <select
-          aria-label="Barangay filter"
+          aria-label={tr("Barangay filter")}
           value={area}
           onChange={(e) => setArea(e.target.value)}
         >
-          <option value="All">All barangays</option>
+          <option value="All">{tr("All barangays")}</option>
           {[...new Set(data.reports.map((r) => r.location.barangay))].map(
             (s) => (
-              <option key={s}>{s}</option>
+              <option key={s} value={s}>{s}</option>
             ),
           )}
         </select>
@@ -2035,18 +1912,12 @@ function MapPage() {
             setStatus("All");
             setArea("All");
           }}
-        >
-          Reset filters
-        </button>
+        >{tr("Reset filters")}</button>
       </div>
       <div className="map-layout">
         <ReportMap reports={rs} height={560} />
-        <Panel title="Reports in view">
-          {rs.length ? (
-            <SmallReports reports={rs} />
-          ) : (
-            <Empty title="No matching roads" />
-          )}
+        <Panel title={tr("Reports in view")}>
+          {rs.length ? (<SmallReports reports={rs} />) : (<Empty title={tr("No matching roads")} />)}
         </Panel>
       </div>
     </>
@@ -2079,43 +1950,37 @@ function Duplicates() {
   return (
     <>
       <Header
-        title="Possible duplicates"
-        description="Same road, within 150 metres. Compare evidence before confirming a duplicate."
+        title={tr("Possible duplicates")}
+        description={tr("Same road, within 150 metres. Compare evidence before confirming a duplicate.")}
       />
-      {pairs.length ? (
-        pairs.map(({ a, b, distance }) => (
+      {pairs.length ? (pairs.map(({ a, b, distance }) => (
           <section className="panel duplicate-pair" key={a.id + b.id}>
             <div className="panel-title">
               <h2>
-                {distance} m apart · {a.location.road}
+                {distance}{" "}{tr("m apart ·")}{" "}{a.location.road}
               </h2>
               <Badge value="Possible duplicate" />
             </div>
             <div className="two-columns">
               {[a, b].map((r) => (
                 <div key={r.id}>
-                  <Gallery photos={r.photos} label="Report evidence" />
+                  <Gallery photos={r.photos} label={tr("Report evidence")} />
                   <h3>{r.id}</h3>
                   <p>{r.description}</p>
                   <p className="muted">
                     {date(r.createdAt)} · {r.location.coordinates.lat},{" "}
                     {r.location.coordinates.lng}
                   </p>
-                  <Link className="button" to={base + "/verification/" + r.id}>
-                    Compare & review
-                    <ArrowUpRight size={16} />
+                  <Link className="button" to={base + "/verification/" + r.id}>{tr("Compare & review")}<ArrowUpRight size={16} />
                   </Link>
                 </div>
               ))}
             </div>
           </section>
-        ))
-      ) : (
-        <Empty
-          title="No possible duplicates"
-          text="New reports are checked by proximity and road name."
-        />
-      )}
+        ))) : (<Empty
+          title={tr("No possible duplicates")}
+          text={tr("New reports are checked by proximity and road name.")}
+        />)}
     </>
   );
 }
@@ -2124,19 +1989,20 @@ function Teams() {
   const { id } = useParams();
   const [q, setQ] = useState("");
   const [editing, setEditing] = useState<Team | null>(null);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   return (
     <>
       <Header
-        title={id ? "Maintenance team" : "Maintenance teams"}
-        description="Create crews, manage availability and review assigned work."
-        action={<button className="primary" onClick={() => {setError("");setEditing({id:"",name:"",members:[],active:true});}}>Add team <Users size={16}/></button>}
+        title={id ? tr("Maintenance team") : tr("Maintenance teams")}
+        description={tr("Create crews, manage availability and review assigned work.")}
+        action={<button className="primary" onClick={() => {setError("");setEditing({id:"",name:"",members:[],active:true});}}>{tr("Add team")}{" "}<Users size={16}/></button>}
       />
       <label className="search">
         <Search size={16} />
         <input
-          aria-label="Search teams"
-          placeholder="Search maintenance teams"
+          aria-label={tr("Search teams")}
+          placeholder={tr("Search maintenance teams")}
           value={q}
           onChange={(e) => setQ(e.target.value)}
         />
@@ -2154,11 +2020,11 @@ function Teams() {
               title={t.name}
               aside={<Badge value={t.active ? "Active" : "Inactive"} />}
             >
-              <p>{t.members.join(" · ") || "No active members yet. Assign accounts from User management."}</p>
-              <button className="button" onClick={() => {setError("");setEditing(t);}}>Edit team</button>
+              <p>{t.members.join(" · ") || tr("No active members yet. Select accounts in Edit team.")}</p>
+              <button className="button" onClick={() => {setError("");setEditing(t);}}>{tr("Edit team")}</button>
               <dl className="detail-list">
                 <div>
-                  <dt>Open tasks</dt>
+                  <dt>{tr("Open tasks")}</dt>
                   <dd>
                     {
                       data.reports.filter(
@@ -2172,7 +2038,7 @@ function Teams() {
                   </dd>
                 </div>
                 <div>
-                  <dt>Verified repairs</dt>
+                  <dt>{tr("Verified repairs")}</dt>
                   <dd>
                     {
                       data.reports.filter(
@@ -2186,21 +2052,30 @@ function Teams() {
                 reports={data.reports.filter((r) => r.teamId === t.id)}
               />
               {!id && (
-                <Link className="panel-bottom" to={base + "/teams/" + t.id}>
-                  View team
-                  <ArrowRight size={15} />
+                <Link className="panel-bottom" to={base + "/teams/" + t.id}>{tr("View team")}<ArrowRight size={15} />
                 </Link>
               )}
             </Panel>
           ))}
       </div>
-      {editing && <Modal title={editing.id ? "Edit maintenance team" : "Add maintenance team"} close={() => setEditing(null)}>
-        <form onSubmit={async(e) => {e.preventDefault();const f=new FormData(e.currentTarget);try{await request("/teams",{id:editing.id,name:f.get("name"),active:f.get("active")==="true"},editing.id?"PATCH":"POST");await refresh();setEditing(null);notify("Team saved.");}catch(e){setError((e as Error).message);}}}>
-          <label>Team name<input name="name" defaultValue={editing.name} required maxLength={100}/></label>
-          <label>Availability<select name="active" defaultValue={String(editing.active)}><option value="true">Active</option><option value="false">Inactive</option></select></label>
-          <p>Members are linked through User accounts. Finish open tasks and move active members before deactivating a team.</p>
-          {error && <p className="error" role="alert">{error}</p>}
-          <button className="primary">Save team <Check size={16}/></button>
+      {editing && <Modal title={editing.id ? tr("Edit maintenance team") : tr("Add maintenance team")} close={() => setEditing(null)}>
+        <form onSubmit={async(e) => {e.preventDefault();const f=new FormData(e.currentTarget);setSaving(true);try{await request("/teams",{id:editing.id,name:f.get("name"),active:f.get("active")==="true",memberIds:f.getAll("memberIds")},editing.id?"PATCH":"POST");await refresh();setEditing(null);notify("Team saved.");}catch(e){setError((e as Error).message);}finally{setSaving(false);}}}>
+          <label>{tr("Team name")}<input name="name" defaultValue={editing.name} required maxLength={100}/></label>
+          <label>{tr("Availability")}<select name="active" defaultValue={String(editing.active)}><option value="true">{tr("Active")}</option><option value="false">{tr("Inactive")}</option></select></label>
+          <fieldset disabled={saving}>
+            <legend>{tr("Crew members")}</legend>
+            <p>{tr("Select active crew accounts. Selecting a member moves them from their current team. Removing a member leaves their account unassigned.")}</p>
+            {data.users.filter(u => u.active && u.role === "maintenance").map(u => (
+              <label className="checkbox" key={u.id}>
+                <input type="checkbox" name="memberIds" value={u.id} defaultChecked={!!editing.id && u.teamId === editing.id} />
+                {u.name} · {u.email} · {data.teams.find(t => t.id === u.teamId)?.name || tr("Not assigned")}
+              </label>
+            ))}
+            {!data.users.some(u => u.active && u.role === "maintenance") && <p>{tr("No eligible crew accounts. Create an active road crew account in User accounts.")}</p>}
+          </fieldset>
+          <p>{tr("Finish open tasks and remove active members before deactivating a team.")}</p>
+          {error && <p className="error" role="alert">{tr(error)}</p>}
+          <button className="primary" disabled={saving}>{tr("Save team")}{" "}<Check size={16}/></button>
         </form>
       </Modal>}
     </>
@@ -2256,15 +2131,13 @@ function UsersPage() {
     <>
       {id && (
         <Link className="back-link" to={base + "/users"}>
-          <ArrowLeft size={16} /> All user accounts
-        </Link>
+          <ArrowLeft size={16} />{" "}{tr("All user accounts")}</Link>
       )}
       <Header
-        title={id ? "User details" : "User accounts"}
-        description="Create, update, manage roles, assign teams, or delete workspace accounts."
+        title={id ? tr("User details") : tr("User accounts")}
+        description={tr("Create, update, manage roles, assign teams, or delete workspace accounts.")}
         action={
-          <button className="primary" onClick={openAdd}>
-            Add account <Users size={16} />
+          <button className="primary" onClick={openAdd}>{tr("Add account")}{" "}<Users size={16} />
           </button>
         }
       />
@@ -2272,34 +2145,34 @@ function UsersPage() {
         <label className="search">
           <Search size={16} />
           <input
-            aria-label="Search users"
+            aria-label={tr("Search users")}
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Search names or email"
+            placeholder={tr("Search names or email")}
           />
         </label>
         <select
-          aria-label="Role filter"
+          aria-label={tr("Role filter")}
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
         >
-          <option>All</option>
-          <option>admin</option>
-          <option>citizen</option>
-          <option>maintenance</option>
+          <option value="All">{tr("All")}</option>
+          <option value="admin">{tr("admin")}</option>
+          <option value="citizen">{tr("citizen")}</option>
+          <option value="maintenance">{tr("maintenance")}</option>
         </select>
       </div>
-      <Panel title="Workspace accounts">
+      <Panel title={tr("Workspace accounts")}>
         <div className="table-scroll">
           <table>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Team</th>
-                <th>Account status</th>
-                <th>Action</th>
+                <th>{tr("Name")}</th>
+                <th>{tr("Email")}</th>
+                <th>{tr("Role")}</th>
+                <th>{tr("Team")}</th>
+                <th>{tr("Account status")}</th>
+                <th>{tr("Action")}</th>
               </tr>
             </thead>
             <tbody>
@@ -2318,7 +2191,7 @@ function UsersPage() {
                       <Link to={base + "/users/" + u.id}>{u.name}</Link>
                     </td>
                     <td>{u.email}</td>
-                    <td>{u.role}</td>
+                    <td>{tr(u.role)}</td>
                     <td>
                       {data.teams.find((t) => t.id === u.teamId)?.name || "—"}
                     </td>
@@ -2330,18 +2203,14 @@ function UsersPage() {
                         <button
                           disabled={u.id === data.user.id}
                           onClick={() => openEdit(u)}
-                        >
-                          Manage
-                        </button>
+                        >{tr("Manage")}</button>
                         <button
                           disabled={u.id === data.user.id}
                           onClick={() => {
                             setError("");
                             setDeleting(u);
                           }}
-                        >
-                          Delete
-                        </button>
+                        >{tr("Delete")}</button>
                       </div>
                     </td>
                   </tr>
@@ -2352,7 +2221,7 @@ function UsersPage() {
       </Panel>
       {selected && (
         <Modal
-          title={selected.id ? "Manage " + selected.name : "Add account"}
+          title={selected.id ? tr("Manage ") + selected.name : tr("Add account")}
           close={() => setSelected(null)}
         >
           <form
@@ -2400,9 +2269,7 @@ function UsersPage() {
               }
             }}
           >
-            <label>
-              Full name
-              <input
+            <label>{tr("Full name")}<input
                 name="name"
                 required
                 maxLength={100}
@@ -2414,9 +2281,7 @@ function UsersPage() {
                 }}
               />
             </label>
-            <label>
-              Email address
-              <input
+            <label>{tr("Email address")}<input
                 name="email"
                 type="email"
                 required
@@ -2430,9 +2295,7 @@ function UsersPage() {
               />
             </label>
             <label className="password-label">
-              {selected.id
-                ? "New password (leave blank to keep current)"
-                : "Temporary demo password"}
+              {selected.id ? tr("New password (leave blank to keep current)") : tr("Temporary demo password")}
               <div className="password-wrap">
                 <input
                   name="password"
@@ -2442,9 +2305,7 @@ function UsersPage() {
                   required={!selected.id}
                   autoComplete="new-password"
                   placeholder={
-                    selected.id
-                      ? "Leave blank to keep existing password"
-                      : "Min. 8 chars (Aa1!)"
+                    selected.id ? tr("Leave blank to keep existing password") : tr("Min. 8 chars (Aa1!)")
                   }
                   defaultValue={selected.id ? "" : draft.password}
                   onChange={(e) => {
@@ -2455,7 +2316,8 @@ function UsersPage() {
                 <button
                   type="button"
                   className="password-toggle-btn"
-                  aria-label={showPw ? "Hide password" : "Show password"}
+                  onMouseDown={(e) => e.preventDefault()}
+                  aria-label={showPw ? tr("Hide password") : tr("Show password")}
                   aria-pressed={showPw}
                   onClick={() => setShowPw(!showPw)}
                 >
@@ -2463,15 +2325,10 @@ function UsersPage() {
                 </button>
               </div>
             </label>
-            <p>
-              Requires at least 8 characters including uppercase, lowercase,
-              number, and special character.
-            </p>
-            <label>
-              Maintenance team
-              <select
+            <p>{tr("Requires at least 8 characters including uppercase, lowercase, number, and special character.")}</p>
+            <label>{tr("Maintenance team")}<select
                 name="teamId"
-                aria-label="Maintenance team"
+                aria-label={tr("Maintenance team")}
                 defaultValue={
                   selected.id ? selected.teamId || "" : draft.teamId
                 }
@@ -2480,7 +2337,7 @@ function UsersPage() {
                     setDraft((d) => ({ ...d, teamId: e.target.value }));
                 }}
               >
-                <option value="">Not assigned (non-maintenance roles)</option>
+                <option value="">{tr("Not assigned")}</option>
                 {data.teams
                   .filter((t) => t.active)
                   .map((t) => (
@@ -2490,11 +2347,9 @@ function UsersPage() {
                   ))}
               </select>
             </label>
-            <label>
-              Role
-              <select
+            <label>{tr("Role")}<select
                 name="role"
-                aria-label="Role"
+                aria-label={tr("Role")}
                 defaultValue={selected.id ? selected.role : draft.role}
                 onChange={(e) => {
                   if (!selected.id)
@@ -2504,14 +2359,12 @@ function UsersPage() {
                     }));
                 }}
               >
-                <option>citizen</option>
-                <option>maintenance</option>
-                <option>admin</option>
+                <option value="citizen">{tr("citizen")}</option>
+                <option value="maintenance">{tr("maintenance")}</option>
+                <option value="admin">{tr("admin")}</option>
               </select>
             </label>
-            <label>
-              Account status
-              <select
+            <label>{tr("Account status")}<select
                 name="active"
                 defaultValue={String(
                   selected.id ? selected.active : draft.active,
@@ -2524,23 +2377,18 @@ function UsersPage() {
                     }));
                 }}
               >
-                <option value="true">Active</option>
-                <option value="false">Inactive</option>
+                <option value="true">{tr("Active")}</option>
+                <option value="false">{tr("Inactive")}</option>
               </select>
             </label>
             {error && (
               <p role="alert" className="error">
-                {error}
+                {tr(error)}
               </p>
             )}
-            <p>
-              Changing roles or deactivating access takes effect on the next API
-              request.
-            </p>
+            <p>{tr("Changing roles or deactivating access takes effect on the next API request.")}</p>
             <div className="dialog-actions" style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
-              <button className="primary" type="submit">
-                Confirm account changes
-              </button>
+              <button className="primary" type="submit">{tr("Confirm account changes")}</button>
               {selected.id && (
                 <button
                   type="button"
@@ -2550,9 +2398,7 @@ function UsersPage() {
                     setError("");
                     setDeleting(target);
                   }}
-                >
-                  Delete account
-                </button>
+                >{tr("Delete account")}</button>
               )}
               {!selected.id && (
                 <button
@@ -2561,9 +2407,7 @@ function UsersPage() {
                     setDraft(emptyDraft);
                     setSelected(null);
                   }}
-                >
-                  Cancel & clear
-                </button>
+                >{tr("Cancel & clear")}</button>
               )}
             </div>
           </form>
@@ -2571,16 +2415,15 @@ function UsersPage() {
       )}
       {deleting && (
         <Modal
-          title={"Delete " + deleting.name}
+          title={tr("Delete ") + deleting.name}
           close={() => setDeleting(null)}
         >
-          <p>
-            Are you sure you want to permanently delete the account for{" "}
+          <p>{tr("Are you sure you want to permanently delete the account for")}{" "}
             <strong>{deleting.name}</strong> ({deleting.email})?
           </p>
           {error && (
             <p role="alert" className="error">
-              {error}
+              {tr(error)}
             </p>
           )}
           <div className="dialog-actions" style={{ display: "flex", gap: "8px", marginTop: "16px" }}>
@@ -2597,12 +2440,8 @@ function UsersPage() {
                   setError((e as Error).message);
                 }
               }}
-            >
-              Confirm delete
-            </button>
-            <button type="button" onClick={() => setDeleting(null)}>
-              Cancel
-            </button>
+            >{tr("Confirm delete")}</button>
+            <button type="button" onClick={() => setDeleting(null)}>{tr("Cancel")}</button>
           </div>
         </Modal>
       )}
@@ -2626,30 +2465,28 @@ function Analytics() {
   return (
     <>
       <Header
-        title="Community reports, in perspective."
-        description="Derived from fictional local records · no official repair statistics."
+        title={tr("Community reports, in perspective.")}
+        description={tr("Derived from fictional local records · no official repair statistics.")}
         action={
-          <Link className="button" to={base + "/exports"}>
-            Export summary
-            <Download size={15} />
+          <Link className="button" to={base + "/exports"}>{tr("Export summary")}<Download size={15} />
           </Link>
         }
       />
       <Stats reports={rs} />
       <div className="two-columns">
-        <Panel title="Reports over time">
+        <Panel title={tr("Reports over time")}>
           <Chart reports={rs} kind="time" />
         </Panel>
-        <Panel title="Reports by status">
+        <Panel title={tr("Reports by status")}>
           <Chart reports={rs} />
         </Panel>
-        <Panel title="Reported severity">
+        <Panel title={tr("Reported severity")}>
           <Chart reports={rs} kind="severity" />
         </Panel>
-        <Panel title="Barangay distribution">
+        <Panel title={tr("Barangay distribution")}>
           <Chart reports={rs} kind="area" />
         </Panel>
-        <Panel title="Maintenance workload">
+        <Panel title={tr("Maintenance workload")}>
           {data.teams.map((t) => (
             <div className="breakdown" key={t.id}>
               <span>{t.name}</span>
@@ -2657,19 +2494,17 @@ function Analytics() {
                 {
                   rs.filter((r) => r.teamId === t.id && r.status !== "Resolved")
                     .length
-                }{" "}
-                open
-              </strong>
+                }{" "}{tr("open")}</strong>
             </div>
           ))}
         </Panel>
-        <Panel title="Resolution summary">
+        <Panel title={tr("Resolution summary")}>
           <div className="breakdown">
-            <span>Verified repairs</span>
+            <span>{tr("Verified repairs")}</span>
             <strong>{done.length}</strong>
           </div>
           <div className="breakdown">
-            <span>Unresolved reports</span>
+            <span>{tr("Unresolved reports")}</span>
             <strong>
               {
                 rs.filter(
@@ -2680,8 +2515,8 @@ function Analytics() {
             </strong>
           </div>
           <div className="breakdown">
-            <span>Mean elapsed time (demo timestamps)</span>
-            <strong>{avg === null ? "—" : avg + " days"}</strong>
+            <span>{tr("Mean elapsed time (demo timestamps)")}</span>
+            <strong>{avg === null ? "—" : avg + tr(" days")}</strong>
           </div>
         </Panel>
       </div>
@@ -2789,55 +2624,45 @@ function Exports() {
   return (
     <>
       <Header
-        title="Export center"
-        description="Choose the reports and fields for a downloadable summary."
+        title={tr("Export center")}
+        description={tr("Choose the reports and fields for a downloadable summary.")}
       />
       <div className="export-layout">
-        <Panel title="Report selection">
-          <label>
-            Status
-            <select value={status} onChange={(e) => setStatus(e.target.value)}>
-              <option value="All">All statuses</option>
+        <Panel title={tr("Report selection")}>
+          <label>{tr("Status")}<select value={status} onChange={(e) => setStatus(e.target.value)}>
+              <option value="All">{tr("All statuses")}</option>
               {statuses.map((s) => (
-                <option key={s}>{s}</option>
+                <option key={s} value={s}>{tr(s)}</option>
               ))}
             </select>
           </label>
-          <label>
-            Severity
-            <select
+          <label>{tr("Severity")}<select
               value={severity}
               onChange={(e) => setSeverity(e.target.value)}
             >
-              <option value="All">All severities</option>
-              <option>High</option>
-              <option>Medium</option>
-              <option>Low</option>
+              <option value="All">{tr("All severities")}</option>
+              <option value="High">{tr("High")}</option>
+              <option value="Medium">{tr("Medium")}</option>
+              <option value="Low">{tr("Low")}</option>
             </select>
           </label>
-          <label>
-            Barangay
-            <select value={area} onChange={(e) => setArea(e.target.value)}>
-              <option value="All">All barangays</option>
+          <label>{tr("Barangay")}<select value={area} onChange={(e) => setArea(e.target.value)}>
+              <option value="All">{tr("All barangays")}</option>
               {[...new Set(data.reports.map((r) => r.location.barangay))].map(
                 (s) => (
-                  <option key={s}>{s}</option>
+                  <option key={s} value={s}>{s}</option>
                 ),
               )}
             </select>
           </label>
           <div className="two-columns">
-            <label>
-              From date
-              <input
+            <label>{tr("From date")}<input
                 type="date"
                 value={from}
                 onChange={(e) => setFrom(e.target.value)}
               />
             </label>
-            <label>
-              To date
-              <input
+            <label>{tr("To date")}<input
                 type="date"
                 value={to}
                 onChange={(e) => setTo(e.target.value)}
@@ -2845,7 +2670,7 @@ function Exports() {
             </label>
           </div>
           <fieldset>
-            <legend>Include fields</legend>
+            <legend>{tr("Include fields")}</legend>
             {[
               "Reference",
               "Road",
@@ -2866,31 +2691,24 @@ function Exports() {
                     )
                   }
                 />
-                {f}
+                {tr(f)}
               </label>
             ))}
           </fieldset>
         </Panel>
-        <Panel title="Ready for your records">
+        <Panel title={tr("Ready for your records")}>
           <Download size={32} />
-          <h3>{rs.length} reports selected</h3>
-          <p>
-            Downloads include a demonstration label. Reporter personal
-            information is excluded.
-          </p>
+          <h3>{rs.length}{" "}{tr("reports selected")}</h3>
+          <p>{tr("Downloads include a demonstration label. Reporter personal information is excluded.")}</p>
           {error && (
             <p className="error" role="alert">
-              {error}
+              {tr(error)}
             </p>
           )}
           <div className="action-stack">
-            <button className="primary" onClick={() => exportFile("CSV")}>
-              Download CSV
-              <Download size={16} />
+            <button className="primary" onClick={() => exportFile("CSV")}>{tr("Download CSV")}<Download size={16} />
             </button>
-            <button onClick={() => exportFile("PDF")}>
-              Download PDF
-              <Download size={16} />
+            <button onClick={() => exportFile("PDF")}>{tr("Download PDF")}<Download size={16} />
             </button>
           </div>
         </Panel>
@@ -2903,8 +2721,8 @@ function Notifications() {
   return (
     <>
       <Header
-        title="Notifications"
-        description="Report and repair updates from the local demonstration service."
+        title={tr("Notifications")}
+        description={tr("Report and repair updates from the local demonstration service.")}
         action={
           <button
             onClick={async () => {
@@ -2915,15 +2733,12 @@ function Notifications() {
                 notify((e as Error).message);
               }
             }}
-          >
-            Mark all as read
-            <Check size={16} />
+          >{tr("Mark all as read")}<Check size={16} />
           </button>
         }
       />
-      <Panel title="Workspace activity">
-        {data.notifications.length ? (
-          data.notifications.map((n) => (
+      <Panel title={tr("Workspace activity")}>
+        {data.notifications.length ? (data.notifications.map((n) => (
             <div
               className={"notice-row " + (!n.read ? "unread" : "")}
               key={n.id}
@@ -2947,13 +2762,10 @@ function Notifications() {
               </Link>
               {!n.read && <span className="unread-dot" />}
             </div>
-          ))
-        ) : (
-          <Empty
-            title="All quiet for now"
-            text="Status updates and assignments will appear here."
-          />
-        )}
+          ))) : (<Empty
+            title={tr("All quiet for now")}
+            text={tr("Status updates and assignments will appear here.")}
+          />)}
       </Panel>
     </>
   );
@@ -2972,29 +2784,29 @@ function Activity() {
   return (
     <>
       <Header
-        title="Report history"
-        description="Local demonstration history. This is not a tamper-proof production audit log."
+        title={tr("Report history")}
+        description={tr("Local demonstration history. This is not a tamper-proof production audit log.")}
       />
       <label className="search">
         <Search size={16} />
         <input
-          aria-label="Search history"
+          aria-label={tr("Search history")}
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search report, action or actor"
+          placeholder={tr("Search report, action or actor")}
         />
       </label>
-      <Panel title={`${entries.length} recorded events`}>
+      <Panel title={`${entries.length} ${tr("recorded events")}`}>
         <div className="table-scroll">
           <table>
             <thead>
               <tr>
-                <th>Report</th>
-                <th>Actor</th>
-                <th>Action</th>
-                <th>Previous status</th>
-                <th>New status</th>
-                <th className="numeric">Date</th>
+                <th>{tr("Report")}</th>
+                <th>{tr("Actor")}</th>
+                <th>{tr("Action")}</th>
+                <th>{tr("Previous status")}</th>
+                <th>{tr("New status")}</th>
+                <th className="numeric">{tr("Date")}</th>
               </tr>
             </thead>
             <tbody>
@@ -3007,11 +2819,11 @@ function Activity() {
                   </td>
                   <td>{actorLabel(h)}</td>
                   <td>
-                    {h.action}
+                    {tr(h.action)}
                     <small className="sub-state">{h.note}</small>
                   </td>
-                  <td>{h.from || "—"}</td>
-                  <td>{h.to}</td>
+                  <td>{h.from ? tr(h.from) : "—"}</td>
+                  <td>{tr(h.to)}</td>
                   <td className="numeric">{dateTime(h.at)}</td>
                 </tr>
               ))}
@@ -3024,6 +2836,8 @@ function Activity() {
 }
 
 function SettingsPage() {
+  const language = useLanguage();
+  const [languageError, setLanguageError] = useState("");
   const navigate = useNavigate();
   const { data, refresh, notify } = useData();
   const [error, setError] = useState(""),
@@ -3033,15 +2847,25 @@ function SettingsPage() {
   return (
     <>
       <Header
-        title={admin ? "Workspace settings" : "Profile & settings"}
-        description="Profile and preferences for this demonstration workspace."
+        title={admin ? tr("Workspace settings") : tr("Profile & settings")}
+        description={tr("Profile and preferences for this demonstration workspace.")}
       />
 
-      <button className="button" onClick={async()=>{try{await request('/auth/logout',{});}finally{sessionStorage.removeItem('patag-token');navigate(base+'/login',{replace:true});}}}>Log out</button>
+      <button className="button" onClick={async()=>{try{await request('/auth/logout',{});}finally{sessionStorage.removeItem('patag-token');navigate(base+'/login',{replace:true});}}}>{tr("Log out")}</button>
+      <section className="settings-row">
+        <div><h2>{tr("Language")}</h2><p>{tr("Choose the interface language. Saved on this browser.")}</p></div>
+        <div className="panel">
+          <label>{tr("Language")}<select aria-label={tr("Language")} value={language} onChange={e => {
+            try { setLanguage(e.target.value as Language); setLanguageError(""); notify("Language saved on this browser."); }
+            catch { setLanguageError("Could not save the language preference. Please allow browser storage and retry."); }
+          }}>{languages.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}</select></label>
+          {languageError && <p className="error" role="alert">{tr(languageError)}</p>}
+        </div>
+      </section>
       <section className="settings-row">
         <div>
-          <h2>Your profile</h2>
-          <p>Used on review notes and task activity.</p>
+          <h2>{tr("Your profile")}</h2>
+          <p>{tr("Used on review notes and task activity.")}</p>
         </div>
         <form
           className="panel"
@@ -3061,13 +2885,9 @@ function SettingsPage() {
             }
           }}
         >
-          <label>
-            Full name
-            <input name="name" defaultValue={data.user.name} required />
+          <label>{tr("Full name")}<input name="name" defaultValue={data.user.name} required />
           </label>
-          <label>
-            Email address
-            <input
+          <label>{tr("Email address")}<input
               name="email"
               type="email"
               defaultValue={data.user.email}
@@ -3075,25 +2895,22 @@ function SettingsPage() {
               required
             />
           </label>
-          <p>
-            Role: {data.user.role}
-            {!admin ? " · " + (data.teams.find(t=>t.id===data.user.teamId)?.name || "No team") : ""}
+          <p>{tr("Role:")}{" "}{tr(data.user.role)}
+            {!admin ? " · " + (data.teams.find(t=>t.id===data.user.teamId)?.name || tr("No team")) : ""}
           </p>
           {error && (
             <p className="error" role="alert">
-              {error}
+              {tr(error)}
             </p>
           )}
-          <button className="primary">
-            Save profile
-            <Check size={15} />
+          <button className="primary">{tr("Save profile")}<Check size={15} />
           </button>
         </form>
       </section>
       <section className="settings-row">
         <div>
-          <h2>Notification preference</h2>
-          <p>Saved on this browser. In-app history stays available.</p>
+          <h2>{tr("Notification preference")}</h2>
+          <p>{tr("Saved on this browser. In-app history stays available.")}</p>
         </div>
         <div className="panel">
           <label className="checkbox">
@@ -3108,22 +2925,15 @@ function SettingsPage() {
                 );
                 notify("Preference saved on this browser.");
               }}
-            />
-            Show unread notification indicators
-          </label>
-          <p className="muted">
-            System push and email delivery require a production notification
-            service.
-          </p>
+            />{tr("Show unread notification indicators")}</label>
+          <p className="muted">{tr("System push and email delivery require a production notification service.")}</p>
         </div>
       </section>
       {admin && (
         <section className="settings-row">
           <div>
-            <h2>Agency & jurisdiction</h2>
-            <p>
-              Shared by all roles in this workspace. New reports use this agency; existing reports keep their assigned jurisdiction.
-            </p>
+            <h2>{tr("Agency & jurisdiction")}</h2>
+            <p>{tr("Shared by all roles in this workspace. New reports use this agency; existing reports keep their assigned jurisdiction.")}</p>
           </div>
           <form
             className="panel"
@@ -3132,9 +2942,7 @@ function SettingsPage() {
               try {await request("/settings",{agency:f.get("agency"),city:f.get("city"),province:f.get("province")},"PATCH");await refresh();notify("Workspace settings saved.");setError("");}catch(e){setError((e as Error).message);}
             }}
           >
-            <label>
-              Agency label
-              <input
+            <label>{tr("Agency label")}<input
                 name="agency"
                 defaultValue={
                   data.settings?.agency || "Malolos demo jurisdiction"
@@ -3142,35 +2950,24 @@ function SettingsPage() {
                 required
               />
             </label>
-            <label>City<input name="city" defaultValue={data.settings?.city || "Malolos"} required/></label>
-            <label>Province<input name="province" defaultValue={data.settings?.province || "Bulacan"} required/></label>
-            {error && <p className="error" role="alert">{error}</p>}
-            <button className="primary">Save workspace settings</button>
-            <Link className="back-link" to={base + "/users"}>
-              Manage user accounts
-              <ArrowRight size={16} />
+            <label>{tr("City")}<input name="city" defaultValue={data.settings?.city || "Malolos"} required/></label>
+            <label>{tr("Province")}<input name="province" defaultValue={data.settings?.province || "Bulacan"} required/></label>
+            {error && <p className="error" role="alert">{tr(error)}</p>}
+            <button className="primary">{tr("Save workspace settings")}</button>
+            <Link className="back-link" to={base + "/users"}>{tr("Manage user accounts")}<ArrowRight size={16} />
             </Link>
           </form>
         </section>
       )}
       <section className="settings-row">
         <div>
-          <h2>About PATAG</h2>
-          <p>Pa-tag lubak, lubak patag.</p>
+          <h2>{tr("About PATAG")}</h2>
+          <p>{tr("Pa-tag lubak, lubak patag.")}</p>
         </div>
         <div className="panel">
-          <p>
-            A Philippine civic platform connecting community reports, LGU
-            verification and maintenance action.
-          </p>
-          <p>
-            IT 305 · Bulacan State University
-            <br />
-            Academic final project · Local development API
-          </p>
-          <p className="muted">
-            Never use real personal data in this demonstration.
-          </p>
+          <p>{tr("A Philippine civic platform connecting community reports, LGU verification and maintenance action.")}</p>
+          <p>{tr("IT 305 · Bulacan State University")}<br />{tr("Academic final project · Local development API")}</p>
+          <p className="muted">{tr("Never use real personal data in this demonstration.")}</p>
         </div>
       </section>
     </>
@@ -3180,26 +2977,23 @@ function Success() {
   const { id } = useParams();
   return (
     <section className="success">
-      <img src="/assets/patag-mascot.png" alt="PATAG mascot" />
+      <img src="/assets/patag-mascot.png" alt={tr("PATAG mascot")} />
       <Badge value="Awaiting Verification" />
-      <h1>
-        Work submitted.
-        <br />
-        One step closer to patag.
-      </h1>
+      <h1>{tr("Work submitted.")}<br />{tr("One step closer to patag.")}</h1>
       <p>
-        {id} · The LGU will review your repair evidence before closing the
-        report.
-      </p>
-      <Link className="primary" to={base + "/assignments/" + id}>
-        View task
-        <ArrowRight size={16} />
+        {id}{" "}{tr("· The LGU will review your repair evidence before closing the report.")}</p>
+      <Link className="primary" to={base + "/assignments/" + id}>{tr("View task")}<ArrowRight size={16} />
       </Link>
-      <Link to={base + "/dashboard"}>Return to overview</Link>
+      <Link to={base + "/dashboard"}>{tr("Return to overview")}</Link>
     </section>
   );
 }
 export default function App() {
+  const language = useLanguage();
+  useEffect(() => {
+    document.documentElement.lang = language;
+    document.title = language === "tl" ? "PATAG · Mga operasyon ng LGU" : "PATAG · LGU operations";
+  }, [language]);
   return (
     <BrowserRouter>
       <Routes>

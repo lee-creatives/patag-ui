@@ -391,6 +391,7 @@ function Login() {
                   <button
                     type="button"
                     className="password-toggle-btn"
+                  onMouseDown={(e) => e.preventDefault()}
                     aria-label={showPassword ? "Hide password" : "Show password"}
                     aria-pressed={showPassword}
                     onClick={() => setShowPassword(!showPassword)}
@@ -2455,6 +2456,7 @@ function UsersPage() {
                 <button
                   type="button"
                   className="password-toggle-btn"
+                  onMouseDown={(e) => e.preventDefault()}
                   aria-label={showPw ? "Hide password" : "Show password"}
                   aria-pressed={showPw}
                   onClick={() => setShowPw(!showPw)}
@@ -2480,7 +2482,7 @@ function UsersPage() {
                     setDraft((d) => ({ ...d, teamId: e.target.value }));
                 }}
               >
-                <option value="">Not assigned (non-maintenance roles)</option>
+                <option value="">Not assigned</option>
                 {data.teams
                   .filter((t) => t.active)
                   .map((t) => (
