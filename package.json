@@ -6,6 +6,7 @@
     "api": "npm --prefix backend run dev",
     "api:lan": "npm --prefix backend run dev:lan",
     "mobile:usb": "node scripts/adb-reverse.mjs",
+    "test:admin-fixes": "node scripts/qa/admin-fixes.mjs",
     "test:backend": "npm --prefix backend test",
     "demo:api": "node dev-mock/server.mjs",
     "test:api": "node --test dev-mock/server.test.mjs dev-mock/project2.test.mjs",

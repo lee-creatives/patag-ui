@@ -127,6 +127,11 @@ export class Store {
     await this.db.query('update teams set name = $2, active = $3 where id = $1', [t.id, t.name, t.active]);
     return this.teamById(t.id);
   }
+  async replaceTeamMembers(teamId: string, memberIds: string[]) {
+    await this.db.query(`update users set team_id = null, updated_at = now()
+      where team_id = $1 and role = 'maintenance' and active and not (id = any($2::text[]))`, [teamId, memberIds]);
+    await this.db.query('update users set team_id = $1, updated_at = now() where id = any($2::text[])', [teamId, memberIds]);
+  }
   async teamHasOpenWorkOrMembers(teamId: string) {
     const { rows } = await this.db.query(
       `select exists (select 1 from reports where team_id = $1 and status <> all($2::text[]))
