@@ -24,7 +24,7 @@ void main(){
   await tester.enterText(find.byType(TextFormField).first,'short');
   await tester.scrollUntilVisible(find.widgetWithText(FilledButton,'Create account'), 250, scrollable: find.byType(Scrollable).first);
   await tester.tap(find.widgetWithText(FilledButton,'Create account'));await tester.pumpAndSettle();
-  expect(find.text('Use 15 to 128 characters.'),findsOneWidget);
+  expect(find.text('Use at least 8 characters with uppercase, lowercase, number, and special character.'),findsOneWidget);
   await tester.scrollUntilVisible(find.text('Back'), 250, scrollable: find.byType(Scrollable).first);await tester.tap(find.text('Back'));await tester.pumpAndSettle();
   expect(tester.widget<TextFormField>(find.byType(TextFormField).at(1)).controller?.text,'Guinhawa');await tester.scrollUntilVisible(find.text('Back'), 250, scrollable: find.byType(Scrollable).first);await tester.tap(find.text('Back'));await tester.pumpAndSettle();expect(tester.widget<TextFormField>(find.byType(TextFormField).first).controller?.text,'Test Citizen');expect(tester.widget<TextFormField>(find.byType(TextFormField).at(1)).controller?.text,'citizen@example.test');expect(tester.takeException(),isNull);
  });
