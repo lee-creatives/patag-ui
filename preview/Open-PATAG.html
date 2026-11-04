@@ -179,8 +179,10 @@ body:not(.citizen-mode) .sidebar{top:32px!important}body:not(.citizen-mode) .top
 .auth-recovery .auth-links{justify-content:flex-start;border-top:0;margin-top:0;padding-top:0}
 
 /* Citizen onboarding lives inside the approved browser app and keeps a phone-first frame. */
+html:has(body.citizen-mode){scrollbar-gutter:stable}
 .citizen-mode:has(.citizen-onboarding-shell){background:var(--raised,#eef2f6)}
-.citizen-onboarding-shell{width:100%;max-width:460px;min-height:calc(100dvh - 32px);margin:0 auto;display:flex;flex-direction:column;background:var(--ground);overflow:hidden}
+.citizen-onboarding-shell{width:calc(100% - 32px);max-width:440px;min-height:calc(100dvh - 80px);margin:24px auto;display:flex;flex-direction:column;background:var(--ground);border-radius:28px;overflow:hidden;box-shadow:0 25px 60px -15px rgba(15,23,42,.14),0 0 0 1px rgba(15,23,42,.04)}
+[data-theme=dark] .citizen-onboarding-shell{box-shadow:0 25px 60px -15px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.08)}
 .onboarding-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 22px 10px}
 .onboarding-header>img{width:100px;height:42px;object-fit:contain;background:transparent}
 [data-theme=dark] .onboarding-header>img{filter:brightness(0) invert(1)}
@@ -205,7 +207,7 @@ body:not(.citizen-mode) .sidebar{top:32px!important}body:not(.citizen-mode) .top
 @keyframes onboarding-float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-7px) scale(1.012)}}
 @media(max-height:700px){.onboarding-header{padding-top:12px}.onboarding-main{padding-top:4px}.onboarding-visual{aspect-ratio:1.7/1;max-height:300px}.onboarding-copy{padding-top:16px}.onboarding-copy h1{font-size:25px;margin-bottom:7px}.onboarding-copy p{font-size:13px;line-height:1.45}.onboarding-progress{margin-top:12px}.onboarding-actions{padding-top:8px;padding-bottom:14px}}
 @media(max-width:340px){.onboarding-header,.onboarding-main,.onboarding-actions{padding-left:16px;padding-right:16px}.onboarding-copy h1{font-size:25px}.onboarding-actions{gap:8px}.onboarding-back{flex-basis:82px}}
-@media(min-width:700px){.citizen-onboarding-shell{min-height:820px;max-height:900px;margin:24px auto;border-radius:32px;box-shadow:0 25px 70px rgba(15,23,42,.18)}}
+@media(min-width:700px){.citizen-onboarding-shell{min-height:820px;max-height:900px}}
 @media(prefers-reduced-motion:reduce){.onboarding-visual img{animation:none}.onboarding-progress span{transition:none}}
 
 /* Universal callout, notice, and error styling with dark/light mode pairing */
