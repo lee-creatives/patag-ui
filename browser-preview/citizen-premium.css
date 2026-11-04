@@ -172,6 +172,36 @@ body:not(.citizen-mode) .sidebar{top:32px!important}body:not(.citizen-mode) .top
 .auth-recovery{padding:14px 0}
 .auth-recovery .auth-links{justify-content:flex-start;border-top:0;margin-top:0;padding-top:0}
 
+/* Citizen onboarding lives inside the approved browser app and keeps a phone-first frame. */
+.citizen-mode:has(.citizen-onboarding-shell){background:var(--raised,#eef2f6)}
+.citizen-onboarding-shell{width:100%;max-width:460px;min-height:calc(100dvh - 32px);margin:0 auto;display:flex;flex-direction:column;background:var(--ground);overflow:hidden}
+.onboarding-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 22px 10px}
+.onboarding-header>img{width:100px;height:42px;object-fit:contain;background:transparent}
+[data-theme=dark] .onboarding-header>img{filter:brightness(0) invert(1)}
+.onboarding-header>div{display:flex;align-items:center;gap:8px}
+.onboarding-header .icon-button{display:grid;place-items:center;width:42px;height:42px;border:1px solid var(--line);border-radius:50%;background:var(--surface);color:var(--ink)}
+.onboarding-skip{min-height:42px;padding:8px 4px 8px 10px;border:0;background:transparent;color:var(--ink);font-size:13px;font-weight:600}
+.onboarding-main{flex:1;min-height:0;display:flex;flex-direction:column;padding:10px 22px 8px}
+.onboarding-visual{position:relative;display:grid;place-items:center;width:100%;aspect-ratio:1.28/1;max-height:52vh;border:1px solid var(--line);border-radius:28px;overflow:hidden;background:linear-gradient(145deg,color-mix(in srgb,var(--surface) 82%,transparent),color-mix(in srgb,var(--raised) 92%,transparent));box-shadow:var(--shadow)}
+.onboarding-visual:after{content:'';position:absolute;inset:auto 12% 7%;height:18%;border-radius:50%;background:currentColor;opacity:.08;filter:blur(22px)}
+.onboarding-visual img{position:relative;z-index:1;width:100%;height:100%;object-fit:cover;display:block;animation:onboarding-float 4.6s ease-in-out infinite;will-change:transform}
+.onboarding-visual.inspect{color:#46bdf2}.onboarding-visual.location{color:#64e997}.onboarding-visual.repair{color:#ff6a29}
+.onboarding-copy{padding:24px 2px 0}
+.onboarding-copy h1{margin:0 0 10px;color:var(--ink);font-size:clamp(27px,7vw,34px);font-weight:700;line-height:1.08;letter-spacing:-.04em}
+.onboarding-copy p{margin:0;max-width:40ch;color:var(--slate);font-size:14px;line-height:1.6}
+.onboarding-progress{display:flex;align-items:center;gap:7px;margin-top:20px}
+.onboarding-progress span{width:7px;height:7px;border-radius:999px;background:var(--line);transition:width .25s ease,background .25s ease}
+.onboarding-progress span.active{width:28px;background:#ff5d1a}
+.onboarding-actions{display:flex;align-items:center;gap:10px;padding:12px 22px calc(22px + env(safe-area-inset-bottom))}
+.onboarding-actions button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:52px;border-radius:16px;font-size:14px;font-weight:700}
+.onboarding-primary{flex:1;border:0;background:var(--primary-gradient);color:#1b140e;box-shadow:0 10px 24px rgba(246,92,25,.22)}
+.onboarding-back{flex:0 0 92px;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+@keyframes onboarding-float{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-7px) scale(1.012)}}
+@media(max-height:700px){.onboarding-header{padding-top:12px}.onboarding-main{padding-top:4px}.onboarding-visual{aspect-ratio:1.7/1;max-height:300px}.onboarding-copy{padding-top:16px}.onboarding-copy h1{font-size:25px;margin-bottom:7px}.onboarding-copy p{font-size:13px;line-height:1.45}.onboarding-progress{margin-top:12px}.onboarding-actions{padding-top:8px;padding-bottom:14px}}
+@media(max-width:340px){.onboarding-header,.onboarding-main,.onboarding-actions{padding-left:16px;padding-right:16px}.onboarding-copy h1{font-size:25px}.onboarding-actions{gap:8px}.onboarding-back{flex-basis:82px}}
+@media(min-width:700px){.citizen-onboarding-shell{min-height:820px;max-height:900px;margin:24px auto;border-radius:32px;box-shadow:0 25px 70px rgba(15,23,42,.18)}}
+@media(prefers-reduced-motion:reduce){.onboarding-visual img{animation:none}.onboarding-progress span{transition:none}}
+
 /* Universal callout, notice, and error styling with dark/light mode pairing */
 .notice{background:var(--raised)!important;color:var(--ink)!important;border:1px solid var(--line)!important;border-radius:16px!important;padding:16px 18px!important}
 .notice strong{display:block;color:var(--ink)!important;font-weight:600;margin-bottom:6px}
